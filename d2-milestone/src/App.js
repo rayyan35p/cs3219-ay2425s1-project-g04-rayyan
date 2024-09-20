@@ -1,9 +1,9 @@
 import './App.css';
 import {BrowserRouter, Routes, Route} from 'react-router-dom'
 import 'bootstrap/dist/css/bootstrap.min.css'
-import Question from './Question';
-import CreateQn from './CreateQn';
-import UpdateQn from './UpdateQn';
+import Question from './components/question/Question';
+import CreateQn from './components/question/CreateQn';
+import UpdateQn from './components/question/UpdateQn';
 
 function App() {
   return (
