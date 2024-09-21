@@ -2,7 +2,8 @@ import React, { useState } from 'react'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
 
-function CreateQn() {
+
+function CreateQn({handleClose, addQuestion}) {
   const [category, setCategory] = useState([])
   const [complexity, setComplexity] = useState('')
   const [description, setDescription] = useState('')
@@ -12,9 +13,14 @@ function CreateQn() {
 
   const Submit = (e) => {
     e.preventDefault();
-    axios.post("http://localhost:3001/createQuestion", {category, complexity, description, ID, title})
+    const newQuestion = { category, complexity, description, ID, title };
+    axios.post("http://localhost:3001/createQuestion", newQuestion)
     .then(result => {
-        console.log(result)
+        console.log(result.data)
+        // Add the new question to the question list in Question.jsx
+        // TODO: either map the fields in result.data to match frontend OR unify
+        addQuestion(result.data)
+        handleClose()
         navigate('/')
       } 
     )
@@ -22,10 +28,9 @@ function CreateQn() {
   }
 
   return (
-    <div className='d-flex vh-100 bg-primary justify-content-center align-items-center'>
-        <div className="w-50 bg-white rounded p-3">
+    <div className='d-flex bg-primary justify-content-center align-items-center'>
+        <div className="w-100 bg-white p-3">
             <form onSubmit={Submit}>
-                <h2>Add Question</h2>
                 <div className="mb-2">
                     <label htmlFor="">Category</label>
                     <input type="text" placeholder='Data Structures' className='form-control'
