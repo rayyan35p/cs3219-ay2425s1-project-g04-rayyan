@@ -16,6 +16,8 @@ function Question() {
     return (
         <div className="table-outer-container">
             <div className='table-inner-container'>
+            <button className="Add-button">Add+</button>
+
                 <table className='table'>
                     <thead>
                     <tr>
