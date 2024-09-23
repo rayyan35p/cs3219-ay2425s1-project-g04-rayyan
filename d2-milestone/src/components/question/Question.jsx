@@ -3,6 +3,8 @@ import React, { useState, useEffect } from 'react';
 import { Link, } from 'react-router-dom';
 import CreateQn from "./CreateQn";
 import Modal from "react-bootstrap/Modal";
+import Table from "react-bootstrap/Table";
+import ButtonGroup from "react-bootstrap/ButtonGroup"
 
 function Question() {
     const [questions, setQuestions] = useState([]);
@@ -10,82 +12,158 @@ function Question() {
     const handleShow = () => setShowComponent(true);
     const handleClose = () => setShowComponent(false);
 
-  useEffect(() => {
-    axios.get('http://localhost:3001')
-    .then(result => {
-        setQuestions(result.data)
-    })
-    .catch(err => console.log(err))
-  }, [])
+    useEffect(() => {
+        axios.get('http://localhost:3001')
+        .then(result => {
+            setQuestions(result.data)
+        })
+        .catch(err => console.log(err))
+    }, [])
 
+    const easyQuestions = questions.filter(q => q.Complexity == "Easy")
+    const mediumQuestions = questions.filter(q => q.Complexity == "Medium")
+    const hardQuestions = questions.filter(q => q.Complexity == "Hard")
+    
     const addQuestion = (newQuestion) => {
         setQuestions((prevQuestions) => [...prevQuestions, newQuestion]);
     };
 
-  const handleDelete = (id) => {
+    const handleDelete = (id) => {
     axios.delete("http://localhost:3001/deleteQuestion/" + id)
     .then(res => {
         console.log(res)
         window.location.reload()
-  })
+    })
     .catch(err => console.log(err))
-  }
+    }
 
   return (
-    <div className="d-flex vh-50 bg-primary justify-content-center align-items-center">
-        <div className='w-50 bg-white rounded p-3'>
-            <button className="btn btn-primary mt-3"
-                    onClick={() => handleShow()}>
-                {showComponent ? 'Hide' : 'Add question'}
-            </button>
+    <div className="d-flex">
+        <div className='bg-white rounded p-3 m-3'>
+            <div className="d-flex justify-content-between">
+                <h1>Questions</h1>
+                <button className="btn btn-primary mt-3" onClick={() => handleShow()}>
+                    {showComponent ? 'Hide' : 'Add question'}
+                </button>
 
-            {/* Modal to display the CreateQn form */}
-            <Modal show={showComponent} onHide={handleClose}>
-                <Modal.Header closeButton>
-                    <Modal.Title>Add New Question</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <CreateQn handleClose={handleClose} addQuestion={addQuestion}/>
-                </Modal.Body>
-            </Modal>
-
+                {/* Modal to display the CreateQn form */}
+                <Modal show={showComponent} onHide={handleClose}>
+                    <Modal.Header closeButton>
+                        <Modal.Title>Add New Question</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <CreateQn handleClose={handleClose} addQuestion={addQuestion}/>
+                    </Modal.Body>
+                </Modal>
+            </div>
             <hr/>
 
+            <div className="container">
+            <h2 className="p-2">Easy Questions</h2>
 
-            <table className='table'>
+            <Table>
                 <thead>
                 <tr>
-                    <th>Category</th>
-                    <th>Complexity</th>
-                    <th>Description</th>
-                    <th>ID</th>
                     <th>Title</th>
+                    <th>Description</th>
+                    <th>Category</th>
                     <th>Action</th>
                 </tr>
                 </thead>
                 <tbody>
                 {
-                    questions.map((question) => {
+                    easyQuestions.map((question) => {
                         return <tr>
-                            <td>{question.Category ? question.Category.join(", ") : ''}</td>
-                            <td>{question.Complexity}</td>
-                            <td>{question.Description}</td>
-                            <td>{question.ID}</td>
                             <td>{question.Title}</td>
+                            <td>{question.Description}</td>
+                            <td>{question.Category ? question.Category.join(", ") : ''}</td>
                             <td>
-                                <Link to={`/update/${question.DB_id}`} className='btn btn-success'>Edit</Link>
-                                <button className='btn btn-danger'
-                                        onClick={(e) => handleDelete(question.DB_id)}>Delete
-                                </button>
+                                <ButtonGroup className="mb-2">
+                                    <Link to={`/update/${question.DB_id}`} className='btn btn-success'>Edit</Link>
+                                    <button className='btn btn-danger' size="sm"
+                                        onClick={(e) => handleDelete(question.DB_id)}>
+                                            Delete
+                                    </button>
+                                </ButtonGroup>
                             </td>
                         </tr>
                     })
                 }
                 </tbody>
-            </table>
+            </Table>
+
+            <h2 className="p-2">Medium Questions</h2>
+
+            <Table>
+                <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Description</th>
+                    <th>Category</th>
+                    <th>Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                {
+                    mediumQuestions.map((question) => {
+                        return <tr>
+                            <td>{question.Title}</td>
+                            <td>{question.Description}</td>
+                            <td>{question.Category ? question.Category.join(", ") : ''}</td>
+                            <td>
+                                <ButtonGroup className="mb-2">
+                                    <Link to={`/update/${question.DB_id}`} className='btn btn-success'>Edit</Link>
+                                    <button className='btn btn-danger' size="sm"
+                                        onClick={(e) => handleDelete(question.DB_id)}>
+                                            Delete
+                                    </button>
+                                </ButtonGroup>
+                            </td>
+                        </tr>
+                    })
+                }
+                </tbody>
+            </Table>
+
+            <h2 className="p-2">Hard Questions</h2>
+
+            <Table>
+                <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Description</th>
+                    <th>Category</th>
+                    <th>Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                {
+                    hardQuestions.map((question) => {
+                        return <tr>
+                            <td>{question.Title}</td>
+                            <td>{question.Description}</td>
+                            <td>{question.Category ? question.Category.join(", ") : ''}</td>
+                            <td>
+                                <ButtonGroup className="mb-2">
+                                    <Link to={`/update/${question.DB_id}`} className='btn btn-success'>Edit</Link>
+                                    <button className='btn btn-danger' size="sm"
+                                        onClick={(e) => handleDelete(question.DB_id)}>
+                                            Delete
+                                    </button>
+                                </ButtonGroup>
+                            </td>
+                        </tr>
+                    })
+                }
+                </tbody>
+            </Table>
+            </div>
+
+
+
         </div>
     </div>
   )
 }
 
-export default Question
+export default Question;
