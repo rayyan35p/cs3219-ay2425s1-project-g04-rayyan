@@ -1,10 +1,9 @@
 import Container from 'react-bootstrap/Container';
 import Navbar from 'react-bootstrap/Navbar';
-import Nav from 'react-bootstrap/Nav';
 
 function NavigationBar() {
     return (
-        <Navbar className='bg-light'>
+        <Navbar className='bg-light' sticky="top">
             <Container>
                 <Navbar.Brand>PeerPrep</Navbar.Brand>
             </Container>

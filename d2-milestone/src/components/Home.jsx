@@ -4,10 +4,10 @@ import Sidebar from './Sidebar';
 
 function Home() {
     return(
-        <div className="home-page">
+        <div>
             <NavigationBar/>
             <div className="row">
-                <div className="col-4">
+                <div className="Navbar col-4">
                     <Sidebar/>
                 </div>
                 <div className="col-8">
