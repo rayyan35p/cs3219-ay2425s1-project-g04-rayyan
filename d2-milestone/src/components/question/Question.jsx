@@ -59,108 +59,105 @@ function Question() {
             <hr/>
 
             <div className="container">
-            <h2 className="p-2">Easy Questions</h2>
+                <h2 className="p-2">Easy Questions</h2>
 
-            <Table>
-                <thead>
-                <tr>
-                    <th>Title</th>
-                    <th>Description</th>
-                    <th>Category</th>
-                    <th>Action</th>
-                </tr>
-                </thead>
-                <tbody>
-                {
-                    easyQuestions.map((question) => {
-                        return <tr>
-                            <td>{question.Title}</td>
-                            <td>{question.Description}</td>
-                            <td>{question.Category ? question.Category.join(", ") : ''}</td>
-                            <td>
-                                <ButtonGroup className="mb-2">
-                                    <Link to={`/update/${question.DB_id}`} className='btn btn-success'>Edit</Link>
-                                    <button className='btn btn-danger' size="sm"
-                                        onClick={(e) => handleDelete(question.DB_id)}>
-                                            Delete
-                                    </button>
-                                </ButtonGroup>
-                            </td>
-                        </tr>
-                    })
-                }
-                </tbody>
-            </Table>
+                <Table>
+                    <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Description</th>
+                        <th>Category</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {
+                        easyQuestions.map((question) => {
+                            return <tr>
+                                <td>{question.Title}</td>
+                                <td>{question.Description}</td>
+                                <td>{question.Category ? question.Category.join(", ") : ''}</td>
+                                <td>
+                                    <ButtonGroup className="mb-2">
+                                        <Link to={`/update/${question.DB_id}`} className='btn btn-success'>Edit</Link>
+                                        <button className='btn btn-danger' size="sm"
+                                            onClick={(e) => handleDelete(question.DB_id)}>
+                                                Delete
+                                        </button>
+                                    </ButtonGroup>
+                                </td>
+                            </tr>
+                        })
+                    }
+                    </tbody>
+                </Table>
 
-            <h2 className="p-2">Medium Questions</h2>
+                <h2 className="p-2">Medium Questions</h2>
 
-            <Table>
-                <thead>
-                <tr>
-                    <th>Title</th>
-                    <th>Description</th>
-                    <th>Category</th>
-                    <th>Action</th>
-                </tr>
-                </thead>
-                <tbody>
-                {
-                    mediumQuestions.map((question) => {
-                        return <tr>
-                            <td>{question.Title}</td>
-                            <td>{question.Description}</td>
-                            <td>{question.Category ? question.Category.join(", ") : ''}</td>
-                            <td>
-                                <ButtonGroup className="mb-2">
-                                    <Link to={`/update/${question.DB_id}`} className='btn btn-success'>Edit</Link>
-                                    <button className='btn btn-danger' size="sm"
-                                        onClick={(e) => handleDelete(question.DB_id)}>
-                                            Delete
-                                    </button>
-                                </ButtonGroup>
-                            </td>
-                        </tr>
-                    })
-                }
-                </tbody>
-            </Table>
+                <Table>
+                    <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Description</th>
+                        <th>Category</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {
+                        mediumQuestions.map((question) => {
+                            return <tr>
+                                <td>{question.Title}</td>
+                                <td>{question.Description}</td>
+                                <td>{question.Category ? question.Category.join(", ") : ''}</td>
+                                <td>
+                                    <ButtonGroup className="mb-2">
+                                        <Link to={`/update/${question.DB_id}`} className='btn btn-success'>Edit</Link>
+                                        <button className='btn btn-danger' size="sm"
+                                            onClick={(e) => handleDelete(question.DB_id)}>
+                                                Delete
+                                        </button>
+                                    </ButtonGroup>
+                                </td>
+                            </tr>
+                        })
+                    }
+                    </tbody>
+                </Table>
 
-            <h2 className="p-2">Hard Questions</h2>
+                <h2 className="p-2">Hard Questions</h2>
 
-            <Table>
-                <thead>
-                <tr>
-                    <th>Title</th>
-                    <th>Description</th>
-                    <th>Category</th>
-                    <th>Action</th>
-                </tr>
-                </thead>
-                <tbody>
-                {
-                    hardQuestions.map((question) => {
-                        return <tr>
-                            <td>{question.Title}</td>
-                            <td>{question.Description}</td>
-                            <td>{question.Category ? question.Category.join(", ") : ''}</td>
-                            <td>
-                                <ButtonGroup className="mb-2">
-                                    <Link to={`/update/${question.DB_id}`} className='btn btn-success'>Edit</Link>
-                                    <button className='btn btn-danger' size="sm"
-                                        onClick={(e) => handleDelete(question.DB_id)}>
-                                            Delete
-                                    </button>
-                                </ButtonGroup>
-                            </td>
-                        </tr>
-                    })
-                }
-                </tbody>
-            </Table>
+                <Table>
+                    <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Description</th>
+                        <th>Category</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {
+                        hardQuestions.map((question) => {
+                            return <tr>
+                                <td>{question.Title}</td>
+                                <td>{question.Description}</td>
+                                <td>{question.Category ? question.Category.join(", ") : ''}</td>
+                                <td>
+                                    <ButtonGroup className="mb-2">
+                                        <Link to={`/update/${question.DB_id}`} className='btn btn-success'>Edit</Link>
+                                        <button className='btn btn-danger' size="sm"
+                                            onClick={(e) => handleDelete(question.DB_id)}>
+                                                Delete
+                                        </button>
+                                    </ButtonGroup>
+                                </td>
+                            </tr>
+                        })
+                    }
+                    </tbody>
+                </Table>
             </div>
-
-
-
         </div>
     </div>
   )
