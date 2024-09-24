@@ -1,10 +1,10 @@
-import axios from 'axios';
 import React, { useState, useEffect } from 'react';
 import { Link, } from 'react-router-dom';
 import CreateQn from "./CreateQn";
 import Modal from "react-bootstrap/Modal";
 import Table from "react-bootstrap/Table";
 import ButtonGroup from "react-bootstrap/ButtonGroup"
+import questionService from "../../services/questions"
 
 function Question() {
     const [questions, setQuestions] = useState([]);
@@ -13,7 +13,7 @@ function Question() {
     const handleClose = () => setShowComponent(false);
 
     useEffect(() => {
-        axios.get('http://localhost:3001/questions')
+        questionService.getAll()
         .then(result => {
             console.log(result.data)
             setQuestions(result.data)
@@ -30,7 +30,7 @@ function Question() {
     };
 
     const handleDelete = (id) => {
-    axios.delete("http://localhost:3001/deleteQuestion/" + id)
+    questionService.deleteQuestion(id)
     .then(res => {
         console.log(res)
         window.location.reload()

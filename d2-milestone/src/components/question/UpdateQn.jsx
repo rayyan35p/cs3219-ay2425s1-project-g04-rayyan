@@ -1,7 +1,7 @@
 import React from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useState, useEffect } from 'react'
-import axios from 'axios'
+import questionService from "../../services/questions"
 
 function UpdateQn() {
   const {question_db_id} = useParams()
@@ -18,7 +18,7 @@ function UpdateQn() {
   useEffect(() => {
     // console.log("Fetching question with ID:", id);
     // get the result 
-    axios.get('http://localhost:3001/getQuestion/' + question_db_id)
+    questionService.get(question_db_id)
     .then(result => {
         console.log(result)
         setCategory(result.data.category)
@@ -32,7 +32,7 @@ function UpdateQn() {
 
   const Update = (e) => {
     e.preventDefault()
-    axios.put("http://localhost:3001/updateQuestion/" + question_db_id, {category, complexity, description, id, title})
+    questionService.updateQuestion(question_db_id, {category, complexity, description, id, title})
     .then(result => {
         console.log(result)
         navigate('/')

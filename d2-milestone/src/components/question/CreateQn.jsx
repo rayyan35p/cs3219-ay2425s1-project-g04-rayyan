@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
-import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
+import questionService from "../../services/questions"
 
 
 function CreateQn({handleClose, addQuestion}) {
@@ -15,7 +15,7 @@ function CreateQn({handleClose, addQuestion}) {
     e.preventDefault();
     const newQuestion = { category, complexity, description, id, title};
     //console.log(newQuestion)
-    axios.post("http://localhost:3001/createQuestion", newQuestion)
+    questionService.createQuestion(newQuestion)
     .then(result => {
         // Add the new question to the question list in Question.jsx
         console.log(result.data)
