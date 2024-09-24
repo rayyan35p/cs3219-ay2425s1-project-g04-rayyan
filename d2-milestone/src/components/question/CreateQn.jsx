@@ -1,23 +1,24 @@
 import React, { useState } from 'react'
-import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
+import questionService from "../../services/questions"
 
 
 function CreateQn({handleClose, addQuestion}) {
-  const [question_cat, setCategory] = useState([])
-  const [question_complex, setComplexity] = useState('')
-  const [question_desc, setDescription] = useState('')
-  const [question_id, setID] = useState('')
-  const [question_title, setTitle] = useState('')
+  const [category, setCategory] = useState([])
+  const [complexity, setComplexity] = useState('')
+  const [description, setDescription] = useState('')
+  const [id, setID] = useState('')
+  const [title, setTitle] = useState('')
   const navigate = useNavigate()
 
   const Submit = (e) => {
     e.preventDefault();
-    const newQuestion = { question_cat, question_complex, question_desc, question_id, question_title};
-    axios.post("http://localhost:3001/createQuestion", newQuestion)
+    const newQuestion = { category, complexity, description, id, title};
+    //console.log(newQuestion)
+    questionService.createQuestion(newQuestion)
     .then(result => {
-        console.log(result.data)
         // Add the new question to the question list in Question.jsx
+        console.log(result.data)
         addQuestion(result.data)
         handleClose()
         navigate('/')

@@ -12,7 +12,7 @@ function App() {
       <Routes>
         <Route path='/' element={<Home/>}></Route>
         <Route path='/create' element={<CreateQn/>}></Route>
-        <Route path='/update/:id' element={<UpdateQn/>}></Route>
+        <Route path='/update/:question_db_id' element={<UpdateQn/>}></Route>
       </Routes>
       </BrowserRouter>
     </div>
