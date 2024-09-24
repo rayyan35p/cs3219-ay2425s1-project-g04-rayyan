@@ -27,7 +27,6 @@ app.get("/", (req, res) => {
     // find() method is specific to MongoDB
     QuestionModel.find({})
     .then(questions => {
-        //console.log(questions)
     //console.log("Data found: ", mappedData);
     res.json(questions);
 })
@@ -48,7 +47,7 @@ app.get("/getQuestion/:id", (req, res) => {
 
         // Since `findById` returns a single document, we don't need `map`
         if (question) { // Check if question is found
-            console.log("Data found: ", mappedData);
+            console.log("Data found: ", question);
             res.json(question);
         } else {
             // If no question is found with that ID
@@ -89,16 +88,6 @@ app.delete("/deleteQuestion/:id", (req, res) => {
 /***************************************************** CREATE API ******************************************************************/
 app.post("/createQuestion", (req, res) => {
     console.log('Incoming Data:', req.body)
-
-    /*
-    const mappedData = {
-        question_cat: req.body.category,
-        question_complex: req.body.complexity,
-        question_desc: req.body.description, 
-        question_id: req.body.ID,
-        question_title: req.body.title,
-    };
-    */
 
     QuestionModel.create(req.body)
 

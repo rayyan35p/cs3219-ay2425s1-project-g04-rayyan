@@ -53,15 +53,15 @@ function UpdateQn() {
                 <div className="container mt-3">
                     <h3>Complexity</h3>
                     <div className="form-check">
-                        <input type="radio" id="easy" value="Easy" checked={question_cat === "Easy"} onChange={(e) => setComplexity(e.target.value)}/>
+                        <input type="radio" id="easy" value="Easy" checked={question_complex === "Easy"} onChange={(e) => setComplexity(e.target.value)}/>
                         <label className="form-check-label" htmlFor="easy">Easy</label>
                     </div>
                     <div className="form-check">
-                        <input type="radio" id="medium" value="Medium" checked={question_cat === "Medium"} onChange={(e) => setComplexity(e.target.value)}/>
+                        <input type="radio" id="medium" value="Medium" checked={question_complex === "Medium"} onChange={(e) => setComplexity(e.target.value)}/>
                         <label className="form-check-label" htmlFor="medium">Medium</label>
                     </div>
                     <div className="form-check">
-                        <input type="radio" id="hard" value="Hard" checked={question_cat === "Hard"} onChange={(e) => setComplexity(e.target.value)}/>
+                        <input type="radio" id="hard" value="Hard" checked={question_complex === "Hard"} onChange={(e) => setComplexity(e.target.value)}/>
                         <label className="form-check-label" htmlFor="hard">Hard</label>
                     </div>
                 </div>
