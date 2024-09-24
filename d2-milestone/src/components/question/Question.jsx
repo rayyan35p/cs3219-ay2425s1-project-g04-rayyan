@@ -4,6 +4,7 @@ import Modal from "react-bootstrap/Modal";
 import Table from "react-bootstrap/Table";
 import ButtonGroup from "react-bootstrap/ButtonGroup";
 import CreateQn from "./CreateQn";
+import UpdateQn from "./UpdateQn";
 import questionService from "../../services/questions"
 
 function Question() {
@@ -11,7 +12,9 @@ function Question() {
     const [showComponent, setShowComponent] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [questionToDelete, setQuestionToDelete] = useState(null);
-
+    const [showEditModal, setShowEditModal] = useState(false);
+    const [currentQuestion, setCurrentQuestion] = useState({});
+    
     const handleShow = () => setShowComponent(true);
     const handleClose = () => setShowComponent(false);
 
@@ -29,6 +32,13 @@ function Question() {
     
     const addQuestion = (newQuestion) => {
         setQuestions((prevQuestions) => [...prevQuestions, newQuestion]);
+    };
+
+    const editQuestion = (id, updatedQuestion) => {
+        const updatedQuestions = questions.map((q) =>
+            q.id === id ? { ...q, ...updatedQuestion } : q
+        );
+        setQuestions(updatedQuestions);
     };
 
     // Show the delete confirmation modal
@@ -54,6 +64,7 @@ function Question() {
             .catch(err => console.log(err));
         }
     };
+
 
     return (
         <div className="d-flex">
@@ -95,13 +106,38 @@ function Question() {
                                   <td>{question.description}</td>
                                   <td>{question.category ? question.category.join(", ") : ''}</td>
                                   <td>
-                                      <ButtonGroup className="mb-2">
-                                          <Link to={`/update/${question._id}`} className='btn btn-success'>Edit</Link>
-                                          <button className='btn btn-danger' size="sm"
-                                              onClick={(e) => handleShowDelete(question._id)}>
-                                                  Delete
-                                          </button>
-                                      </ButtonGroup>
+                                  <ButtonGroup className="mb-2">
+                                    
+                                    {/* Edit Button */}
+                                    <button 
+                                        className='btn btn-success' 
+                                        onClick={() => {
+                                            setCurrentQuestion(question); // Set the question to be edited
+                                            setShowEditModal(true); // Show the edit modal
+                                        }}
+                                    >
+                                        Edit
+                                    </button>
+                                        <button className='btn btn-danger' size="sm"
+                                            onClick={(e) => handleShowDelete(question._id)}>
+                                                Delete
+                                        </button>
+                                    </ButtonGroup>
+
+                                    {/* Edit Modal */}
+                                    <Modal show={showEditModal} onHide={() => setShowEditModal(false)}>
+                                        <Modal.Header closeButton>
+                                            <Modal.Title>Edit Question</Modal.Title>
+                                        </Modal.Header>
+                                        <Modal.Body>
+                                            <UpdateQn 
+                                                question={currentQuestion} 
+                                                handleClose={() => setShowEditModal(false)} 
+                                                editQuestion={editQuestion} // Your edit function
+                                            />
+                                        </Modal.Body>
+                                    </Modal>
+
                                   </td>
                               </tr>
                           })

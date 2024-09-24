@@ -3,42 +3,39 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import questionService from "../../services/questions"
 
-function UpdateQn() {
-  const {question_db_id} = useParams()
-  console.log(question_db_id)
+function UpdateQn({question, handleClose, editQuestion}) {
 
-  const [category, setCategory] = useState([])
-  const [complexity, setComplexity] = useState('')
-  const [description, setDescription] = useState('')
-  const [id, setID] = useState('')
-  const [title, setTitle] = useState('')
-  const navigate = useNavigate()
+  console.log("question_db_id is: ", question._id)
 
-  // update the question 
-  useEffect(() => {
-    // console.log("Fetching question with ID:", id);
-    // get the result 
-    questionService.get(question_db_id)
-    .then(result => {
-        console.log(result)
-        setCategory(result.data.category)
-        setComplexity(result.data.complexity)
-        setDescription(result.data.description)
-        setID(result.data.id)
-        setTitle(result.data.title)
-    })
-    .catch(err => console.log(err))
-  }, [])
+  const [category, setCategory] = useState(question.category)
+  const [complexity, setComplexity] = useState(question.complexity)
+  const [description, setDescription] = useState(question.description)
+  const [id, setID] = useState(question.id);
+  const [title, setTitle] = useState(question.title)
 
   const Update = (e) => {
     e.preventDefault()
-    questionService.updateQuestion(question_db_id, {category, complexity, description, id, title})
-    .then(result => {
-        console.log(result)
-        navigate('/')
-      } 
-    )
-  }
+    // console.log("Update triggered")
+
+    const updatedQuestion = {
+        category, 
+        complexity, 
+        description, 
+        id, 
+        title,
+    };
+
+    questionService.updateQuestion(question._id, {category, complexity, description, id, title})
+        .then(result => {
+            console.log('Question edited successfully:', result)
+            
+            editQuestion(id, updatedQuestion);
+            handleClose(); 
+        })
+        .catch(e => {
+            console.error('Error updateding question:', e);
+        });
+};
 
   return (
     <div className='d-flex vh-100 bg-primary justify-content-center align-items-center'>
