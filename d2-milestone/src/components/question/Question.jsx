@@ -13,16 +13,17 @@ function Question() {
     const handleClose = () => setShowComponent(false);
 
     useEffect(() => {
-        axios.get('http://localhost:3001')
+        axios.get('http://localhost:3001/questions')
         .then(result => {
+            console.log(result.data)
             setQuestions(result.data)
         })
         .catch(err => console.log(err))
     }, [])
 
-    const easyQuestions = questions.filter(q => q.question_complex == "Easy")
-    const mediumQuestions = questions.filter(q => q.question_complex == "Medium")
-    const hardQuestions = questions.filter(q => q.question_complex == "Hard")
+    const easyQuestions = questions.filter(q => q.complexity == "Easy")
+    const mediumQuestions = questions.filter(q => q.complexity == "Medium")
+    const hardQuestions = questions.filter(q => q.complexity == "Hard")
     
     const addQuestion = (newQuestion) => {
         setQuestions((prevQuestions) => [...prevQuestions, newQuestion]);
@@ -74,9 +75,9 @@ function Question() {
                     {
                         easyQuestions.map((question) => {
                             return <tr>
-                                <td>{question.question_title}</td>
-                                <td>{question.question_desc}</td>
-                                <td>{question.question_cat ? question.question_cat.join(", ") : ''}</td>
+                                <td>{question.title}</td>
+                                <td>{question.description}</td>
+                                <td>{question.category ? question.category.join(", ") : ''}</td>
                                 <td>
                                     <ButtonGroup className="mb-2">
                                         <Link to={`/update/${question._id}`} className='btn btn-success'>Edit</Link>
@@ -107,9 +108,9 @@ function Question() {
                     {
                         mediumQuestions.map((question) => {
                             return <tr>
-                                <td>{question.question_title}</td>
-                                <td>{question.question_desc}</td>
-                                <td>{question.question_cat ? question.question_cat.join(", ") : ''}</td>
+                                <td>{question.title}</td>
+                                <td>{question.description}</td>
+                                <td>{question.category ? question.category.join(", ") : ''}</td>
                                 <td>
                                     <ButtonGroup className="mb-2">
                                         <Link to={`/update/${question._id}`} className='btn btn-success'>Edit</Link>
@@ -140,9 +141,9 @@ function Question() {
                     {
                         hardQuestions.map((question) => {
                             return <tr>
-                                <td>{question.question_title}</td>
-                                <td>{question.question_desc}</td>
-                                <td>{question.question_cat ? question.question_cat.join(", ") : ''}</td>
+                                <td>{question.title}</td>
+                                <td>{question.description}</td>
+                                <td>{question.category ? question.category.join(", ") : ''}</td>
                                 <td>
                                     <ButtonGroup className="mb-2">
                                         <Link to={`/update/${question._id}`} className='btn btn-success'>Edit</Link>

@@ -22,12 +22,12 @@ app.listen(3001, () => {
 })
 
 /************************************************************* READ API **************************************************************/
-app.get("/", (req, res) => {
+app.get("/questions", (req, res) => {
 
     // find() method is specific to MongoDB
     QuestionModel.find({})
     .then(questions => {
-    //console.log("Data found: ", mappedData);
+    //console.log("Data found: ", questions);
     res.json(questions);
 })
     .catch(err => res.json(err))
@@ -63,11 +63,11 @@ app.put('/updateQuestion/:id', (req, res) => {
 
     // do {_id:id} because we want to cast the String type id to Object type id 
     QuestionModel.findByIdAndUpdate({_id:id}, 
-        {question_cat: req.body.question_cat,
-        question_complex: req.body.question_complex,
-        question_desc: req.body.question_desc, 
-        question_id: req.body.question_id,
-        question_title: req.body.question_title})
+        {category: req.body.category,
+        complexity: req.body.complexity,
+        description: req.body.description, 
+        id: req.body.id,
+        title: req.body.title})
 
     .then(question => res.json(question))
     .catch(err => res.json(err));
@@ -87,13 +87,13 @@ app.delete("/deleteQuestion/:id", (req, res) => {
 
 /***************************************************** CREATE API ******************************************************************/
 app.post("/createQuestion", (req, res) => {
-    console.log('Incoming Data:', req.body)
-
+    //console.log('Incoming Data:', req.body)
     QuestionModel.create(req.body)
 
     .then(question => res.json(question))
     .catch(err => res.json(err));
 })
 /***************************************************** CREATE API ******************************************************************/
+
 
 
