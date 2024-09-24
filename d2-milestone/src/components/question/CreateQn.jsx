@@ -4,21 +4,20 @@ import { useNavigate } from 'react-router-dom'
 
 
 function CreateQn({handleClose, addQuestion}) {
-  const [category, setCategory] = useState([])
-  const [complexity, setComplexity] = useState('')
-  const [description, setDescription] = useState('')
-  const [ID, setID] = useState('')
-  const [title, setTitle] = useState('')
+  const [question_cat, setCategory] = useState([])
+  const [question_complex, setComplexity] = useState('')
+  const [question_desc, setDescription] = useState('')
+  const [question_id, setID] = useState('')
+  const [question_title, setTitle] = useState('')
   const navigate = useNavigate()
 
   const Submit = (e) => {
     e.preventDefault();
-    const newQuestion = { category, complexity, description, ID, title };
+    const newQuestion = { question_cat, question_complex, question_desc, question_id, question_title};
     axios.post("http://localhost:3001/createQuestion", newQuestion)
     .then(result => {
         console.log(result.data)
         // Add the new question to the question list in Question.jsx
-        // TODO: either map the fields in result.data to match frontend OR unify
         addQuestion(result.data)
         handleClose()
         navigate('/')

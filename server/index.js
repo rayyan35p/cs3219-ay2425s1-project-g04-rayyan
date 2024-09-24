@@ -28,24 +28,8 @@ app.get("/", (req, res) => {
     QuestionModel.find({})
     .then(questions => {
         //console.log(questions)
-
-        // Mapping done because in the cluster 'Questions' the keys are e.g. question_id,
-        // but in the client/src/Question.jsx I refer to the cluster keys in a different
-        // name e.g. question_id -> ID 
-
-        // NOTE: KEYS MAY BE EXCLUDED WHEN YOU DO MAPPING E.G. if in cluster I have a key
-        // __v that I did not map here, you can't access it in frontend
-        const mappedData = questions.map(question => ({
-            DB_id: question._id,
-            Category: question.question_cat,
-            Complexity: question.question_complex,
-            Description: question.question_desc,
-            ID: question.question_id,
-            Title: question.question_title,
-    }));
-
     //console.log("Data found: ", mappedData);
-    res.json(mappedData);
+    res.json(questions);
 })
     .catch(err => res.json(err))
 })
@@ -64,16 +48,8 @@ app.get("/getQuestion/:id", (req, res) => {
 
         // Since `findById` returns a single document, we don't need `map`
         if (question) { // Check if question is found
-            const mappedData = {
-                Category: question.question_cat,
-                Complexity: question.question_complex,
-                Description: question.question_desc,
-                ID: question.question_id,
-                Title: question.question_title,
-            };
-
             console.log("Data found: ", mappedData);
-            res.json(mappedData);
+            res.json(question);
         } else {
             // If no question is found with that ID
             res.status(404).json({ message: "Question not found" });
@@ -88,11 +64,11 @@ app.put('/updateQuestion/:id', (req, res) => {
 
     // do {_id:id} because we want to cast the String type id to Object type id 
     QuestionModel.findByIdAndUpdate({_id:id}, 
-        {question_cat: req.body.category,
-        question_complex: req.body.complexity,
-        question_desc: req.body.description, 
-        question_id: req.body.ID,
-        question_title: req.body.title})
+        {question_cat: req.body.question_cat,
+        question_complex: req.body.question_complex,
+        question_desc: req.body.question_desc, 
+        question_id: req.body.question_id,
+        question_title: req.body.question_title})
 
     .then(question => res.json(question))
     .catch(err => res.json(err));
@@ -114,6 +90,7 @@ app.delete("/deleteQuestion/:id", (req, res) => {
 app.post("/createQuestion", (req, res) => {
     console.log('Incoming Data:', req.body)
 
+    /*
     const mappedData = {
         question_cat: req.body.category,
         question_complex: req.body.complexity,
@@ -121,8 +98,9 @@ app.post("/createQuestion", (req, res) => {
         question_id: req.body.ID,
         question_title: req.body.title,
     };
+    */
 
-    QuestionModel.create(mappedData)
+    QuestionModel.create(req.body)
 
     .then(question => res.json(question))
     .catch(err => res.json(err));
