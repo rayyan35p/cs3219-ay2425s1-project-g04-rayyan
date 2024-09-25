@@ -13,7 +13,7 @@ function Question() {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [questionToDelete, setQuestionToDelete] = useState(null);
     const [showEditModal, setShowEditModal] = useState(false);
-    const [currentQuestion, setCurrentQuestion] = useState({});
+    const [currentQuestion, setCurrentQuestion] = useState(null);
     
     const handleShow = () => setShowComponent(true);
     const handleClose = () => setShowComponent(false);
@@ -106,25 +106,25 @@ function Question() {
                                   <td>{question.description}</td>
                                   <td>{question.category ? question.category.join(", ") : ''}</td>
                                   <td>
-                                  <ButtonGroup className="mb-2">
-                                    
-                                    {/* Edit Button */}
-                                    <button 
-                                        className='btn btn-success' 
-                                        onClick={() => {
-                                            setCurrentQuestion(question); // Set the question to be edited
-                                            setShowEditModal(true); // Show the edit modal
-                                        }}
-                                    >
-                                        Edit
-                                    </button>
+                                    <ButtonGroup className="mb-2">
+                                        {/* Edit button */}
+                                        <button 
+                                            className='btn btn-success' 
+                                            onClick={() => {
+                                                setCurrentQuestion(question); // Set the question to be edited
+                                                setShowEditModal(true); // Show the edit modal
+                                            }}
+                                        >
+                                            Edit
+                                        </button>
+                                        {/* Delete button */}
                                         <button className='btn btn-danger' size="sm"
                                             onClick={(e) => handleShowDelete(question._id)}>
                                                 Delete
                                         </button>
                                     </ButtonGroup>
 
-                                    {/* Edit Modal */}
+                                    {/* Edit modal */}
                                     <Modal show={showEditModal} onHide={() => setShowEditModal(false)}>
                                         <Modal.Header closeButton>
                                             <Modal.Title>Edit Question</Modal.Title>
@@ -133,11 +133,10 @@ function Question() {
                                             <UpdateQn 
                                                 question={currentQuestion} 
                                                 handleClose={() => setShowEditModal(false)} 
-                                                editQuestion={editQuestion} // Your edit function
+                                                editQuestion={editQuestion}
                                             />
                                         </Modal.Body>
                                     </Modal>
-
                                   </td>
                               </tr>
                           })
@@ -164,13 +163,37 @@ function Question() {
                                   <td>{question.description}</td>
                                   <td>{question.category ? question.category.join(", ") : ''}</td>
                                   <td>
-                                      <ButtonGroup className="mb-2">
-                                          <Link to={`/update/${question._id}`} className='btn btn-success'>Edit</Link>
-                                          <button className='btn btn-danger' size="sm"
-                                              onClick={(e) => handleShowDelete(question._id)}>
-                                                  Delete
-                                          </button>
-                                      </ButtonGroup>
+                                    <ButtonGroup className="mb-2">
+                                        {/* Edit button */}
+                                        <button 
+                                            className='btn btn-success' 
+                                            onClick={() => {
+                                                setCurrentQuestion(question); // Set the question to be edited
+                                                setShowEditModal(true); // Show the edit modal
+                                            }}
+                                        >
+                                            Edit
+                                        </button>
+                                        {/* Delete button */}
+                                        <button className='btn btn-danger' size="sm"
+                                            onClick={(e) => handleShowDelete(question._id)}>
+                                                Delete
+                                        </button>
+                                    </ButtonGroup>
+
+                                    {/* Edit modal */}
+                                    <Modal show={showEditModal} onHide={() => setShowEditModal(false)}>
+                                        <Modal.Header closeButton>
+                                            <Modal.Title>Edit Question</Modal.Title>
+                                        </Modal.Header>
+                                        <Modal.Body>
+                                            <UpdateQn 
+                                                question={currentQuestion} 
+                                                handleClose={() => setShowEditModal(false)} 
+                                                editQuestion={editQuestion}
+                                            />
+                                        </Modal.Body>
+                                    </Modal>
                                   </td>
                               </tr>
                           })
@@ -197,13 +220,37 @@ function Question() {
                                   <td>{question.description}</td>
                                   <td>{question.category ? question.category.join(", ") : ''}</td>
                                   <td>
-                                      <ButtonGroup className="mb-2">
-                                          <Link to={`/update/${question._id}`} className='btn btn-success'>Edit</Link>
-                                          <button className='btn btn-danger' size="sm"
-                                              onClick={(e) => handleShowDelete(question._id)}>
-                                                  Delete
-                                          </button>
-                                      </ButtonGroup>
+                                    <ButtonGroup className="mb-2">
+                                        {/* Edit button */}
+                                        <button 
+                                            className='btn btn-success' 
+                                            onClick={() => {
+                                                setCurrentQuestion(question); // Set the question to be edited
+                                                setShowEditModal(true); // Show the edit modal
+                                            }}
+                                        >
+                                            Edit
+                                        </button>
+                                        {/* Delete button */}
+                                        <button className='btn btn-danger' size="sm"
+                                            onClick={(e) => handleShowDelete(question._id)}>
+                                                Delete
+                                        </button>
+                                    </ButtonGroup>
+
+                                    {/* Edit modal */}
+                                    <Modal show={showEditModal} onHide={() => setShowEditModal(false)}>
+                                        <Modal.Header closeButton>
+                                            <Modal.Title>Edit Question</Modal.Title>
+                                        </Modal.Header>
+                                        <Modal.Body>
+                                            <UpdateQn 
+                                                question={currentQuestion} 
+                                                handleClose={() => setShowEditModal(false)} 
+                                                editQuestion={editQuestion}
+                                            />
+                                        </Modal.Body>
+                                    </Modal>
                                   </td>
                               </tr>
                           })
