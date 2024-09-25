@@ -33,30 +33,30 @@ function CreateQn({handleClose, addQuestion}) {
             <form onSubmit={Submit}>
                 <div className="mb-2">
                     <label htmlFor="">Category</label>
-                    <input type="text" placeholder='Data Structures' className='form-control'
+                    <input type="text" placeholder='Data Structures' className='form-control' required
                     onChange={(e) => setCategory(e.target.value.split(","))}/>
                 </div>
                 <div className="container mt-3">
                     <h3>Complexity</h3>
                     <div className="form-check">
-                        <input type="radio" id="easy" value="Easy"
+                        <input type="radio" id="easy" value="Easy" name={"complexity"} required
                         onChange={(e) => setComplexity(e.target.value)}/>
                         <label className="form-check-label" htmlFor="easy">Easy</label>
                     </div>
                     <div className="form-check">
-                        <input type="radio" id="medium" value="Medium"
+                        <input type="radio" id="medium" value="Medium" name={"complexity"} required
                         onChange={(e) => setComplexity(e.target.value)}/>
                         <label className="form-check-label" htmlFor="medium">Medium</label>
                     </div>
                     <div className="form-check">
-                        <input type="radio" id="hard" value="Hard"
+                        <input type="radio" id="hard" value="Hard" name={"complexity"} required
                         onChange={(e) => setComplexity(e.target.value)}/>
                         <label className="form-check-label" htmlFor="hard">Hard</label>
                     </div>
                 </div>
                 <div className="mb-2">
                     <label htmlFor="">Description</label>
-                    <input type="text" placeholder='Return the largest....' className='form-control'
+                    <input type="text" placeholder='Return the largest....' className='form-control' required
                     onChange={(e) => setDescription(e.target.value)}/>
                 </div>
                 <div className="mb-2">
@@ -66,7 +66,7 @@ function CreateQn({handleClose, addQuestion}) {
                 </div>
                 <div className="mb-2">
                     <label htmlFor="">Title</label>
-                    <input type="text" placeholder='Shortest Distance' className='form-control'
+                    <input type="text" placeholder='Shortest Distance' className='form-control' required
                     onChange={(e) => setTitle(e.target.value)}/>
                 </div>
                 <button className="btn btn-success">Submit</button>

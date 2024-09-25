@@ -120,7 +120,7 @@ function Question() {
                         {showComponent ? 'Hide' : 'Add question'}
                     </button>
 
-                    <Modal show={showComponent} onHide={handleClose}>
+                    <Modal show={showComponent} onHide={handleClose} backdrop={"static"}>
                         <Modal.Header closeButton>
                             <Modal.Title>Add New Question</Modal.Title>
                         </Modal.Header>
