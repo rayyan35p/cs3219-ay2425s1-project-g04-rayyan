@@ -1,11 +1,8 @@
 import React from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import questionService from "../../services/questions"
 
 function EditQn({question, handleClose, editQuestion}) {
-
-  console.log("question_db_id is: ", question._id)
 
   const [category, setCategory] = useState(question.category)
   const [complexity, setComplexity] = useState(question.complexity)
@@ -17,8 +14,9 @@ function EditQn({question, handleClose, editQuestion}) {
     e.preventDefault()
 
     // To remove empty strings and extra spaces
-    const categoryString = category.join(", ");
-    const cleanedCategoryArray = categoryString.split(", ").filter(item => item.trim() !== "");
+    const delimeter = ", "
+    const categoryString = category.join(delimeter);
+    const cleanedCategoryArray = categoryString.split(delimeter).filter(item => item.trim() !== "");
 
     const updatedQuestion = {
         category: cleanedCategoryArray,
