@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import questionService from "../../services/questions"
 
-function UpdateQn({question, handleClose, editQuestion}) {
+function EditQn({question, handleClose, editQuestion}) {
 
   console.log("question_db_id is: ", question._id)
 
@@ -15,10 +15,13 @@ function UpdateQn({question, handleClose, editQuestion}) {
 
   const Update = (e) => {
     e.preventDefault()
-    // console.log("Update triggered")
+
+    // To remove empty strings and extra spaces
+    const categoryString = category.join(", ");
+    const cleanedCategoryArray = categoryString.split(", ").filter(item => item.trim() !== "");
 
     const updatedQuestion = {
-        category, 
+        category: cleanedCategoryArray,
         complexity, 
         description, 
         id, 
@@ -38,14 +41,14 @@ function UpdateQn({question, handleClose, editQuestion}) {
 };
 
   return (
-    <div className='d-flex vh-100 bg-primary justify-content-center align-items-center'>
-        <div className="w-50 bg-white rounded p-3">
+    <div className='d-flex bg-primary justify-content-center align-items-center'>
+        <div className="w-100 bg-white p-3">
             <form onSubmit={Update}>
                 <h2>Update Question</h2>
                 <div className="mb-2">
                     <label htmlFor="">Category</label>
                     <input type="text" placeholder='Data Structures' className='form-control'
-                    value={category.join(", ")} onChange={(e) => setCategory(e.target.value.split(","))}/>
+                    value={category.join(",")} onChange={(e) => setCategory(e.target.value.split(","))}/>
                 </div>
                 <div className="container mt-3">
                     <h3>Complexity</h3>
@@ -84,4 +87,4 @@ function UpdateQn({question, handleClose, editQuestion}) {
   )
 }
 
-export default UpdateQn
+export default EditQn
