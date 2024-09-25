@@ -1,54 +1,52 @@
 import React from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import questionService from "../../services/questions"
 
-function UpdateQn() {
-  const {question_db_id} = useParams()
-  console.log(question_db_id)
+function EditQn({question, handleClose, editQuestion}) {
 
-  const [category, setCategory] = useState([])
-  const [complexity, setComplexity] = useState('')
-  const [description, setDescription] = useState('')
-  const [id, setID] = useState('')
-  const [title, setTitle] = useState('')
-  const navigate = useNavigate()
-
-  // update the question 
-  useEffect(() => {
-    // console.log("Fetching question with ID:", id);
-    // get the result 
-    questionService.get(question_db_id)
-    .then(result => {
-        console.log(result)
-        setCategory(result.data.category)
-        setComplexity(result.data.complexity)
-        setDescription(result.data.description)
-        setID(result.data.id)
-        setTitle(result.data.title)
-    })
-    .catch(err => console.log(err))
-  }, [])
+  const [category, setCategory] = useState(question.category)
+  const [complexity, setComplexity] = useState(question.complexity)
+  const [description, setDescription] = useState(question.description)
+  const [id, setID] = useState(question.id);
+  const [title, setTitle] = useState(question.title)
 
   const Update = (e) => {
     e.preventDefault()
-    questionService.updateQuestion(question_db_id, {category, complexity, description, id, title})
-    .then(result => {
-        console.log(result)
-        navigate('/')
-      } 
-    )
-  }
+
+    // To remove empty strings and extra spaces
+    const delimeter = ", "
+    const categoryString = category.join(delimeter);
+    const cleanedCategoryArray = categoryString.split(delimeter).filter(item => item.trim() !== "");
+
+    const updatedQuestion = {
+        category: cleanedCategoryArray,
+        complexity, 
+        description, 
+        id, 
+        title,
+    };
+
+    questionService.updateQuestion(question._id, {category, complexity, description, id, title})
+        .then(result => {
+            console.log('Question edited successfully:', result)
+            
+            editQuestion(id, updatedQuestion);
+            handleClose(); 
+        })
+        .catch(e => {
+            console.error('Error updateding question:', e);
+        });
+};
 
   return (
-    <div className='d-flex vh-100 bg-primary justify-content-center align-items-center'>
-        <div className="w-50 bg-white rounded p-3">
+    <div className='d-flex bg-primary justify-content-center align-items-center'>
+        <div className="w-100 bg-white p-3">
             <form onSubmit={Update}>
                 <h2>Update Question</h2>
                 <div className="mb-2">
                     <label htmlFor="">Category</label>
                     <input type="text" placeholder='Data Structures' className='form-control'
-                    value={category.join(", ")} onChange={(e) => setCategory(e.target.value.split(","))}/>
+                    value={category.join(",")} onChange={(e) => setCategory(e.target.value.split(","))}/>
                 </div>
                 <div className="container mt-3">
                     <h3>Complexity</h3>
@@ -87,4 +85,4 @@ function UpdateQn() {
   )
 }
 
-export default UpdateQn
+export default EditQn
