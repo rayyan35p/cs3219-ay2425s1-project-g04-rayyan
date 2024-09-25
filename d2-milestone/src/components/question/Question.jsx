@@ -14,6 +14,7 @@ function Question() {
     const [questionToDelete, setQuestionToDelete] = useState(null);
     const [showEditModal, setShowEditModal] = useState(false);
     const [currentQuestion, setCurrentQuestion] = useState(null);
+    const [error, setError] = useState("")
     
     const handleShow = () => setShowComponent(true);
     const handleClose = () => setShowComponent(false);
@@ -47,7 +48,10 @@ function Question() {
         setShowEditModal(true);
     }
 
-    const handleCloseEditModal = () => setShowEditModal(false);
+    const handleCloseEditModal = () => {
+        setShowEditModal(false);
+        setError("");
+    }
 
     // Show the delete confirmation modal
     const handleShowDelete = (id) => {
@@ -150,7 +154,10 @@ function Question() {
                                 <EditQn 
                                     question={currentQuestion} 
                                     handleClose={handleCloseEditModal} 
-                                    editQuestion={editQuestion} // Your edit function
+                                    editQuestion={editQuestion}
+                                    error={error}
+                                    setError={setError}
+                                    allQuestions={questions}
                                 />
                             </Modal.Body>
                         </Modal>
