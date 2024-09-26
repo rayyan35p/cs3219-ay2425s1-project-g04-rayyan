@@ -18,7 +18,7 @@ questionsRouter.post("/", async (req, res) => {
         const question = await QuestionModel.create(req.body);
         res.status(201).json(question);
     } catch (error) {
-        if (error.code === 110000) {
+        if (error.code === 11000) {
             return res.status(400).json({ error: "This title is already in use. " });
         } else if (error.name === "ValidationError" || error.name === "CastError" ) {
             const errors = Object.values(error.errors).map(err => err.message);
@@ -55,7 +55,7 @@ questionsRouter.put("/:id", async (req, res) => {
         res.status(200).json(question);
     } catch (error) {
         
-        if (error.code === 110000) {
+        if (error.code === 11000) {
             return res.status(400).json({ error: "This title is already in use. " });
         } else if (error.name === "ValidationError" || error.name === "CastError" ) {
             const errors = Object.values(error.errors).map(err => err.message);
