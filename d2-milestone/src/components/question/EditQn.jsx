@@ -2,16 +2,16 @@ import React from 'react'
 import { useState } from 'react'
 import questionService from "../../services/questions"
 
-function EditQn({question, handleClose, editQuestion}) {
+function EditQn({ question, handleClose, editQuestion }) {
+    const [category, setCategory] = useState(question.category);
+    const [complexity, setComplexity] = useState(question.complexity);
+    const [description, setDescription] = useState(question.description);
+    const [id, setID] = useState(question.id);
+    const [title, setTitle] = useState(question.title);
+    const [error, setError] = useState(null);
 
-  const [category, setCategory] = useState(question.category)
-  const [complexity, setComplexity] = useState(question.complexity)
-  const [description, setDescription] = useState(question.description)
-  const [id, setID] = useState(question.id);
-  const [title, setTitle] = useState(question.title)
-
-  const Update = (e) => {
-    e.preventDefault()
+    const Update = (e) => {
+      e.preventDefault();
 
     // To remove empty strings and extra spaces
     const delimeter = ", "
@@ -25,16 +25,23 @@ function EditQn({question, handleClose, editQuestion}) {
         id, 
         title,
     };
+    console.log("category array: ", cleanedCategoryArray)
+    console.log("db_id:", question._id)
+    console.log(category, complexity, description, id, title);
 
-    questionService.updateQuestion(question._id, {category, complexity, description, id, title})
+    questionService.updateQuestion(question._id, updatedQuestion)
         .then(result => {
-            console.log('Question edited successfully:', result)
             
-            editQuestion(id, updatedQuestion);
+            editQuestion(question._id, updatedQuestion);
+            console.log('Question edited successfully:', result)
             handleClose(); 
         })
         .catch(e => {
-            console.error('Error updateding question:', e);
+            if (e.response && e.response.status === 400) {
+                setError(e.response.data.error)
+                // console.log("error is:", error)
+            }
+            console.error('Error updating question:', e);
         });
 };
 
@@ -43,6 +50,7 @@ function EditQn({question, handleClose, editQuestion}) {
         <div className="w-100 bg-white p-3">
             <form onSubmit={Update}>
                 <h2>Update Question</h2>
+                {error && <div className="alert alert-danger">{error}</div>}
                 <div className="mb-2">
                     <label htmlFor="">Category</label>
                     <input type="text" placeholder='Data Structures' className='form-control'
@@ -65,7 +73,7 @@ function EditQn({question, handleClose, editQuestion}) {
                 </div>
                 <div className="mb-2">
                     <label htmlFor="">Description</label>
-                    <input type="text" placeholder='Return the largest....' className='form-control'
+                    <input type="text" placeholder='Return the largest....' className='form-control' 
                     value={description} onChange={(e) => setDescription(e.target.value)}/>
                 </div>
                 <div className="mb-2">

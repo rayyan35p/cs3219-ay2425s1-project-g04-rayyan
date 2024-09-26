@@ -9,6 +9,7 @@ function CreateQn({handleClose, addQuestion}) {
   const [description, setDescription] = useState('')
   const [id, setID] = useState('')
   const [title, setTitle] = useState('')
+  const [error, setError] = useState(null);
   const navigate = useNavigate()
 
   const Submit = (e) => {
@@ -24,39 +25,46 @@ function CreateQn({handleClose, addQuestion}) {
         navigate('/')
       } 
     )
-    .catch(err => console.log(err))
+    .catch(e => {
+        if (e.response && e.response.status === 400) {
+                setError(e.response.data.error)
+                // console.log("error is:", error)
+            }
+            console.error('Error updating question:', e);
+    })
   }
 
   return (
     <div className='d-flex bg-primary justify-content-center align-items-center'>
         <div className="w-100 bg-white p-3">
             <form onSubmit={Submit}>
+                {error && <div className="alert alert-danger">{error}</div>}
                 <div className="mb-2">
                     <label htmlFor="">Category</label>
-                    <input type="text" placeholder='Data Structures' className='form-control' required
+                    <input type="text" placeholder='Data Structures' className='form-control'
                     onChange={(e) => setCategory(e.target.value.split(","))}/>
                 </div>
                 <div className="container mt-3">
                     <h3>Complexity</h3>
                     <div className="form-check">
-                        <input type="radio" id="easy" value="Easy" name={"complexity"} required
+                        <input type="radio" id="easy" value="Easy" name={"complexity"} 
                         onChange={(e) => setComplexity(e.target.value)}/>
                         <label className="form-check-label" htmlFor="easy">Easy</label>
                     </div>
                     <div className="form-check">
-                        <input type="radio" id="medium" value="Medium" name={"complexity"} required
+                        <input type="radio" id="medium" value="Medium" name={"complexity"} 
                         onChange={(e) => setComplexity(e.target.value)}/>
                         <label className="form-check-label" htmlFor="medium">Medium</label>
                     </div>
                     <div className="form-check">
-                        <input type="radio" id="hard" value="Hard" name={"complexity"} required
+                        <input type="radio" id="hard" value="Hard" name={"complexity"} 
                         onChange={(e) => setComplexity(e.target.value)}/>
                         <label className="form-check-label" htmlFor="hard">Hard</label>
                     </div>
                 </div>
                 <div className="mb-2">
                     <label htmlFor="">Description</label>
-                    <input type="text" placeholder='Return the largest....' className='form-control' required
+                    <input type="text" placeholder='Return the largest....' className='form-control'
                     onChange={(e) => setDescription(e.target.value)}/>
                 </div>
                 <div className="mb-2">
@@ -66,7 +74,7 @@ function CreateQn({handleClose, addQuestion}) {
                 </div>
                 <div className="mb-2">
                     <label htmlFor="">Title</label>
-                    <input type="text" placeholder='Shortest Distance' className='form-control' required
+                    <input type="text" placeholder='Shortest Distance' className='form-control'
                     onChange={(e) => setTitle(e.target.value)}/>
                 </div>
                 <button className="btn btn-success">Submit</button>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import Modal from "react-bootstrap/Modal";
 import Table from "react-bootstrap/Table";
 import ButtonGroup from "react-bootstrap/ButtonGroup";
@@ -13,6 +14,7 @@ function Question() {
     const [questionToDelete, setQuestionToDelete] = useState(null);
     const [showEditModal, setShowEditModal] = useState(false);
     const [currentQuestion, setCurrentQuestion] = useState(null);
+    const [error, setError] = useState("")
     
     const handleShow = () => setShowComponent(true);
     const handleClose = () => setShowComponent(false);
@@ -36,7 +38,7 @@ function Question() {
     
     const editQuestion = (id, updatedQuestion) => {
         const updatedQuestions = questions.map((q) =>
-            q.id === id ? { ...q, ...updatedQuestion } : q
+            q._id === id ? { ...q, ...updatedQuestion } : q
         );
         setQuestions(updatedQuestions);
     };
@@ -46,7 +48,10 @@ function Question() {
         setShowEditModal(true);
     }
 
-    const handleCloseEditModal = () => setShowEditModal(false);
+    const handleCloseEditModal = () => {
+        setShowEditModal(false);
+        setError("");
+    }
 
     // Show the delete confirmation modal
     const handleShowDelete = (id) => {
@@ -119,7 +124,7 @@ function Question() {
                         {showComponent ? 'Hide' : 'Add question'}
                     </button>
 
-                    <Modal show={showComponent} onHide={handleClose} backdrop={"static"}>
+                    <Modal show={showComponent} onHide={handleClose}>
                         <Modal.Header closeButton>
                             <Modal.Title>Add New Question</Modal.Title>
                         </Modal.Header>
@@ -149,7 +154,7 @@ function Question() {
                                 <EditQn 
                                     question={currentQuestion} 
                                     handleClose={handleCloseEditModal} 
-                                    editQuestion={editQuestion} // Your edit function
+                                    editQuestion={editQuestion}
                                 />
                             </Modal.Body>
                         </Modal>
