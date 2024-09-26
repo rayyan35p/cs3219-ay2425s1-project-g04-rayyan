@@ -18,6 +18,10 @@ questionsRouter.post("/", async (req, res) => {
         const question = await QuestionModel.create(req.body);
         res.status(201).json(question);
     } catch (error) {
+        if (error.name === "ValidationError") {
+            const errors = Object.values(error.errors).map(err => err.message);
+            return res.status(400).json({ error: errors });
+        }
         res.status(500).json({error: error.message});
     }
 })

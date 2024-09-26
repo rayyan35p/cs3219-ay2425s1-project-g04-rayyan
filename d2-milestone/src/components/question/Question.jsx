@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import Modal from "react-bootstrap/Modal";
 import Table from "react-bootstrap/Table";
 import ButtonGroup from "react-bootstrap/ButtonGroup";
@@ -26,9 +25,9 @@ function Question() {
         .catch(err => console.log(err));
     }, []);
 
-    const easyQuestions = questions.filter(q => q.complexity == "Easy")
-    const mediumQuestions = questions.filter(q => q.complexity == "Medium")
-    const hardQuestions = questions.filter(q => q.complexity == "Hard")
+    const easyQuestions = questions.filter(q => q.complexity === "Easy")
+    const mediumQuestions = questions.filter(q => q.complexity === "Medium")
+    const hardQuestions = questions.filter(q => q.complexity === "Hard")
     
     const addQuestion = (newQuestion) => {
         setQuestions((prevQuestions) => [...prevQuestions, newQuestion]);
@@ -120,7 +119,7 @@ function Question() {
                         {showComponent ? 'Hide' : 'Add question'}
                     </button>
 
-                    <Modal show={showComponent} onHide={handleClose}>
+                    <Modal show={showComponent} onHide={handleClose} backdrop={"static"}>
                         <Modal.Header closeButton>
                             <Modal.Title>Add New Question</Modal.Title>
                         </Modal.Header>
