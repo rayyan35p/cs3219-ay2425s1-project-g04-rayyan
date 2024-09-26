@@ -19,6 +19,7 @@ questionsRouter.post("/", async (req, res) => {
         res.status(201).json(question);
     } catch (error) {
         if (error.code === 11000) {
+            // Check for duplicate key in MongoDB
             return res.status(400).json({ error: "This title is already in use. " });
         } else if (error.name === "ValidationError" || error.name === "CastError" ) {
             const errors = Object.values(error.errors).map(err => err.message);
@@ -56,6 +57,7 @@ questionsRouter.put("/:id", async (req, res) => {
     } catch (error) {
         
         if (error.code === 11000) {
+            // Check for duplicate key in MongoDB
             return res.status(400).json({ error: "This title is already in use. " });
         } else if (error.name === "ValidationError" || error.name === "CastError" ) {
             const errors = Object.values(error.errors).map(err => err.message);
