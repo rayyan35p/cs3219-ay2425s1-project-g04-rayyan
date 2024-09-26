@@ -47,17 +47,17 @@ function CreateQn({handleClose, addQuestion}) {
                 <div className="container mt-3">
                     <h3>Complexity</h3>
                     <div className="form-check">
-                        <input type="radio" id="easy" value="Easy"
+                        <input type="radio" id="easy" value="Easy" name={"complexity"} 
                         onChange={(e) => setComplexity(e.target.value)}/>
                         <label className="form-check-label" htmlFor="easy">Easy</label>
                     </div>
                     <div className="form-check">
-                        <input type="radio" id="medium" value="Medium"
+                        <input type="radio" id="medium" value="Medium" name={"complexity"} 
                         onChange={(e) => setComplexity(e.target.value)}/>
                         <label className="form-check-label" htmlFor="medium">Medium</label>
                     </div>
                     <div className="form-check">
-                        <input type="radio" id="hard" value="Hard"
+                        <input type="radio" id="hard" value="Hard" name={"complexity"} 
                         onChange={(e) => setComplexity(e.target.value)}/>
                         <label className="form-check-label" htmlFor="hard">Hard</label>
                     </div>

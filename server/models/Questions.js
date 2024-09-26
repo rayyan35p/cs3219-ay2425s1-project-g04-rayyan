@@ -12,7 +12,10 @@ const QuestionSchema = new mongoose.Schema({
             message: "Category cannot be empty. "
         },
     },
-    complexity: String,
+    complexity: {
+        type: String,
+        required: [true, "Please select one complexity level."]
+    },
     description: {
         type: String,
         required: [true, "Description is required. "],
