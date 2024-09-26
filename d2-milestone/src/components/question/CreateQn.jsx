@@ -9,6 +9,7 @@ function CreateQn({handleClose, addQuestion}) {
   const [description, setDescription] = useState('')
   const [id, setID] = useState('')
   const [title, setTitle] = useState('')
+  const [error, setError] = useState(null);
   const navigate = useNavigate()
 
   const Submit = (e) => {
@@ -24,13 +25,20 @@ function CreateQn({handleClose, addQuestion}) {
         navigate('/')
       } 
     )
-    .catch(err => console.log(err))
+    .catch(e => {
+        if (e.response && e.response.status === 400) {
+                setError(e.response.data.error)
+                // console.log("error is:", error)
+            }
+            console.error('Error updating question:', e);
+    })
   }
 
   return (
     <div className='d-flex bg-primary justify-content-center align-items-center'>
         <div className="w-100 bg-white p-3">
             <form onSubmit={Submit}>
+                {error && <div className="alert alert-danger">{error}</div>}
                 <div className="mb-2">
                     <label htmlFor="">Category</label>
                     <input type="text" placeholder='Data Structures' className='form-control'

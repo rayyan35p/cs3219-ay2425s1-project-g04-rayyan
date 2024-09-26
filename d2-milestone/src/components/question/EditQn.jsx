@@ -10,12 +10,6 @@ function EditQn({ question, handleClose, editQuestion }) {
     const [title, setTitle] = useState(question.title);
     const [error, setError] = useState(null);
 
-    const rephraseErrorMessage = (err) => {
-        if (err.includes("duplicate key error")) {
-            setError("The title is already in use. Please use another one.")
-        }
-    }
-
     const Update = (e) => {
       e.preventDefault();
 
@@ -45,7 +39,7 @@ function EditQn({ question, handleClose, editQuestion }) {
         .catch(e => {
             if (e.response && e.response.status === 400) {
                 setError(e.response.data.error)
-                console.log("error is:", error)
+                // console.log("error is:", error)
             }
             console.error('Error updating question:', e);
         });
