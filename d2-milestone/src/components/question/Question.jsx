@@ -27,9 +27,9 @@ function Question() {
         .catch(err => console.log(err));
     }, []);
 
-    const easyQuestions = questions.filter(q => q.complexity == "Easy")
-    const mediumQuestions = questions.filter(q => q.complexity == "Medium")
-    const hardQuestions = questions.filter(q => q.complexity == "Hard")
+    const easyQuestions = questions.filter(q => q.complexity === "Easy")
+    const mediumQuestions = questions.filter(q => q.complexity === "Medium")
+    const hardQuestions = questions.filter(q => q.complexity === "Hard")
     
     const addQuestion = (newQuestion) => {
         setQuestions((prevQuestions) => [...prevQuestions, newQuestion]);
@@ -38,7 +38,7 @@ function Question() {
     
     const editQuestion = (id, updatedQuestion) => {
         const updatedQuestions = questions.map((q) =>
-            q.id === id ? { ...q, ...updatedQuestion } : q
+            q._id === id ? { ...q, ...updatedQuestion } : q
         );
         setQuestions(updatedQuestions);
     };
@@ -155,9 +155,6 @@ function Question() {
                                     question={currentQuestion} 
                                     handleClose={handleCloseEditModal} 
                                     editQuestion={editQuestion}
-                                    error={error}
-                                    setError={setError}
-                                    allQuestions={questions}
                                 />
                             </Modal.Body>
                         </Modal>

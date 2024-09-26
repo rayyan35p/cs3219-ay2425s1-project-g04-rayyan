@@ -2,24 +2,19 @@ import React from 'react'
 import { useState } from 'react'
 import questionService from "../../services/questions"
 
-function EditQn({ question, handleClose, editQuestion, error, setError, allQuestions }) {
+function EditQn({ question, handleClose, editQuestion }) {
     const [category, setCategory] = useState(question.category);
     const [complexity, setComplexity] = useState(question.complexity);
     const [description, setDescription] = useState(question.description);
     const [id, setID] = useState(question.id);
     const [title, setTitle] = useState(question.title);
-  
-    //Problem....
-    const isDuplicate = (editedQuestion, category) => {
-        return allQuestions.some(q =>
-            q.category.join(", ") === category.join(", ") &&
-            q.complexity === editedQuestion.complexity &&
-            q.description === editedQuestion.description &&
-            q.id === editedQuestion.id &&
-            q.title === editedQuestion.title &&
-            q._id !== editedQuestion._id
-        );
-    };
+    const [error, setError] = useState(null);
+
+    const rephraseErrorMessage = (err) => {
+        if (err.includes("duplicate key error")) {
+            setError("The title is already in use. Please use another one.")
+        }
+    }
 
     const Update = (e) => {
       e.preventDefault();
@@ -36,46 +31,23 @@ function EditQn({ question, handleClose, editQuestion, error, setError, allQuest
         id, 
         title,
     };
-    console.log("category now: ", cleanedCategoryArray)
-    console.log("cat length", cleanedCategoryArray.length)
-    if (!id || isNaN(Number(id))) {
-
-        setError("ID must be a valid number.");
-        console.log("id check")
-        return;
-    }
-
-    if (cleanedCategoryArray.length === 0 || !title.trim() || !description.trim() || !complexity.trim()) {
-
-        setError("All fields must be filled.");
-        console.log("all fields check")
-        return;
-    }
+    console.log("category array: ", cleanedCategoryArray)
     console.log("db_id:", question._id)
-    console.log(cleanedCategoryArray, complexity, description, id, title);
+    console.log(category, complexity, description, id, title);
 
-    if (allQuestions.some(q =>
-        q.category.join(", ") === cleanedCategoryArray.join(", ") &&
-        q.complexity === complexity &&
-        q.description === description &&
-        q.id === id &&
-        q.title === title &&
-        q._id !== question._id)) {
-
-        setError("This question already exists.")
-        console.log("duplicate check")
-        return;
-    }
-
-    questionService.updateQuestion(question._id, {category, complexity, description, id, title})
+    questionService.updateQuestion(question._id, updatedQuestion)
         .then(result => {
-            console.log('Question edited successfully:', result)
             
-            editQuestion(id, updatedQuestion);
+            editQuestion(question._id, updatedQuestion);
+            console.log('Question edited successfully:', result)
             handleClose(); 
         })
         .catch(e => {
-            console.error('Error updateding question:', e);
+            if (e.response && e.response.status === 400) {
+                setError(e.response.data.error)
+                console.log("error is:", error)
+            }
+            console.error('Error updating question:', e);
         });
 };
 
@@ -107,7 +79,7 @@ function EditQn({ question, handleClose, editQuestion, error, setError, allQuest
                 </div>
                 <div className="mb-2">
                     <label htmlFor="">Description</label>
-                    <input type="text" placeholder='Return the largest....' className='form-control'
+                    <input type="text" placeholder='Return the largest....' className='form-control' 
                     value={description} onChange={(e) => setDescription(e.target.value)}/>
                 </div>
                 <div className="mb-2">
