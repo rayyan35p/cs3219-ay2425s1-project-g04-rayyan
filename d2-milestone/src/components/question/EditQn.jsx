@@ -6,7 +6,6 @@ function EditQn({ question, handleClose, editQuestion }) {
     const [category, setCategory] = useState(question.category);
     const [complexity, setComplexity] = useState(question.complexity);
     const [description, setDescription] = useState(question.description);
-    const [id, setID] = useState(question.id);
     const [title, setTitle] = useState(question.title);
     const [error, setError] = useState(null);
 
@@ -21,13 +20,12 @@ function EditQn({ question, handleClose, editQuestion }) {
     const updatedQuestion = {
         category: cleanedCategoryArray,
         complexity, 
-        description, 
-        id, 
+        description,
         title,
     };
     console.log("category array: ", cleanedCategoryArray)
     console.log("db_id:", question._id)
-    console.log(category, complexity, description, id, title);
+    console.log(category, complexity, description, title);
 
     questionService.updateQuestion(question._id, updatedQuestion)
         .then(result => {
@@ -75,11 +73,6 @@ function EditQn({ question, handleClose, editQuestion }) {
                     <label htmlFor="">Description</label>
                     <input type="text" placeholder='Return the largest....' className='form-control' 
                     value={description} onChange={(e) => setDescription(e.target.value)}/>
-                </div>
-                <div className="mb-2">
-                    <label htmlFor="">ID</label>
-                    <input type="text" placeholder='21' className='form-control'
-                    value={id} onChange={e => setID(e.target.value)}/>
                 </div>
                 <div className="mb-2">
                     <label htmlFor="">Title</label>

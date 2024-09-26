@@ -1,4 +1,5 @@
 server/.env
+server/insert_questions_script.py
 
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 

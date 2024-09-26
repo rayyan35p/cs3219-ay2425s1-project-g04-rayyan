@@ -11,22 +11,34 @@ questionsRouter.get("/", async (req, res) => {
     }
 })
 
-// Create a new question 
+// Create a new question
 questionsRouter.post("/", async (req, res) => {
-    console.log('Incoming Data:', req.body)
-    try {
-        const question = await QuestionModel.create(req.body);
-        res.status(201).json(question);
-    } catch (error) {
-        if (error.code === 11000) {
-            // Check for duplicate key in MongoDB
-            return res.status(400).json({ error: "This title is already in use. " });
-        } else if (error.name === "ValidationError" || error.name === "CastError" ) {
-            const errors = Object.values(error.errors).map(err => err.message);
-            return res.status(400).json({ error: errors });
-        }
-        res.status(500).json({ error: error.message });
-    }
+  console.log('Incoming Data:', req.body)
+  try {
+      const maxQuestion = await QuestionModel.findOne().sort({ id: -1 }).exec()
+      const maxId = maxQuestion ? maxQuestion.id : 0
+
+      const newQuestion = new QuestionModel({
+          category: req.body.category,
+          complexity: req.body.complexity,
+          description: req.body.description,
+          id: maxId + 1,
+          title: req.body.title
+      })
+
+      // Save the new question
+      await newQuestion.save()
+      res.status(201).json(newQuestion)
+  } catch (error) {
+      if (error.code === 11000) {
+          // Check for duplicate key in MongoDB
+          return res.status(400).json({ error: "This title is already in use." })
+      } else if (error.name === "ValidationError" || error.name === "CastError") {
+          const errors = Object.values(error.errors).map(err => err.message)
+          return res.status(400).json({ error: errors })
+      }
+      res.status(500).json({ error: error.message })
+  }
 })
 
 // Read a specific question 
