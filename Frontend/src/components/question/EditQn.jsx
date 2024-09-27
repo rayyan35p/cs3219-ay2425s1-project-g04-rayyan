@@ -45,17 +45,21 @@ function EditQn({ question, handleClose, editQuestion }) {
 
   return (
     <div className='d-flex bg-primary justify-content-center align-items-center'>
-        <div className="w-100 bg-white p-3">
+        <div className="w-100 bg-white px-3 pb-3">
             <form onSubmit={Update}>
-                <h2>Update Question</h2>
                 {error && <div className="alert alert-danger">{error}</div>}
+                <div className="mb-2">
+                    <label htmlFor="">Title</label>
+                    <input type="text" placeholder='Shortest Distance' className='form-control'
+                    value={title} onChange={e => setTitle(e.target.value)}/>
+                </div>
                 <div className="mb-2">
                     <label htmlFor="">Category</label>
                     <input type="text" placeholder='Data Structures' className='form-control'
                     value={category.join(",")} onChange={(e) => setCategory(e.target.value.split(","))}/>
                 </div>
-                <div className="container mt-3">
-                    <h3>Complexity</h3>
+                <div className="container my-3">
+                    <h5>Complexity</h5>
                     <div className="form-check">
                         <input type="radio" id="easy" value="Easy" checked={complexity === "Easy"} onChange={(e) => setComplexity(e.target.value)}/>
                         <label className="form-check-label" htmlFor="easy">Easy</label>
@@ -69,16 +73,12 @@ function EditQn({ question, handleClose, editQuestion }) {
                         <label className="form-check-label" htmlFor="hard">Hard</label>
                     </div>
                 </div>
-                <div className="mb-2">
+                <div className="mb-3">
                     <label htmlFor="">Description</label>
                     <input type="text" placeholder='Return the largest....' className='form-control' 
                     value={description} onChange={(e) => setDescription(e.target.value)}/>
                 </div>
-                <div className="mb-2">
-                    <label htmlFor="">Title</label>
-                    <input type="text" placeholder='Shortest Distance' className='form-control'
-                    value={title} onChange={e => setTitle(e.target.value)}/>
-                </div>
+
                 <button className="btn btn-success">Update</button>
             </form>
         </div>

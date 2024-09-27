@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import Modal from "react-bootstrap/Modal";
 import Table from "react-bootstrap/Table";
 import ButtonGroup from "react-bootstrap/ButtonGroup";
@@ -14,8 +13,7 @@ function Question() {
     const [questionToDelete, setQuestionToDelete] = useState(null);
     const [showEditModal, setShowEditModal] = useState(false);
     const [currentQuestion, setCurrentQuestion] = useState(null);
-    const [error, setError] = useState("")
-    
+
     const handleShow = () => setShowComponent(true);
     const handleClose = () => setShowComponent(false);
 
@@ -50,7 +48,6 @@ function Question() {
 
     const handleCloseEditModal = () => {
         setShowEditModal(false);
-        setError("");
     }
 
     // Show the delete confirmation modal
