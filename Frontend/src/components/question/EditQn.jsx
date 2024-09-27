@@ -47,7 +47,6 @@ function EditQn({ question, handleClose, editQuestion }) {
     <div className='d-flex bg-primary justify-content-center align-items-center'>
         <div className="w-100 bg-white p-3">
             <form onSubmit={Update}>
-                <h2>Update Question</h2>
                 {error && <div className="alert alert-danger">{error}</div>}
                 <div className="mb-2">
                     <label htmlFor="">Title</label>
