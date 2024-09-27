@@ -45,7 +45,7 @@ function EditQn({ question, handleClose, editQuestion }) {
 
   return (
     <div className='d-flex bg-primary justify-content-center align-items-center'>
-        <div className="w-100 bg-white p-3">
+        <div className="w-100 bg-white px-3 pb-3">
             <form onSubmit={Update}>
                 {error && <div className="alert alert-danger">{error}</div>}
                 <div className="mb-2">
