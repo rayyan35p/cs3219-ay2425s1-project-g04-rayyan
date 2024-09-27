@@ -78,19 +78,23 @@ function Question() {
     };
 
     const renderQuestionsTable = (questions) => {
+      const sortedQuestions = [...questions].sort((a, b) => a.id - b.id)
+
         return (
             <Table>
                 <thead>
                 <tr>
-                    <th>Title</th>
-                    <th>Description</th>
-                    <th>Category</th>
-                    <th>Action</th>
+                  <th>ID</th>
+                  <th>Title</th>
+                  <th>Description</th>
+                  <th>Category</th>
+                  <th>Action</th>
                 </tr>
                 </thead>
                 <tbody>
-                {questions.map((question) => (
-                    <tr key={question._id}>
+                {sortedQuestions.map((question) => (
+                    <tr key={question.id}>
+                        <td>{question.id}</td>
                         <td>{question.title}</td>
                         <td>{question.description}</td>
                         <td>{question.category ? question.category.join(", ") : ''}</td>

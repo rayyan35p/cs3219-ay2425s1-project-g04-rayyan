@@ -7,14 +7,13 @@ function CreateQn({handleClose, addQuestion}) {
   const [category, setCategory] = useState([])
   const [complexity, setComplexity] = useState('')
   const [description, setDescription] = useState('')
-  const [id, setID] = useState('')
   const [title, setTitle] = useState('')
   const [error, setError] = useState(null);
   const navigate = useNavigate()
 
   const Submit = (e) => {
     e.preventDefault();
-    const newQuestion = { category, complexity, description, id, title};
+    const newQuestion = { category, complexity, description, title};
     //console.log(newQuestion)
     questionService.createQuestion(newQuestion)
     .then(result => {
@@ -66,11 +65,6 @@ function CreateQn({handleClose, addQuestion}) {
                     <label htmlFor="">Description</label>
                     <input type="text" placeholder='Return the largest....' className='form-control'
                     onChange={(e) => setDescription(e.target.value)}/>
-                </div>
-                <div className="mb-2">
-                    <label htmlFor="">ID</label>
-                    <input type="text" placeholder='21' className='form-control'
-                    onChange={(e) => setID(e.target.value)}/>
                 </div>
                 <div className="mb-2">
                     <label htmlFor="">Title</label>
