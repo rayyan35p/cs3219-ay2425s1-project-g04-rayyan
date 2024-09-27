@@ -66,7 +66,7 @@ function CreateQn({handleClose, addQuestion}) {
                         <label className="form-check-label" htmlFor="hard">Hard</label>
                     </div>
                 </div>
-                <div className="mb-2">
+                <div className="mb-3">
                     <label htmlFor="">Description</label>
                     <input type="text" placeholder='Return the largest....' className='form-control'
                     onChange={(e) => setDescription(e.target.value)}/>
