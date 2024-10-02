@@ -8,7 +8,8 @@ const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [inputError, setInputError] = useState(false);
+  const [emailError, setEmailError] = useState(false);
+  const [passwordError, setPasswordError] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = (e) => {
@@ -30,11 +31,13 @@ const Login = () => {
         switch (e.response.status) {
           case 400:
             setError(e.response.data.message); // Missing email and/or password
-            setInputError(true);
+            setEmailError(true);
+            setPasswordError(true);
             break;
           case 401:
             setError(e.response.data.message); // Wrong email and/or password
-            setInputError(true); 
+            setEmailError(true);
+            setPasswordError(true); 
             break;
           case 500:
             setError(e.response.data.message); // Database or server error 
@@ -63,14 +66,22 @@ const Login = () => {
               label="Email" 
               type="email" 
               placeholder="Enter your email" 
-              onChange={(e) => setEmail(e.target.value)}
-              error={inputError}
+              onChange={(e) => {
+                setEmail(e.target.value)
+                setEmailError(false);
+              }}
+              error={emailError}
+              required
               />
               <InputField label="Password" 
               type="password" 
               placeholder="Enter your password" 
-              onChange={(e) => setPassword(e.target.value)}
-              error={inputError}
+              onChange={(e) => {
+                setPassword(e.target.value)
+                setPasswordError(false)
+              }}
+              error={passwordError}
+              required
               />
             </div>
             <div className="button-container">
