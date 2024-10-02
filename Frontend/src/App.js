@@ -23,10 +23,6 @@ function App() {
 
           {/* Home page route */}
           <Route path='/home' element={<Home />} />
-
-          {/* Create and Edit question routes */}
-          <Route path='/create' element={<CreateQn />} />
-          <Route path='/update/:question_db_id' element={<EditQn />} />
         </Routes>
       </BrowserRouter>
     </div>

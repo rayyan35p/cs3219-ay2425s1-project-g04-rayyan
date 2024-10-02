@@ -21,7 +21,6 @@ function CreateQn({handleClose, addQuestion}) {
         console.log(result.data)
         addQuestion(result.data)
         handleClose()
-        navigate('/')
       } 
     )
     .catch(e => {
