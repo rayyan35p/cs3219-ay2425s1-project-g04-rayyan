@@ -26,3 +26,7 @@
 .input-element:focus {
   border-color: #004b9b; /* Change border color on focus */
 }
+
+.input-error {
+  border-color: #ff0000; /* Change border color on wrong input */
+}
