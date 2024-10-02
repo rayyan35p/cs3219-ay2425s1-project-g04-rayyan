@@ -10,6 +10,9 @@ function SignUp() {
     const [password, setPassword] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
     const [successMessage, setSuccessMessage] = useState('');
+    const [usernameError, setUsernameError] = useState(false);
+    const [emailError, setEmailError] = useState(false);
+    const [passwordError, setPasswordError] = useState(false);
 
     const navigate = useNavigate(); // Initialize useNavigate
 
@@ -42,9 +45,14 @@ function SignUp() {
                 switch (error.response.status) {
                     case 400:
                         setErrorMessage('Please fill in all required fields.');
+                        setUsernameError(true);
+                        setEmailError(true);
+                        setPasswordError(true);
                         break;
                     case 409:
                         setErrorMessage('Username or email already exists.');
+                        setUsernameError(true);
+                        setEmailError(true);
                         break;
                     case 500:
                         setErrorMessage('Server error. Please try again later.');
@@ -73,7 +81,11 @@ function SignUp() {
                     type="text" 
                     placeholder="Enter your username" 
                     value={username} 
-                    onChange={(e) => setUsername(e.target.value)} 
+                    onChange={(e) => {
+                        setUsername(e.target.value)
+                        setUsernameError(false);
+                    }}
+                    error={usernameError} 
                     required 
                 />
                 <InputField 
@@ -81,7 +93,11 @@ function SignUp() {
                     type="email" 
                     placeholder="Enter your email" 
                     value={email} 
-                    onChange={(e) => setEmail(e.target.value)} 
+                    onChange={(e) => {
+                        setEmail(e.target.value)
+                        setEmailError(false);
+                    }}
+                    error={emailError} 
                     required 
                 />
                 <InputField 
@@ -89,7 +105,11 @@ function SignUp() {
                     type="password" 
                     placeholder="Enter your password" 
                     value={password} 
-                    onChange={(e) => setPassword(e.target.value)} 
+                    onChange={(e) => { 
+                        setPassword(e.target.value)
+                        setPasswordError(false);
+                    }}
+                    error={passwordError} 
                     required 
                 />
                 <div className='button-container'>
