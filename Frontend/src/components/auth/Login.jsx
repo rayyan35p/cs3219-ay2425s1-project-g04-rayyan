@@ -8,6 +8,7 @@ const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [inputError, setInputError] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = (e) => {
@@ -24,17 +25,16 @@ const Login = () => {
       navigate('/home')
     })
     .catch(e => {
-
-      //console.log(e.response.data.message);
-
       // handle errors here 
       if (e.response) {
         switch (e.response.status) {
           case 400:
             setError(e.response.data.message); // Missing email and/or password
+            setInputError(true);
             break;
           case 401:
-            setError(e.response.data.message); // Wrong email and/or password 
+            setError(e.response.data.message); // Wrong email and/or password
+            setInputError(true); 
             break;
           case 500:
             setError(e.response.data.message); // Database or server error 
@@ -46,9 +46,7 @@ const Login = () => {
       } else {
         setError("Network error. Please check your connection.");
       }
-
     })
-
   };
 
   return (
@@ -61,16 +59,28 @@ const Login = () => {
         <div className="input-container">
           <form onSubmit={handleLogin}>
             <div>
-              <InputField label="Email" type="email" placeholder="Enter your email" 
-              onChange={(e) => setEmail(e.target.value)}/>
-              <InputField label="Password" type="password" placeholder="Enter your password" 
-              onChange={(e) => setPassword(e.target.value)}/>
+              <InputField 
+              label="Email" 
+              type="email" 
+              placeholder="Enter your email" 
+              onChange={(e) => setEmail(e.target.value)}
+              error={inputError}
+              />
+              <InputField label="Password" 
+              type="password" 
+              placeholder="Enter your password" 
+              onChange={(e) => setPassword(e.target.value)}
+              error={inputError}
+              />
             </div>
             <div className="button-container">
               <Link to="/signup" className="create-account-link">Create Account</Link>
               <button type="submit" className="login-button">Sign In</button>
             </div>
           </form>
+          <div className='notification'>
+              {error && <p className="text-danger mt-3">{error}</p>}
+            </div>
         </div>
       </div>
     </div>
