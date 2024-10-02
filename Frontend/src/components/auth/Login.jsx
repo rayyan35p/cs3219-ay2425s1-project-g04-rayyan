@@ -1,44 +1,54 @@
-// import React from 'react';
-// import { useNavigate } from 'react-router-dom';
-// import { Button, Container, Row, Col } from 'react-bootstrap';
-
-// function Login() {
-//     const navigate = useNavigate();
-
-//     const goToSignUp = () => {
-//         navigate('/signup'); // Redirects to the sign-up page
-//     };
-
-//     return (
-//         <Container className="d-flex align-items-center justify-content-center" style={{ height: '100vh' }}>
-//             <Row>
-//                 <Col md={6} className="text-center">
-//                     <h2>Login Page</h2>
-//                     <p>If you don't have an account, click the button below to sign up!</p>
-//                     <Button variant="primary" onClick={goToSignUp}>
-//                         Go to Sign Up
-//                     </Button>
-//                 </Col>
-//             </Row>
-//         </Container>
-//     );
-// }
-
-// export default Login;
-
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom'; // Import Link for navigation
+import { Link, useNavigate } from 'react-router-dom'; // Import Link for navigation
 import '../../css/Login.css'; // Import the CSS for styling
 import InputField from './InputField';
+import userService from '../../services/users';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
 
   const handleLogin = (e) => {
     e.preventDefault();
-    // Add your login logic here
+
+    const userCredentials = {email, password};
     console.log('Logging in with:', { email, password });
+
+    // call the login user API
+    userService.loginUser(userCredentials)
+    .then(result => {
+      // navigate to home page if successful
+      console.log(result);
+      navigate('/home')
+    })
+    .catch(e => {
+
+      //console.log(e.response.data.message);
+
+      // handle errors here 
+      if (e.response) {
+        switch (e.response.status) {
+          case 400:
+            setError(e.response.data.message); // Missing email and/or password
+            break;
+          case 401:
+            setError(e.response.data.message); // Wrong email and/or password 
+            break;
+          case 500:
+            setError(e.response.data.message); // Database or server error 
+            break;
+          default:
+            setError("An unexpected error occurred.");
+            break;
+        }
+      } else {
+        setError("Network error. Please check your connection.");
+      }
+
+    })
+
   };
 
   return (
@@ -51,8 +61,10 @@ const Login = () => {
         <div className="input-container">
           <form onSubmit={handleLogin}>
             <div>
-              <InputField label="Email" type="email" placeholder="Enter your email" />
-              <InputField label="Password" type="password" placeholder="Enter your password" />
+              <InputField label="Email" type="email" placeholder="Enter your email" 
+              onChange={(e) => setEmail(e.target.value)}/>
+              <InputField label="Password" type="password" placeholder="Enter your password" 
+              onChange={(e) => setPassword(e.target.value)}/>
             </div>
             <div className="button-container">
               <Link to="/signup" className="create-account-link">Create Account</Link>
