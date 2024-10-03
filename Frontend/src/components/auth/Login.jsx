@@ -23,7 +23,15 @@ const Login = () => {
     .then(result => {
       // navigate to home page if successful
       console.log(result);
-      navigate('/home')
+      const jwt_token = result.data.data.accessToken;
+
+      if (jwt_token) {
+        sessionStorage.setItem('jwt_token', jwt_token);
+        navigate('/home');
+      } else {
+        setError('Token not found, authentication failed.');
+      }
+      
     })
     .catch(e => {
       // handle errors here 
