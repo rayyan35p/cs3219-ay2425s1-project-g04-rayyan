@@ -19,4 +19,9 @@ const loginUser = async (userCredentials) => {
     return response;
 }
 
-export default { createUser, getUser, loginUser };
+const verifyToken = async (authHeader) => {
+    const response = await axios.get(`${baseUrl}/${auth}/verify-token`, authHeader);
+    return response;
+}
+
+export default { createUser, getUser, loginUser, verifyToken };
