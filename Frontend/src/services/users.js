@@ -9,8 +9,8 @@ const createUser = async (newUser) => {
     return response;
 };
 
-const getUser = async (id) => {
-    const response = await axios.get(`${baseUrl}/${user}/${id}`);
+const getUser = async (id, jwt_token) => {
+    const response = await axios.get(`${baseUrl}/${user}/${id}`, jwt_token);
     return response;
 };
 
