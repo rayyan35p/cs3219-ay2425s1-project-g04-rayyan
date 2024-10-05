@@ -28,6 +28,7 @@ async function getUserFromToken() {
 
 function UserAvatarBox() {
     const navigate = useNavigate();
+    const [user, setUser] = useState(null);
     const [username, setUsername] = useState("No User");
 
     const handleLogout = () => {
@@ -40,22 +41,25 @@ function UserAvatarBox() {
             const user = await getUserFromToken();
             console.log("User: ", user);
             if (user) {
+                setUser(user)
                 setUsername(user.username);
-                console.log(username);
+                console.log(user.username);
             }
         }
         fetchData();
     }, []);
 
     return (
-    <Dropdown as={ButtonGroup} className="m-2">
+    <Dropdown as={ButtonGroup} className="ms-auto">
         {/* Nice to have image in the future*/}
         <Dropdown.Toggle id="dropdown-custom-1">
             {username}
         </Dropdown.Toggle>
         <Dropdown.Menu className="super-colors">
-            <Dropdown.Item eventKey="1" onClick={handleLogout}>Logout</Dropdown.Item>
-            <Dropdown.Item eventKey="2" onClick={() => navigate('/profile')}>Profile</Dropdown.Item>
+            <Dropdown.Item eventKey="1" onClick={handleLogout}>
+                <span style={{color: 'red'}}>Logout</span>
+            </Dropdown.Item>
+            <Dropdown.Item eventKey="2" onClick={() => navigate(`/profile/${user.id}`)}>Edit Profile</Dropdown.Item>
         </Dropdown.Menu>
     </Dropdown>
     );
