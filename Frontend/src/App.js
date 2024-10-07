@@ -4,6 +4,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import Home from './components/Home';
 import Login from './components/auth/Login';
 import SignUp from './components/auth/SignUp';
+import EditProfile from "./components/user/EditProfile";
 import ProtectedRoute from './components/routes/ProtectedRoute';
 
 function App() {
@@ -22,6 +23,9 @@ function App() {
 
           {/* Home page route */}
           <Route path='/home' element={<ProtectedRoute><Home /></ProtectedRoute>} />
+
+          {/* Edit Profile page route */}
+          <Route path='/profile/:id' element={<ProtectedRoute><EditProfile /></ProtectedRoute>} />
         </Routes>
       </BrowserRouter>
     </div>
