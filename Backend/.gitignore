@@ -1,5 +1,6 @@
 QuestionService/.env
 user-service/.env
+MatchingService/.env
 QuestionService/insert_questions_script.py
 
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
@@ -7,6 +8,7 @@ QuestionService/insert_questions_script.py
 # dependencies
 QuestionService/node_modules
 user-service/node_modules
+MatchingService/node_modules
 /.pnp
 .pnp.js
 
