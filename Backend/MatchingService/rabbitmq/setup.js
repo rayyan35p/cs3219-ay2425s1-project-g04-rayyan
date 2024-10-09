@@ -18,6 +18,10 @@ async function setupRabbitMQ() {
         const matching_exchange_name = "matching_exchange";
         await channel.assertExchange(matching_exchange_name, "topic", { durable: false });
 
+        // Declare dead letter exchange
+        const dead_letter_exchange_name = "dead_letter_exchange";
+        await channel.assertExchange(dead_letter_exchange_name, "fanout", { durable: false });
+
         const queueNames = [
             'easy.python',
             'easy.java',
@@ -32,13 +36,33 @@ async function setupRabbitMQ() {
 
         // Create and bind queues to exchange with the routing keys 
         for (let name of queueNames) {
-            await channel.assertQueue(name, { durable: false }); // durable=false ensures queue will survive broker restarts 
+            /*
+            try {
+                await channel.deleteQueue(name);
+            } catch (err) {
+                console.log(`Queue ${name} does not exist or could not be deleted: ${err.message}`);
+            }
+            */
+            await channel.assertQueue(name, 
+                { durable: false, // durable=false ensures queue will survive broker restarts 
+                  arguments: {
+                    'x-dead-letter-exchange': dead_letter_exchange_name // set dead letter exchange
+                  }
+                
+            }); 
+
             await channel.bindQueue(name, matching_exchange_name, name); // e.g. messages with routing key easy.python goes to easy.python queue
         }
 
         // Create and bind queue to exchange (if we want only 1 queue) 
         // await channel.assertQueue(name, { durable: false })
         // await channel.bindQueue(name, matching_exchange_name, '#') // all messages go to this queue because of a wildcard pattern
+
+        // Create and bind dead letter queue
+        // const dead_letter_queue_name = "dead_letter_queue";
+        // await channel.assertQueue(deadLetterQueueName, { durable: false });
+        // await channel.bindQueue(deadLetterQueueName, deadLetterExchangeName, ''); // Bind all messages to this queue
+
 
         console.log("RabbitMQ setup complete with queues and bindings.")
 
@@ -50,3 +74,5 @@ async function setupRabbitMQ() {
 }
 
 module.exports = { setupRabbitMQ };
+
+setupRabbitMQ()
