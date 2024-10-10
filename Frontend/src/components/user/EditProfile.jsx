@@ -48,6 +48,16 @@ function EditProfile() {
             return;
         }
 
+        const usernameRegex = /^[a-zA-Z0-9._]{3,20}$/;
+        const isValidUsername = usernameRegex.test(username)
+        
+        if(!isValidUsername) {
+            console.log("username is not valid:", username)
+            setUsernameError(true)
+            setErrorMessage("Username can only contain letters, numbers, dots (.), and underscores (_), and must be between 3 and 20 characters long.")
+            return;
+        }
+
         if (password !== confirmPassword) {
             setPasswordError(true);
             setErrorMessage('Passwords do not match');
