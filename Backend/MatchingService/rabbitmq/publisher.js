@@ -1,23 +1,28 @@
 const amqp = require('amqplib');
-// TODO: Write function to publish to rabbitMQ 
+// Connect -> Exchange -> Queue -> Bind -> Publish
+const { matching_exchange_name } = require('./setup.js');
 
-/*
-async function publishToQueue(userId, difficulty, language) {
+async function publishToQueue({userId, difficulty, language}) {
     try {
         const connection = await amqp.connect(process.env.RABBITMQ_URL);
         const channel = await connection.createChannel();
-        const matching_exchange_name = 'matching_exchange';
         const routingKey = `${difficulty}.${language}`;
-        const queueName = `${difficulty}.${language}`;
 
-        if (queueInfo) {
-            channel.publish(matching_exchange_name, routingKey, Buffer.from(JSON.stringify({ userId, language, difficulty })));
+        // Connect to the exchange (just in case it does not exist)
+        await channel.assertExchange(matching_exchange_name, 'topic', { durable: false });
 
-            console.log(`Published user: ${userId} with routing key: ${routingKey}`);
+        // Publish the message to the exchange
+        const messageSent = channel.publish(
+            matching_exchange_name,
+            routingKey,
+            Buffer.from(JSON.stringify({ userId, difficulty, language }))
+        );
+
+        if (messageSent) {
+            console.log(`Message sent: ${userId} -> ${routingKey}`);
         } else {
-            console.log(`Cannot publish message: Queue ${queueName} does not exist`);
+            console.error(`Message NOT sent: ${userId} -> ${routingKey}`);
         }
-        
         
         await channel.close();
         await connection.close();
@@ -27,7 +32,6 @@ async function publishToQueue(userId, difficulty, language) {
 }
 
 module.exports = { publishToQueue };
-*/
 
 
 

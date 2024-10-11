@@ -1,13 +1,14 @@
 // TODO: Matching users logic
 
 
-/*
-const { notifyUsers } = require('./websocket/websocket) 
+const { notifyUsers } = require('../websocket/websocket')
+// local dict to store waiting users
 const waitingUsers = {};
 
 function matchUsers(userId, language, difficulty) {
     const criteriaKey = `${difficulty}.${language}`;
 
+    // if the criteria key does not exist, create it
     if (!waitingUsers[criteriaKey]) {
         waitingUsers[criteriaKey] = [];
     }
@@ -29,4 +30,3 @@ function matchUsers(userId, language, difficulty) {
 }
 
 module.exports = { matchUsers };
-*/
