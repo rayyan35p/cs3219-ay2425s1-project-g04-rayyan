@@ -47,6 +47,7 @@ async function setupRabbitMQ() {
         }
 
         // Declare the dead-letter queue and bind it to the dead-letter exchange
+        await channel.deleteQueue(dead_letter_queue_name);
         await channel.assertQueue(dead_letter_queue_name, { durable: false });
         await channel.bindQueue(dead_letter_queue_name, dead_letter_exchange_name, ''); // Bind with no routing key
 
