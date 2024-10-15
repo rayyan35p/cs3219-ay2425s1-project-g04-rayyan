@@ -10,70 +10,9 @@ const { notifyUsers } = require('../websocket/websocket');
 
 const dead_letter_queue_name = "dead_letter_queue";
 const timeoutMap = {};
+
 // Local dictionary to store waiting users
 const waitingUsers = {};
-
-// manual rejection of message that is constantly being consumed. Not using TTL feature.
-// Race condition: upon matching user 2 with user 1, the flag for whether user 1 is matched is still false.
-// async function consumeQueue() {
-//   try {
-//       // Connect
-//       const connection = await amqp.connect(process.env.RABBITMQ_URL);
-//       const channel = await connection.createChannel();
-
-//       console.log("Waiting for users...");
-
-//       // Process + subscribe to each matchmaking queue
-//       for (let queueName of queueNames) {
-//           await channel.consume(queueName, (msg) => {
-//               if (msg !== null) {
-//                   const userData = JSON.parse(msg.content.toString());
-//                   const { userId, language, difficulty } = userData;
-
-//                   // Perform the matching logic
-//                   console.log(`Received user ${userId} with ${language} and ${difficulty}`);
-//                   const matched = matchUsers(userId, language, difficulty);
-
-//                   // Flag to track if a match is found
-//                   // let isMatched = false;
-//                   if (timeoutMap[userId]) {
-//                     clearTimeout(timeoutMap[userId]);
-//                     delete timeoutMap[userId];
-//                 }
-
-//                   // Only acknowledge if a match was found
-//                   if (matched) {
-//                       // isMatched = true; // Set the flag
-//                       channel.ack(msg);
-//                       console.log(`Matched user ${userId}`);
-
-//                       // clearTimeout(timeoutMap[userId]);
-//                       // delete timeoutMap[userId];
-//                   } else {
-//                       console.log(`No match for ${userId}, waiting for TTL to expire.`);
-
-//                       // Set a timeout for rejection only if not matched
-//                       const timeoutId = setTimeout(() => {
-//                           // if (!isMatched) { // Check if matched after timeout
-//                           console.log(`is the user matched upon timeout? ${matched}`);
-//                           console.log(`Rejecting user ${userId} after 10 seconds.`);
-//                           channel.reject(msg, false); // Reject without requeuing
-//                           // }
-//                       }, 10000); // 10 seconds delay
-
-//                       timeoutMap[userId] = timeoutId;
-//                   }
-//               }
-//           });
-//       }
-
-//       console.log("Listening to matchmaking queues");
-//   } catch (error) {
-//       console.error('Error consuming RabbitMQ queue:', error);
-//   }
-// }
-
-
 
 // using promises to handle errors and ensure clearing of timer.
 function matchUsers(channel, msg, userId, language, difficulty) {
@@ -93,7 +32,8 @@ function matchUsers(channel, msg, userId, language, difficulty) {
         console.log(`Matched users: ${matchedUsers.map(user => user.userId)}`);
 
         // Send match success (this could trigger WebSocket communication)
-        notifyUsers(matchedUsers.map(user => user.userId));
+        // notifyUsers(matchedUsers.map(user => user.userId));
+        notifyUsers(matchedUsers.map(user => user.userId), 'Match found!', 'match');
 
         // Acknowledge the messages for both matched users
         matchedUsers.forEach(({ msg }) => {
@@ -191,7 +131,7 @@ async function consumeDLQ() {
               console.log(`Received message from DLQ for user: ${userId}`);
 
               // Notify the user via WebSocket
-              notifyUsers(userId, `Match not found for ${difficulty} ${language}, please try again.`);
+              notifyUsers(userId, `Match not found for ${difficulty} ${language}, please try again.`, 'rejection');
 
               // Acknowledge the message (so it's removed from the DLQ)
               channel.ack(msg);
