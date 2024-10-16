@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require("cors");
 const dotenv = require("dotenv");
 const matchmakingRouter = require("./controllers/matchmaking");
-const { consumeQueue } = require('./rabbitmq/subscriber');
+const { consumeQueue, consumeDLQ } = require('./rabbitmq/subscriber');
 const { setupRabbitMQ } = require('./rabbitmq/setup');
 const { publishToQueue } = require('./rabbitmq/publisher')
 
@@ -21,8 +21,11 @@ app.use('/api/match', matchmakingRouter);
 setupRabbitMQ().then(() => {
 
     consumeQueue().catch(console.error);
-    publishToQueue({userId: "user_234", difficulty: "easy", language: "python"})
-    publishToQueue({userId: "user_234", difficulty: "easy", language: "java"})
+    consumeDLQ().catch(console.error);
+
+    publishToQueue({userId: "user_1", difficulty: "easy", language: "java"})
+    publishToQueue({userId: "user_2", difficulty: "easy", language: "python"})
+    publishToQueue({userId: "user_3", difficulty: "easy", language: "java"})
 
 })
 

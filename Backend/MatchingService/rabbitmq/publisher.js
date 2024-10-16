@@ -8,9 +8,6 @@ async function publishToQueue({userId, difficulty, language}) {
         const channel = await connection.createChannel();
         const routingKey = `${difficulty}.${language}`;
 
-        // Connect to the exchange (just in case it does not exist)
-        await channel.assertExchange(matching_exchange_name, 'topic', { durable: false });
-
         // Publish the message to the exchange
         const messageSent = channel.publish(
             matching_exchange_name,
