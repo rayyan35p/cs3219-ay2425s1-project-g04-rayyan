@@ -57,7 +57,6 @@ async function setupRabbitMQ() {
 
         await channel.close();
         await connection.close();
-        console.log("RabbitMQ connection closed.")
     } catch (error) {
         console.error("Error setting up RabbitMQ:", error);
     }
