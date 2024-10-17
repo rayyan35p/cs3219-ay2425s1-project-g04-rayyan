@@ -18,16 +18,16 @@ app.use('/api/match', matchmakingRouter);
 
 // TODO: Start consuming RabbitMQ queues 
 
-setupRabbitMQ().then(() => {
+// setupRabbitMQ().then(() => {
 
-    consumeQueue().catch(console.error);
-    consumeDLQ().catch(console.error);
+consumeQueue().catch(console.error);
+consumeDLQ().catch(console.error);
 
-    publishToQueue({userId: "user_1", difficulty: "easy", language: "java"})
-    publishToQueue({userId: "user_2", difficulty: "easy", language: "python"})
-    publishToQueue({userId: "user_3", difficulty: "easy", language: "java"})
+    // publishToQueue({userId: "user_1", difficulty: "easy", language: "java"})
+    // publishToQueue({userId: "user_2", difficulty: "easy", language: "python"})
+    // publishToQueue({userId: "user_3", difficulty: "easy", language: "java"})
 
-})
+// })
 
 
 module.exports = app;

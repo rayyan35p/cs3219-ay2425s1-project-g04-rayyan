@@ -1,11 +1,28 @@
+const { publishToQueue } = require('../rabbitmq/publisher')
 const WebSocket = require('ws');
 const wss = new WebSocket.Server({ port: 8080 });
 
 wss.on('connection', (ws) => {
     console.log('User connected to WebSocket');
-    
-    ws.on('message', (message) => {
+
+    // Listen for messages from the frontend
+    ws.on('message', async (message) => {
         console.log(`Received message: ${message}`);
+
+        // Parse the message to extract userId, difficulty, and language
+        const { userId, difficulty, language } = JSON.parse(message);
+
+        // Call the RabbitMQ publisher to publish this message to the queue
+        try {
+            await publishToQueue({ userId, difficulty, language });
+            console.log('Message published to RabbitMQ');
+            
+            // // Notify the user that they have been matched successfully
+            // ws.send(JSON.stringify({ status: 'success', message: 'Match request sent!' }));
+        } catch (error) {
+            console.error('Error publishing message to RabbitMQ:', error);
+            // ws.send(JSON.stringify({ status: 'error', message: 'Match request failed!' }));
+        }
     });
 
     ws.on('close', () => {
