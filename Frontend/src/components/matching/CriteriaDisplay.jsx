@@ -30,8 +30,9 @@ const CriteriaDisplay = ({ difficulty, language }) => {
                     <Card.Title>Selected Criteria</Card.Title>
                     <Card.Text>
                         <span>
-                            Difficulty: <Badge bg={getBadgeVariant(difficulty ? difficulty : "Null" )}>{capitalizeFirstLetter(difficulty ? difficulty : "Null")}</Badge>{' '}
-                            Language: <strong>{capitalizeFirstLetter(language ? language : "???")}</strong>
+                            Difficulty: <Badge bg={getBadgeVariant(difficulty ? difficulty : "Not Selected" )}>{capitalizeFirstLetter(difficulty ? difficulty : "Not Selected")}</Badge>
+                            <br></br>
+                            Language: <strong>{capitalizeFirstLetter(language ? language : "Not Selected")}</strong>
                         </span>
                     </Card.Text>
                 </Card.Body>
