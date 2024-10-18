@@ -1,11 +1,24 @@
 const amqp = require('amqplib');
-// Connect -> Exchange -> Queue -> Bind -> Publish
 const { matching_exchange_name } = require('./setup.js');
+
+let channel = null;  // Store a persistent channel connection
+
+async function connectToRabbitMQ() {
+    if (!channel) {
+        try {
+            const connection = await amqp.connect(process.env.RABBITMQ_URL);
+            channel = await connection.createChannel();
+            console.log("RabbitMQ channel created");
+        } catch (error) {
+            console.error('Error creating RabbitMQ channel:', error);
+        }
+    }
+    return channel;
+}
 
 async function publishToQueue({userId, difficulty, language}) {
     try {
-        const connection = await amqp.connect(process.env.RABBITMQ_URL);
-        const channel = await connection.createChannel();
+        const channel = await connectToRabbitMQ();  // Reuse persistent connection
         const routingKey = `${difficulty}.${language}`;
 
         // Publish the message to the exchange
@@ -20,18 +33,9 @@ async function publishToQueue({userId, difficulty, language}) {
         } else {
             console.error(`Message NOT sent: ${userId} -> ${routingKey}`);
         }
-        
-        await channel.close();
-        await connection.close();
     } catch (error) {
         console.error('Error publishing to RabbitMQ:', error);
     }
 }
 
 module.exports = { publishToQueue };
-
-
-
-
-
-

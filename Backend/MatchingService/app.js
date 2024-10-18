@@ -4,7 +4,6 @@ const dotenv = require("dotenv");
 const matchmakingRouter = require("./controllers/matchmaking");
 const { consumeQueue, consumeDLQ } = require('./rabbitmq/subscriber');
 const { setupRabbitMQ } = require('./rabbitmq/setup');
-const { publishToQueue } = require('./rabbitmq/publisher')
 
 dotenv.config();
 

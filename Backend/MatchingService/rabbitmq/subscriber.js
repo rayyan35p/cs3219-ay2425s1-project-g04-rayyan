@@ -64,11 +64,39 @@ async function acknowledgeMessage(channel, msg) {
 async function rejectMessage(channel, msg, userId) {
     return new Promise((resolve, reject) => {
         try {
+            // Get user data from the message to find the correct key in waitingUsers
+            const userData = JSON.parse(msg.content.toString());
+            const { language, difficulty } = userData;
+
+            // Correctly creating the criteriaKey using template literals
+            const criteriaKey = `${difficulty}.${language}`;
+
+            
+            // Find the user in the waitingUsers list and remove them
+            if (waitingUsers[criteriaKey]) {
+                // Find the index of the user in the waiting list
+                const userIndex = waitingUsers[criteriaKey].findIndex(user => user.userId === userId);
+
+                if (userIndex !== -1) {
+                    // Remove the user from the waiting list
+                    waitingUsers[criteriaKey].splice(userIndex, 1);
+                    console.log(`Removed user ${userId} from waiting list for ${criteriaKey}`);
+                }
+            }
+
+            // Reject the message without requeuing
             channel.reject(msg, false); // Reject without requeuing
             console.log(`Rejected message for user: ${userId}`);
+
+            // Clean up the timeoutMap
+            if (timeoutMap[userId]) {
+                clearTimeout(timeoutMap[userId]);
+                delete timeoutMap[userId];
+            }
+
             resolve();
         } catch (error) {
-            console.error(`Failed to reject message for user ${userId}:`, error);
+            console.error(`Failed to reject message for user ${userId}:, error`);
             reject(error);
         }
     });

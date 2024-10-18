@@ -1,4 +1,4 @@
-const { publishToQueue } = require('../rabbitmq/publisher')
+const { publishToQueue } = require('../rabbitmq/publisher');
 const WebSocket = require('ws');
 const wss = new WebSocket.Server({ port: 8080 });
 
@@ -7,21 +7,24 @@ wss.on('connection', (ws) => {
 
     // Listen for messages from the frontend
     ws.on('message', async (message) => {
-        console.log(`Received message: ${message}`);
-
-        // Parse the message to extract userId, difficulty, and language
-        const { userId, difficulty, language } = JSON.parse(message);
-
-        // Call the RabbitMQ publisher to publish this message to the queue
         try {
+            console.log(`Received message: ${message}`);
+
+            // Parse the message to extract userId, difficulty, and language
+            const { userId, difficulty, language } = JSON.parse(message);
+
+            // Store userId in WebSocket connection
+            ws.userId = userId;
+
+            // Call the RabbitMQ publisher to publish this message to the queue
             await publishToQueue({ userId, difficulty, language });
             console.log('Message published to RabbitMQ');
             
-            // // Notify the user that they have been matched successfully
-            // ws.send(JSON.stringify({ status: 'success', message: 'Match request sent!' }));
+            // Notify the user that their message has been processed successfully
+            ws.send(JSON.stringify({ status: 'success', message: 'Match request sent!' }));
         } catch (error) {
-            console.error('Error publishing message to RabbitMQ:', error);
-            // ws.send(JSON.stringify({ status: 'error', message: 'Match request failed!' }));
+            console.error('Error handling WebSocket message:', error);
+            ws.send(JSON.stringify({ status: 'error', message: 'Match request failed!' }));
         }
     });
 
@@ -30,6 +33,7 @@ wss.on('connection', (ws) => {
     });
 });
 
+
 /**
  * Notify users through WebSocket.
  * @param {string|array} userId - User ID or an array of user IDs to notify.
@@ -37,15 +41,17 @@ wss.on('connection', (ws) => {
  * @param {string} type - The type of message (e.g., 'match' or 'rejection').
  */
 function notifyUsers(userId, message, type) {
-    console.log(`Notifying user: ${userId}, Message: ${message}, Type: ${type}`); // Log message details
-    
+    console.log(`Notifying user(s): ${userId}, Message: ${message}, Type: ${type}`);
+
+    const userIds = Array.isArray(userId) ? userId : [userId]; // Convert to array if single user
+
     wss.clients.forEach((client) => {
-        if (client.readyState === WebSocket.OPEN) {
-            // Construct the payload to include userId, message, and type
+        if (client.readyState === WebSocket.OPEN && userIds.includes(client.userId)) {
+            console.log(`Notifying client: ${client.userId}`);
             client.send(JSON.stringify({
-                userId, 
+                userId: client.userId, 
                 message,
-                type // This allows the frontend to differentiate between match and rejection messages
+                type
             }));
         }
     });
