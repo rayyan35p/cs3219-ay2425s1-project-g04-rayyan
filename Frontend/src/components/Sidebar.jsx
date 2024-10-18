@@ -63,6 +63,7 @@ function Sidebar() {
     const handleMatch = () => {
         if (ws && difficulty && language) {
             setShowMatching(true);
+            setShowUnsuccessfulMatch(false);
             ws.send(JSON.stringify({ userId, difficulty, language })); // Send to server
         } else {
             alert('Please select a difficulty and language.');
@@ -111,7 +112,7 @@ function Sidebar() {
             </Modal>
 
             <Modal show={showUnsuccessfulMatch} onHide={handleCloseUnsuccessfulMatch} backdrop="static" className="custom-modal" centered>
-                <UnsuccessfulMatch handleClose={handleCloseUnsuccessfulMatch}/>
+                <UnsuccessfulMatch handleClose={handleCloseUnsuccessfulMatch} handleMatch={handleMatch}/>
             </Modal>
         </Stack>
     );
