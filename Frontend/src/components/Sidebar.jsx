@@ -4,9 +4,10 @@ import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
 import Form from 'react-bootstrap/Form';
 import Modal from "react-bootstrap/Modal";
-import Matching from "./Matching";
-import SuccessfulMatch from "./SuccessfulMatch";
-import UnsuccessfulMatch from "./UnsuccessfulMatch";
+import Matching from "./matching/Matching";
+import SuccessfulMatch from "./matching/SuccessfulMatch";
+import UnsuccessfulMatch from "./matching/UnsuccessfulMatch";
+import CriteriaDisplay from './matching/CriteriaDisplay';
 const { getUserFromToken } = require('./user/userAvatarBox');
 
 function Sidebar() {
@@ -60,8 +61,8 @@ function Sidebar() {
     }, []);
 
     const handleMatch = () => {
-        setShowMatching(true);
         if (ws && difficulty && language) {
+            setShowMatching(true);
             ws.send(JSON.stringify({ userId, difficulty, language })); // Send to server
         } else {
             alert('Please select a difficulty and language.');
@@ -94,6 +95,10 @@ function Sidebar() {
                 <option value="Java">Java</option>
                 <option value="C++">C++</option>
             </Form.Select>
+
+            {/* Display Criteria Selected*/}
+            <CriteriaDisplay difficulty={difficulty} language={language}></CriteriaDisplay>
+
             <Button variant="primary" onClick={handleMatch}>Match me!</Button>
 
             {/* Modals */}

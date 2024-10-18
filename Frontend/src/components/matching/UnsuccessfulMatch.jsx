@@ -8,7 +8,7 @@ function UnsuccessfulMatch({ handleClose }) {
             <div className="matching-text">
             <CloseButton className="close-button" onClick={handleClose}></CloseButton>
                 <h2>Sorry, we are unable to find you a match.</h2>
-                <button className='btn btn-primary btn-sm'>Match me again</button>
+                {/*<button className='btn btn-primary btn-sm'>Match me again</button>*/}
             </div>
         </div>
     );
