@@ -18,7 +18,7 @@ services:
       context: ./Backend/MatchingService
       dockerfile: Dockerfile
     ports:
-      - "3003:3003"
+      - "8080:8080"
 
   frontend:
     build:
