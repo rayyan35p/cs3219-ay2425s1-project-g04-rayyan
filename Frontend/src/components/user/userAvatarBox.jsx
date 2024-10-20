@@ -5,7 +5,7 @@ import {jwtDecode} from "jwt-decode";
 import userService from "../../services/users";
 
 
-async function getUserFromToken() {
+export async function getUserFromToken() {
     const jwtToken = sessionStorage.getItem('jwt_token');
     if (jwtToken) {
         const decodedToken = jwtDecode(jwtToken);

@@ -13,6 +13,13 @@ services:
     ports:
       - "3002:3002"
 
+  matching-service:
+    build:
+      context: ./Backend/MatchingService
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+
   frontend:
     build:
       context: ./Frontend

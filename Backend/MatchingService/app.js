@@ -4,7 +4,6 @@ const dotenv = require("dotenv");
 const matchmakingRouter = require("./controllers/matchmaking");
 const { consumeQueue, consumeDLQ } = require('./rabbitmq/subscriber');
 const { setupRabbitMQ } = require('./rabbitmq/setup');
-const { publishToQueue } = require('./rabbitmq/publisher')
 
 dotenv.config();
 
@@ -23,9 +22,9 @@ setupRabbitMQ().then(() => {
     consumeQueue().catch(console.error);
     consumeDLQ().catch(console.error);
 
-    publishToQueue({userId: "user_1", difficulty: "easy", language: "java"})
-    publishToQueue({userId: "user_2", difficulty: "easy", language: "python"})
-    publishToQueue({userId: "user_3", difficulty: "easy", language: "java"})
+    // publishToQueue({userId: "user_1", difficulty: "easy", language: "java"})
+    // publishToQueue({userId: "user_2", difficulty: "easy", language: "python"})
+    // publishToQueue({userId: "user_3", difficulty: "easy", language: "java"})
 
 })
 

@@ -23,7 +23,8 @@ function matchUsers(channel, msg, userId, language, difficulty) {
         waitingUsers[criteriaKey] = [];
     }
 
-    waitingUsers[criteriaKey].push({ userId, msg }); // Store both userId and the message
+    // Store both the userId, message, and the channel in waitingUsers
+    waitingUsers[criteriaKey].push({ userId, msg, channel });
     console.log(`User ${userId} added to ${criteriaKey}. Waiting list: ${waitingUsers[criteriaKey].length}`);
 
     // Check if there are 2 or more users waiting for this criteria
@@ -31,12 +32,11 @@ function matchUsers(channel, msg, userId, language, difficulty) {
         const matchedUsers = waitingUsers[criteriaKey].splice(0, 2); // Match the first two users
         console.log(`Matched users: ${matchedUsers.map(user => user.userId)}`);
 
-        // Send match success (this could trigger WebSocket communication)
-        // notifyUsers(matchedUsers.map(user => user.userId));
+        // Notify users of the match
         notifyUsers(matchedUsers.map(user => user.userId), 'Match found!', 'match');
 
         // Acknowledge the messages for both matched users
-        matchedUsers.forEach(({ msg }) => {
+        matchedUsers.forEach(({ msg, channel }) => {
             acknowledgeMessage(channel, msg);
         });
 
@@ -45,6 +45,7 @@ function matchUsers(channel, msg, userId, language, difficulty) {
 
     return false;
 }
+
 
 async function acknowledgeMessage(channel, msg) {
     return new Promise((resolve, reject) => {
@@ -64,11 +65,39 @@ async function acknowledgeMessage(channel, msg) {
 async function rejectMessage(channel, msg, userId) {
     return new Promise((resolve, reject) => {
         try {
+            // Get user data from the message to find the correct key in waitingUsers
+            const userData = JSON.parse(msg.content.toString());
+            const { language, difficulty } = userData;
+
+            // Correctly creating the criteriaKey using template literals
+            const criteriaKey = `${difficulty}.${language}`;
+
+            
+            // Find the user in the waitingUsers list and remove them
+            if (waitingUsers[criteriaKey]) {
+                // Find the index of the user in the waiting list
+                const userIndex = waitingUsers[criteriaKey].findIndex(user => user.userId === userId);
+
+                if (userIndex !== -1) {
+                    // Remove the user from the waiting list
+                    waitingUsers[criteriaKey].splice(userIndex, 1);
+                    console.log(`Removed user ${userId} from waiting list for ${criteriaKey}`);
+                }
+            }
+
+            // Reject the message without requeuing
             channel.reject(msg, false); // Reject without requeuing
             console.log(`Rejected message for user: ${userId}`);
+
+            // Clean up the timeoutMap
+            if (timeoutMap[userId]) {
+                clearTimeout(timeoutMap[userId]);
+                delete timeoutMap[userId];
+            }
+
             resolve();
         } catch (error) {
-            console.error(`Failed to reject message for user ${userId}:`, error);
+            console.error(`Failed to reject message for user ${userId}:, error`);
             reject(error);
         }
     });
@@ -76,7 +105,6 @@ async function rejectMessage(channel, msg, userId) {
 
 async function consumeQueue() {
     try {
-        // Connect
         const connection = await amqp.connect(process.env.RABBITMQ_URL);
         const channel = await connection.createChannel();
 
@@ -95,23 +123,23 @@ async function consumeQueue() {
                     // Call matchUsers with channel, message, and user details
                     const matched = matchUsers(channel, msg, userId, language, difficulty);
 
-                    // If not matched, set a timeout for rejection
                     if (!matched) {
                         console.log(`No match for ${userId}, waiting for rejection timeout.`);
 
-                        // Set a timeout for rejection after 10 seconds
                         const timeoutId = setTimeout(async () => {
                             await rejectMessage(channel, msg, userId);
                         }, 10000); // 10 seconds delay
 
-                        // Store the timeout ID
                         timeoutMap[userId] = timeoutId;
                     }
                 }
-            });
+            }, { noAck: false }); // Ensure manual acknowledgment
         }
 
         console.log("Listening to matchmaking queues");
+
+        await consumeCancelQueue();
+        console.log("Listening to Cancel Queue");
     } catch (error) {
         console.error('Error consuming RabbitMQ queue:', error);
     }
@@ -143,5 +171,72 @@ async function consumeDLQ() {
       console.error('Error consuming from DLQ:', error);
   }
 }
+
+async function consumeCancelQueue() {
+    try {
+        const connection = await amqp.connect(process.env.RABBITMQ_URL);
+        const channel = await connection.createChannel();
+
+        // Subscribe to the cancel queue
+        await channel.consume('cancel_queue', async (msg) => {
+            if (msg !== null) {
+                const { userId } = JSON.parse(msg.content.toString());
+                console.log(`Received cancel request for user: ${userId}`);
+
+                // Process the cancel request
+                await cancelMatching(channel, msg, userId);
+            }
+        }, { noAck: false }); // Ensure manual acknowledgment
+
+        console.log("Listening for cancel requests");
+    } catch (error) {
+        console.error('Error consuming cancel queue:', error);
+    }
+}
+
+async function cancelMatching(cancelChannel, cancelMsg, userId) {
+    try {
+        let foundOriginalMsg = false;
+
+        // Loop through waitingUsers to find the original message for the user
+        Object.keys(waitingUsers).forEach(criteriaKey => {
+            const userIndex = waitingUsers[criteriaKey].findIndex(user => user.userId === userId);
+
+            if (userIndex !== -1) {
+                const { msg, channel } = waitingUsers[criteriaKey][userIndex]; // Get original msg and its channel
+
+                // Acknowledge the original matchmaking message from the queue (e.g., easy.python)
+                if (msg && channel) {
+                    console.log(`Acknowledging original message for user ${userId} in queue ${criteriaKey}`);
+                    channel.ack(msg); // Use the same channel that consumed the message to acknowledge it
+                    foundOriginalMsg = true;
+                }
+
+                // Remove the user from the waiting list
+                waitingUsers[criteriaKey].splice(userIndex, 1);
+                console.log(`User ${userId} removed from waiting list for ${criteriaKey}`);
+            }
+        });
+
+        // If original message not found, log a warning
+        if (!foundOriginalMsg) {
+            console.warn(`Original message for user ${userId} not found in matchmaking queues.`);
+        }
+
+        // Clear any timeouts for the user
+        if (timeoutMap[userId]) {
+            clearTimeout(timeoutMap[userId]);
+            delete timeoutMap[userId];
+        }
+
+        // Acknowledge the cancel message from the cancel queue
+        cancelChannel.ack(cancelMsg);
+        console.log(`Cancel processed for user ${userId}`);
+
+    } catch (error) {
+        console.error(`Failed to process cancel for user ${userId}:`, error);
+    }
+}
+
 
 module.exports = { consumeQueue, consumeDLQ };
