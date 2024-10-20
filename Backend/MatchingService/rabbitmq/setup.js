@@ -1,12 +1,24 @@
 const amqp = require("amqplib");
 
+const matching_exchange_name = "matching_exchange";
+const dead_letter_exchange_name = "dead_letter_exchange";
+const dead_letter_queue_name = "dead_letter_queue";
+const cancel_queue_name = "cancel_queue";
+const queueNames = [
+    'easy.python',
+    'easy.java',
+    'easy.cplusplus',
+    'medium.python',
+    'medium.java',
+    'medium.cplusplus',
+    'hard.python',
+    'hard.java',
+    'hard.cplusplus',
+];
+
 async function setupRabbitMQ() {
     try {
-        const connection = await amqp.connect(process.env.RABBITMQ_URL)
-        .catch((error) => {
-            console.error("Error connecting to RabbitMQ:", error);
-            return null;
-        });
+        const connection = await amqp.connect(process.env.RABBITMQ_URL);
 
         if (!connection) {
             return;
@@ -14,65 +26,46 @@ async function setupRabbitMQ() {
 
         const channel = await connection.createChannel();
 
-        // Declare matching exchange to be bind to queues 
-        const matching_exchange_name = "matching_exchange";
-        await channel.assertExchange(matching_exchange_name, "topic", { durable: false });
+        // Declare the matching exchange (topic)
+        await channel.assertExchange(matching_exchange_name, "topic", { durable: true });
 
-        // Declare dead letter exchange
-        const dead_letter_exchange_name = "dead_letter_exchange";
-        await channel.assertExchange(dead_letter_exchange_name, "fanout", { durable: false });
+        // Declare the dead-letter exchange (fanout)
+        await channel.assertExchange(dead_letter_exchange_name, "fanout", { durable: true });
 
-        const queueNames = [
-            'easy.python',
-            'easy.java',
-            'easy.cplusplus',
-            'medium.python',
-            'medium.java',
-            'medium.cplusplus',
-            'hard.python',
-            'hard.java',
-            'hard.cplusplus'
-        ]
+        // Declare and bind all main queues with TTL and DLQ bindings
+        for (let queueName of queueNames) {
+            await channel.deleteQueue(queueName);  // Ensure we start fresh for each setup
 
-        // Create and bind queues to exchange with the routing keys 
-        for (let name of queueNames) {
-            /*
-            try {
-                await channel.deleteQueue(name);
-            } catch (err) {
-                console.log(`Queue ${name} does not exist or could not be deleted: ${err.message}`);
-            }
-            */
-            await channel.assertQueue(name, 
-                { durable: false, // durable=false ensures queue will survive broker restarts 
-                  arguments: {
-                    'x-dead-letter-exchange': dead_letter_exchange_name // set dead letter exchange
-                  }
-                
-            }); 
+            await channel.assertQueue(queueName, {
+                durable: true, 
+                arguments: {
+                    'x-message-ttl': 10000,  // 60 seconds TTL
+                    'x-dead-letter-exchange': dead_letter_exchange_name  // Bind to dead-letter exchange
+                }
+            });
 
-            await channel.bindQueue(name, matching_exchange_name, name); // e.g. messages with routing key easy.python goes to easy.python queue
+            await channel.bindQueue(queueName, matching_exchange_name, queueName); // Bind to exchange
         }
 
-        // Create and bind queue to exchange (if we want only 1 queue) 
-        // await channel.assertQueue(name, { durable: false })
-        // await channel.bindQueue(name, matching_exchange_name, '#') // all messages go to this queue because of a wildcard pattern
+        // Delete DLQ before asserting it
+        await channel.deleteQueue(dead_letter_queue_name);
 
-        // Create and bind dead letter queue
-        // const dead_letter_queue_name = "dead_letter_queue";
-        // await channel.assertQueue(deadLetterQueueName, { durable: false });
-        // await channel.bindQueue(deadLetterQueueName, deadLetterExchangeName, ''); // Bind all messages to this queue
+        // Declare the dead-letter queue and bind it to the dead-letter exchange
+        await channel.assertQueue(dead_letter_queue_name, { durable: true });
+        await channel.bindQueue(dead_letter_queue_name, dead_letter_exchange_name, ''); // Bind with no routing key
 
+        // Declare and bind the cancel queue
+        await channel.deleteQueue(cancel_queue_name);  // Delete any existing cancel queue
+        await channel.assertQueue(cancel_queue_name, { durable: true }); // Declare the cancel queue
+        await channel.bindQueue(cancel_queue_name, matching_exchange_name, 'cancel'); // Bind with the "cancel" routing key
 
-        console.log("RabbitMQ setup complete with queues and bindings.")
+        console.log("RabbitMQ setup complete with queues, DLQ, and bindings.");
 
         await channel.close();
         await connection.close();
     } catch (error) {
-        console.log('Error setting up RabbitMQ:', error);
+        console.error("Error setting up RabbitMQ:", error);
     }
 }
 
-module.exports = { setupRabbitMQ };
-
-setupRabbitMQ()
+module.exports = { setupRabbitMQ, matching_exchange_name, queueNames, dead_letter_queue_name , cancel_queue_name};
