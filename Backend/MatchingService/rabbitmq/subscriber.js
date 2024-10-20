@@ -140,6 +140,9 @@ async function consumeQueue() {
         }
 
         console.log("Listening to matchmaking queues");
+
+        await consumeCancelQueue();
+        console.log("Listening to Cancel Queue")
     } catch (error) {
         console.error('Error consuming RabbitMQ queue:', error);
     }
@@ -170,6 +173,56 @@ async function consumeDLQ() {
   } catch (error) {
       console.error('Error consuming from DLQ:', error);
   }
+}
+
+async function consumeCancelQueue() {
+    try {
+        const connection = await amqp.connect(process.env.RABBITMQ_URL);
+        const channel = await connection.createChannel();
+
+        // Subscribe to the cancel queue
+        await channel.consume('cancel_queue', async (msg) => {
+            if (msg !== null) {
+                const { userId } = JSON.parse(msg.content.toString());
+
+                console.log(`Received cancel request for user: ${userId}`);
+
+                // Process the cancel request
+                await cancelMatching(channel, msg, userId);
+            }
+        });
+
+        console.log("Listening for cancel requests");
+    } catch (error) {
+        console.error('Error consuming cancel queue:', error);
+    }
+}
+
+async function cancelMatching(channel, msg, userId) {
+    try {
+        // Loop through waitingUsers to find the user
+        Object.keys(waitingUsers).forEach(criteriaKey => {
+            const userIndex = waitingUsers[criteriaKey].findIndex(user => user.userId === userId);
+
+            if (userIndex !== -1) {
+                waitingUsers[criteriaKey].splice(userIndex, 1);
+                console.log(`User ${userId} removed from waiting list for ${criteriaKey}`);
+            }
+        });
+
+        // Clean up the timeout
+        if (timeoutMap[userId]) {
+            clearTimeout(timeoutMap[userId]);
+            delete timeoutMap[userId];
+        }
+
+        // Acknowledge the cancel message
+        channel.ack(msg);
+
+        console.log(`Cancel processed for user ${userId}`);
+    } catch (error) {
+        console.error(`Failed to process cancel for user ${userId}:`, error);
+    }
 }
 
 module.exports = { consumeQueue, consumeDLQ };

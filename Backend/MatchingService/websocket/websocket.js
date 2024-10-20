@@ -1,4 +1,4 @@
-const { publishToQueue } = require('../rabbitmq/publisher');
+const { publishToQueue , publishCancelRequest} = require('../rabbitmq/publisher');
 const WebSocket = require('ws');
 const wss = new WebSocket.Server({ port: 8080 });
 
@@ -11,17 +11,28 @@ wss.on('connection', (ws) => {
             console.log(`Received message: ${message}`);
 
             // Parse the message to extract userId, difficulty, and language
-            const { userId, difficulty, language } = JSON.parse(message);
+            const { userId, difficulty, language , action} = JSON.parse(message);
 
             // Store userId in WebSocket connection
             ws.userId = userId;
 
-            // Call the RabbitMQ publisher to publish this message to the queue
-            await publishToQueue({ userId, difficulty, language });
-            console.log('Message published to RabbitMQ');
+            if (action === 'match') {
+                // Call the RabbitMQ publisher to publish this message to the queue
+                await publishToQueue({ userId, difficulty, language });
+                console.log('Message published to RabbitMQ');
+                
+                // Notify the user that their message has been processed successfully
+                ws.send(JSON.stringify({ status: 'su9ccess', message: 'Match request sent!' }));
+            } else if (action === 'cancel') {
+                await publishCancelRequest({ userId });
+                console.log('Cancel request published to RabbitMQ');
+                
+                // Notify the user that their cancel request has been processed successfully
+                ws.send(JSON.stringify({ status: 'success', message: 'Match request cancelled!' }));
+            }
             
-            // Notify the user that their message has been processed successfully
-            ws.send(JSON.stringify({ status: 'success', message: 'Match request sent!' }));
+            
+            
         } catch (error) {
             console.error('Error handling WebSocket message:', error);
             ws.send(JSON.stringify({ status: 'error', message: 'Match request failed!' }));

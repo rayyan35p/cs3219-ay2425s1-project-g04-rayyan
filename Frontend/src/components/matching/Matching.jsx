@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import CloseButton from 'react-bootstrap/esm/CloseButton';
 import '../../css/Matching.css'; 
 
-function Matching({ handleClose }) {
+function Matching({ handleCancel }) {
     const [seconds, setSeconds] = useState(0);
     const [minutes, setMinutes] = useState(0);
 
@@ -26,7 +26,7 @@ function Matching({ handleClose }) {
             <div className="matching-text">
                 <h2>Matching you....</h2>
                 <p>{`${minutes < 10 ? `0${minutes}` : minutes}:${seconds < 10 ? `0${seconds}` : seconds}`}</p>
-                {/*<button className='btn btn-primary btn-sm' onClick={handleClose} >Cancel</button>*/}
+                <button className='btn btn-primary btn-sm' onClick={handleCancel} >Cancel</button>
             </div>
         </div>
     );

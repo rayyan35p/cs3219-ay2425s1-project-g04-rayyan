@@ -42,7 +42,7 @@ function Sidebar() {
 
         websocket.onmessage = (event) => {
             const { message, type } = JSON.parse(event.data);
-            console.log(`Notification from server: ${message} ////////////////////////////`);
+            console.log(`Notification from server: ${message}`);
             
             if (type === 'match') {
                 setShowMatching(false);
@@ -62,12 +62,17 @@ function Sidebar() {
 
     const handleMatch = () => {
         if (ws && difficulty && language) {
-            setShowMatching(true);
+            handleShowMatching();
             setShowUnsuccessfulMatch(false);
-            ws.send(JSON.stringify({ userId, difficulty, language })); // Send to server
+            ws.send(JSON.stringify({ userId, difficulty, language , action: 'match'})); // Send to server
         } else {
             alert('Please select a difficulty and language.');
         }
+    };
+
+    const handleCancel = () => {
+        handleCloseMatching();
+        ws.send(JSON.stringify({ userId, action: 'cancel' }));
     };
 
     return (
@@ -104,7 +109,7 @@ function Sidebar() {
 
             {/* Modals */}
             <Modal show={showMatching} onHide={handleCloseMatching} backdrop="static" className="custom-modal" centered>
-                <Matching handleClose={handleCloseMatching}/>
+                <Matching handleCancel={handleCancel}/>
             </Modal>
 
             <Modal show={showSuccessfulMatch} onHide={handleCloseSuccessfulMatch} backdrop="static" className="custom-modal" centered>

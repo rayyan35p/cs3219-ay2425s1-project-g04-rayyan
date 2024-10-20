@@ -38,4 +38,26 @@ async function publishToQueue({userId, difficulty, language}) {
     }
 }
 
-module.exports = { publishToQueue };
+async function publishCancelRequest({ userId }) {
+    try {
+        const channel = await connectToRabbitMQ(); // Reuse persistent connection
+        const routingKey = 'cancel'; // Define a routing key for cancellation
+
+        // Publish the cancel message to the exchange
+        const messageSent = channel.publish(
+            matching_exchange_name,
+            routingKey,
+            Buffer.from(JSON.stringify({ userId }))
+        );
+
+        if (messageSent) {
+            console.log(`Cancel request sent: ${userId}`);
+        } else {
+            console.error(`Cancel request NOT sent: ${userId}`);
+        }
+    } catch (error) {
+        console.error('Error publishing cancel request to RabbitMQ:', error);
+    }
+}
+
+module.exports = { publishToQueue, publishCancelRequest }; 

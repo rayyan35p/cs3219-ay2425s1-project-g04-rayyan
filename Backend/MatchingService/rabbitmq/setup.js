@@ -3,6 +3,7 @@ const amqp = require("amqplib");
 const matching_exchange_name = "matching_exchange";
 const dead_letter_exchange_name = "dead_letter_exchange";
 const dead_letter_queue_name = "dead_letter_queue";
+const cancel_queue_name = "cancel_queue";
 const queueNames = [
     'easy.python',
     'easy.java',
@@ -53,6 +54,11 @@ async function setupRabbitMQ() {
         await channel.assertQueue(dead_letter_queue_name, { durable: false });
         await channel.bindQueue(dead_letter_queue_name, dead_letter_exchange_name, ''); // Bind with no routing key
 
+        // Declare and bind the cancel queue
+        await channel.deleteQueue(cancel_queue_name);  // Delete any existing cancel queue
+        await channel.assertQueue(cancel_queue_name, { durable: false }); // Declare the cancel queue
+        await channel.bindQueue(cancel_queue_name, matching_exchange_name, 'cancel'); // Bind with the "cancel" routing key
+
         console.log("RabbitMQ setup complete with queues, DLQ, and bindings.");
 
         await channel.close();
@@ -62,4 +68,4 @@ async function setupRabbitMQ() {
     }
 }
 
-module.exports = { setupRabbitMQ, matching_exchange_name, queueNames, dead_letter_queue_name };
+module.exports = { setupRabbitMQ, matching_exchange_name, queueNames, dead_letter_queue_name , cancel_queue_name};
