@@ -22,7 +22,7 @@ wss.on('connection', (ws) => {
                 console.log('Message published to RabbitMQ');
                 
                 // Notify the user that their message has been processed successfully
-                ws.send(JSON.stringify({ status: 'su9ccess', message: 'Match request sent!' }));
+                ws.send(JSON.stringify({ status: 'success', message: 'Match request sent!' }));
             } else if (action === 'cancel') {
                 await publishCancelRequest({ userId });
                 console.log('Cancel request published to RabbitMQ');
@@ -50,8 +50,9 @@ wss.on('connection', (ws) => {
  * @param {string|array} userId - User ID or an array of user IDs to notify.
  * @param {string} message - The message to send.
  * @param {string} type - The type of message (e.g., 'match' or 'rejection').
+ * @param {object} [data] - Additional data (e.g., collaboration URL).
  */
-function notifyUsers(userId, message, type) {
+function notifyUsers(userId, message, type, data = {}) {
     console.log(`Notifying user(s): ${userId}, Message: ${message}, Type: ${type}`);
 
     const userIds = Array.isArray(userId) ? userId : [userId]; // Convert to array if single user
@@ -60,12 +61,14 @@ function notifyUsers(userId, message, type) {
         if (client.readyState === WebSocket.OPEN && userIds.includes(client.userId)) {
             console.log(`Notifying client: ${client.userId}`);
             client.send(JSON.stringify({
-                userId: client.userId, 
+                userId: client.userId,
                 message,
-                type
+                type,
+                ...data  // Include additional data such as collaboration URL
             }));
         }
     });
 }
+
 
 module.exports = { notifyUsers };
