@@ -1,6 +1,7 @@
 QuestionService/.env
 user-service/.env
 MatchingService/.env
+HistoryService/.env
 QuestionService/insert_questions_script.py
 
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
