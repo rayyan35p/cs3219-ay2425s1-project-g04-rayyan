@@ -42,6 +42,6 @@ const QuestionSchema = new mongoose.Schema({
 
 
 // We create a model with the name 'Question', a schema 'QuestionSchema', and specifically looking at 'Questions' cluster in
-// the 'Question-User-DB' database 
+// the 'Question-DB' database 
 const QuestionModel = mongoose.model('Question', QuestionSchema, 'Questions');
 module.exports = QuestionModel;
