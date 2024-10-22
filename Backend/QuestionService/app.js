@@ -10,7 +10,7 @@ const app = express()
 app.use(cors())
 app.use(express.json())
 
-const mongoURI = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@cs3219.rrxz3.mongodb.net/Question-User-DB?retryWrites=true&w=majority&appName=CS3219`
+const mongoURI = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@cs3219.rrxz3.mongodb.net/Question-DB?retryWrites=true&w=majority&appName=CS3219`
 mongoose.connect(mongoURI)
 .then(() => console.log('MongoDB connected'))
 .catch(err => console.error('MongoDB connection error:', err));
