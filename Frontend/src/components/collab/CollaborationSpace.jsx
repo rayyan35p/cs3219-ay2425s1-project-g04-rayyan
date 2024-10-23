@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Editor } from '@monaco-editor/react';
 import * as Y from 'yjs';
 import { WebsocketProvider } from 'y-websocket';
-import Button from 'react-bootstrap/Button';
 import { getUserFromToken } from '../user/userAvatarBox';
+import QuestionDisplay from './QuestionDisplay';
+import Chat from './Chat';
+import CollabNavigationBar from './CollabNavigationBar';
+import CodingSpace from './CodeSpace';
+import { Container, Row, Col } from 'react-bootstrap';
 
 const CollaborationSpace = () => {
     const navigate = useNavigate();
@@ -102,23 +105,19 @@ const CollaborationSpace = () => {
     }
 
     return (
-        <div style={{ textAlign: 'center', marginTop: '50px' }}>
-            <h1>Welcome to Collaboration Space</h1>
-            <p>You are in room: {roomId}</p>
-            <h3>Connected Users:</h3>
-            <ul>
-                {users.map(user => {
-                    return <li key={user}>{user}</li>
-                })}
-            </ul>
-            <Editor
-                height="800px"
-                language="javascript" // change this later to get from params too
-                value={code}
-                theme="vs-dark"
-                onChange={handleEditorChange}
-            />
-            <Button variant="danger" onClick={() => handleExit()}>Exit</Button>{' '}
+        <div>
+            <CollabNavigationBar handleExit={handleExit} users={users}/>
+            <Container fluid style={{ marginTop: '20px' }}>
+                <Row>
+                    <Col md={8}>
+                        <CodingSpace handleEditorChange={handleEditorChange} code={code}/>
+                    </Col>
+                    <Col md={4}>
+                        <QuestionDisplay/>
+                        <Chat/>
+                    </Col>
+                </Row>
+            </Container>
         </div>
     );
 };
