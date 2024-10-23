@@ -12,10 +12,12 @@ function setupWebSocket(server) {
 
             switch (data.type) {
                 case 'joinRoom':
-                    manageRoom(ws, data.roomId);
+                    // add user into room with roomId
+                    manageRoom(ws, data.roomId, data.userId, "join");
                     break;
-                case 'codeUpdate':
-                    broadcastToRoom(data.roomId, data.code);
+                case 'leaveRoom':
+                    // remove user from room with roomId
+                    manageRoom(ws, data.roomId, data.userId, "leave");
                     break;
                 default:
                     console.error('Unknown message type');
@@ -27,13 +29,6 @@ function setupWebSocket(server) {
         });
     });
 
-    function broadcastToRoom(roomId, code) {
-        wss.clients.forEach((client) => {
-            if (client.readyState === WebSocket.OPEN && client.roomId === roomId) {
-                client.send(JSON.stringify({ type: 'codeUpdate', code }));
-            }
-        });
-    }
 }
 
 module.exports = { setupWebSocket };
