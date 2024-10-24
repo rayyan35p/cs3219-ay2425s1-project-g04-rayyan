@@ -5,7 +5,7 @@ const Chat = () => {
 
     const messages = ["Hello!", "Nice to meet you!"]
     return (
-        <Card>
+        <Card className='mt-3'>
             <Card.Header>Chat</Card.Header>
             <Card.Body>
                 <ListGroup>

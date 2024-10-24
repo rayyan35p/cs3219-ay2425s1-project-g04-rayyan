@@ -6,8 +6,9 @@ import { getUserFromToken } from '../user/userAvatarBox';
 import QuestionDisplay from './QuestionDisplay';
 import Chat from './Chat';
 import CollabNavigationBar from './CollabNavigationBar';
-import CodingSpace from './CodeSpace';
+import CodeSpace from './CodeSpace';
 import { Container, Row, Col } from 'react-bootstrap';
+import collabService from '../../services/collab'; 
 
 const CollaborationSpace = () => {
     const navigate = useNavigate();
@@ -18,8 +19,17 @@ const CollaborationSpace = () => {
     const [code, setCode] = useState('');
     const [users, setUsers] = useState([]); // track users in the room 
     const [userId, setUserId] = useState(""); // current user 
+    const [language, setLanguage] = useState("python") // set default language to python 
+    const [output, setOutput] = useState("")
 
-    // get the userid only once with useEffect
+    // use https://emkc.org/api/v2/piston/runtimes to GET other languages
+    const LANGUAGEVERSIONS = {
+        "python" : "3.10.0",
+        "java" : "15.0.2",
+        "c++": "10.2.0"
+    }
+
+    {/* Set up websockets for room management on client side, and collaboration for Yjs */}
     useEffect(() => {
         const fetchUser = async () => {
             const user = await getUserFromToken();
@@ -82,6 +92,8 @@ const CollaborationSpace = () => {
         }
     }
 
+    {/* Functions to handle interaction with UI elements */}
+
     const handleExit = () => {
         // Notify server 3004 user is leaving 
         websocket.send(JSON.stringify({ type: 'leaveRoom', roomId, userId}));
@@ -98,6 +110,26 @@ const CollaborationSpace = () => {
         navigate("/home")
     };
 
+    const handleCodeRun = () => {
+        const code_message = {
+            "language": language,
+            "files": [
+                {
+                    "content": code
+                }
+            ],
+            "version": LANGUAGEVERSIONS[language]
+        }
+
+        collabService.getCodeOutput(code_message)
+        .then(result => {
+            console.log(result.data.run.output)
+            setOutput(result.data.run.output)
+        })
+        .catch(err => console.log(err));
+
+    }
+
     const handleEditorChange = (value) => {
         const yText = yDoc.getText('monacoEditor');
         yText.delete(0, yText.length); // Clear existing content 
@@ -106,11 +138,11 @@ const CollaborationSpace = () => {
 
     return (
         <div>
-            <CollabNavigationBar handleExit={handleExit} users={users}/>
+            <CollabNavigationBar handleExit={handleExit} handleCodeRun={handleCodeRun} users={users} setLanguage={setLanguage} language={language}/>
             <Container fluid style={{ marginTop: '20px' }}>
                 <Row>
                     <Col md={8}>
-                        <CodingSpace handleEditorChange={handleEditorChange} code={code}/>
+                        <CodeSpace handleEditorChange={handleEditorChange} code={code} language={language} output={output}/>
                     </Col>
                     <Col md={4}>
                         <QuestionDisplay/>
