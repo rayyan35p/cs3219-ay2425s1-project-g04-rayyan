@@ -1,39 +1,17 @@
 const WebSocket = require('ws');
-const { manageRoom } = require('../utils/roomManager');
 
-function setupWebSocket(server) {
-    const wss = new WebSocket.Server({ server });
+function setUpYjsSocket(port) {
+    const wss = new WebSocket.Server({ port: 1234 });
 
     wss.on('connection', (ws) => {
-        console.log('User connected to the collaboration space');
-
-        ws.on('message', (message) => {
-            const data = JSON.parse(message);
-
-            switch (data.type) {
-                case 'joinRoom':
-                    manageRoom(ws, data.roomId);
-                    break;
-                case 'codeUpdate':
-                    broadcastToRoom(data.roomId, data.code);
-                    break;
-                default:
-                    console.error('Unknown message type');
-            }
-        });
+        console.log('New client connected');
 
         ws.on('close', () => {
-            console.log('User disconnected from collaboration space');
+            console.log('Client disconnected');
         });
     });
 
-    function broadcastToRoom(roomId, code) {
-        wss.clients.forEach((client) => {
-            if (client.readyState === WebSocket.OPEN && client.roomId === roomId) {
-                client.send(JSON.stringify({ type: 'codeUpdate', code }));
-            }
-        });
-    }
+    console.log('Websocket server is listening on ws://localhost:1234')
 }
 
-module.exports = { setupWebSocket };
+module.exports = { setUpYjsSocket };
