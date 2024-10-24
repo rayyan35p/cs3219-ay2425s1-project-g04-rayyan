@@ -1,22 +1,21 @@
 const express = require('express');
 const http = require('http');
-const { setupWebSocket } = require('./websocket/collabSocket');
-// const { WebsocketServer } = require('y-websockets-server');
-
+const { setupWebSocket } = require('./websocket/roomManagerSocket');
+const { setUpYjsSocket } = require('./websocket/collabSocket');
 const app = express();
-//const PORT = 1234;
  
 const server = http.createServer(app);
+const yjsPORT = 1234
 
 // Set up WebSocket server and attach to HTTP server
 setupWebSocket(server);
-
-//const wss = new WebsocketServer(PORT);
-//console.log(`Yjs WebSocket server is running on ws://localhost:${PORT}`)
+setUpYjsSocket(yjsPORT);
 
 // Basic route to test the server
 app.get('/', (req, res) => {
     res.send('CollabService using Yjs is running');
 });
+
+
 
 module.exports = { server };

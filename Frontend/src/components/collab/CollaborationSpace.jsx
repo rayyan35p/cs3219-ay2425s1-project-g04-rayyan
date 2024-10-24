@@ -76,7 +76,6 @@ const CollaborationSpace = () => {
         const wsProvider = new WebsocketProvider("ws://localhost:1234", roomId, doc);
         setProvider(wsProvider);
 
-
         // Create a shared type in Yjs for collaborative code editing
         const yText = doc.getText('monacoEditor');
 
