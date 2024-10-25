@@ -6,7 +6,7 @@ function manageRoom(ws, roomId, userId, type) {
 
     switch (type) {
         case "join":
-            
+
             // userIds -> track users in room
             // matchedUserIds -> check authorized users
             if (!rooms[roomId]) {
@@ -14,7 +14,7 @@ function manageRoom(ws, roomId, userId, type) {
             }
 
             console.log(`BEFORE room Info: userIds[${rooms[roomId].userIds}] || matchedusers[${rooms[roomId].matchedUserIds}]`)
-        
+
             const numOfMatchedUsers = rooms[roomId].matchedUserIds.length
 
             // max 2 authorized users per room
@@ -23,7 +23,7 @@ function manageRoom(ws, roomId, userId, type) {
                 rooms[roomId].userIds.push(userId);
                 rooms[roomId].matchedUserIds.push(userId);
             }
-            
+
             if (numOfMatchedUsers === 2){
                 if (!rooms[roomId].matchedUserIds.includes(userId)){
                     console.log(`User ${userId} is denied access to room ${roomId}`);
@@ -36,7 +36,7 @@ function manageRoom(ws, roomId, userId, type) {
                     rooms[roomId].userIds.push(userId);
                 }
             }
-            
+
 
             // set websocket roomId 
             ws.roomId = roomId;
@@ -101,9 +101,13 @@ function manageRoom(ws, roomId, userId, type) {
     }
 }
 
+function getRoom(roomId) {
+    return rooms[roomId];
+}
+
 function getUsersInRoom(roomId){
     return rooms[roomId]?.userIds || [];
 }
 
-module.exports = { manageRoom, getUsersInRoom };
+module.exports = { manageRoom, getRoom, getUsersInRoom };
 

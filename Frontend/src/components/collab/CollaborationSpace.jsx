@@ -20,11 +20,13 @@ const CollaborationSpace = () => {
     const [yDoc, setYDoc] = useState(null);
     const [provider, setProvider] = useState(null);
     const [code, setCode] = useState('');
-    const [users, setUsers] = useState([]); // Track users in the room 
-    const [userId, setUserId] = useState(""); // Current user 
-    const [language, setLanguage] = useState("python"); // Set default language to python 
-    const [output, setOutput] = useState("");
+    const [users, setUsers] = useState([]); // track users in the room 
+    const [userId, setUserId] = useState(""); // current user 
+    const [language, setLanguage] = useState("python") // set default language to python 
+    const [output, setOutput] = useState("")
+    const [messages, setMessages] = useState([])
 
+    // use https://emkc.org/api/v2/piston/runtimes to GET other languages
     const LANGUAGEVERSIONS = {
         "python" : "3.10.0",
         "java" : "15.0.2",
@@ -65,6 +67,10 @@ const CollaborationSpace = () => {
         };
     }, []);
 
+    useEffect(() => {
+        console.log("Messages state updated:", messages);
+    }, [messages]);
+
     const initiateWebSocket = (userId) => {
         if (websocketRef.current) return; // Prevent duplicate connections
 
@@ -93,22 +99,32 @@ const CollaborationSpace = () => {
                     setShowAccessDeniedToast(true);
                     setLoading(false);
                     break;
+                case 'newMessage':
+                    console.log("adding message", data.message)
+                    setMessages((prevMessages) => [...prevMessages, data.message]);
+                    break;
                 default:
                     console.log("No messages received from room management server");
                     break;
             }
         };
 
+        // create a Yjs document for collaboration
         const doc = new Y.Doc();
         setYDoc(doc);
 
+        // create websocket provider to synchronize the document
         const wsProvider = new WebsocketProvider("ws://localhost:1234", roomId, doc);
         setProvider(wsProvider);
 
+        // Create a shared type in Yjs for collaborative code editing
         const yText = doc.getText('monacoEditor');
+
+        // Update monaco editor with Yjs changes 
         yText.observe(() => {
             setCode(yText.toString());
         });
+
         return () => {
             // clean up for room management
             wsProvider.destroy();
@@ -155,6 +171,11 @@ const CollaborationSpace = () => {
         yText.insert(0, value);
     };
 
+    const sendMessage = (text) => {
+        const message = {text, sender: userId};
+        websocketRef.current.send(JSON.stringify({ type: 'sendMessage', roomId: roomId, message: message}));
+    }
+
     if (loading) {
         return (
             <div style={{ textAlign: 'center' }}>
@@ -170,10 +191,10 @@ const CollaborationSpace = () => {
         <div style={{ textAlign: 'center' }}>
             {showAccessDeniedToast ? (
                 <ToastContainer className="p-3" position="top-center" style={{ zIndex: 1 }}>
-                    <Toast 
-                        onClose={handleCloseToast} 
-                        show={showAccessDeniedToast} 
-                        delay={3000} 
+                    <Toast
+                        onClose={handleCloseToast}
+                        show={showAccessDeniedToast}
+                        delay={3000}
                         autohide
                         bg="danger"
                     >
@@ -192,7 +213,7 @@ const CollaborationSpace = () => {
                             </Col>
                             <Col md={4}>
                                 <QuestionDisplay/>
-                                <Chat/>
+                                <Chat currentUser={userId} messages={messages} sendMessage={sendMessage}> </Chat>
                             </Col>
                         </Row>
                     </Container>
