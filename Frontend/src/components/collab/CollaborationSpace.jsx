@@ -104,10 +104,23 @@ const CollaborationSpace = () => {
         yText.observe(() => {
             setCode(yText.toString());
         });
+        return () => {
+            // clean up for room management
+            wsProvider.destroy();
+            doc.destroy();
+        }
     };
 
     const handleExit = () => {
         if (websocketRef.current) websocketRef.current.send(JSON.stringify({ type: 'leaveRoom', roomId, userId }));
+        // Clean up Yjs document and provider before going back to home
+        if (provider) {
+            provider.destroy();
+        }
+
+        if (yDoc) {
+            yDoc.destroy();
+        }
         navigate("/home");
     };
 
@@ -119,7 +132,10 @@ const CollaborationSpace = () => {
         };
 
         collabService.getCodeOutput(code_message)
-            .then(result => setOutput(result.data.run.output))
+            .then(result => {
+                console.log(result.data.run.output)
+                setOutput(result.data.run.output)
+            })
             .catch(err => console.log(err));
     };
 
