@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import * as Y from 'yjs';
 import { WebsocketProvider } from 'y-websocket';
@@ -16,32 +16,27 @@ import Spinner from 'react-bootstrap/Spinner';
 const CollaborationSpace = () => {
     const navigate = useNavigate();
     const { roomId } = useParams(); // Get the roomId from the URL
+    const websocketRef = useRef(null); // Use ref to persist websocket across renders
     const [yDoc, setYDoc] = useState(null);
     const [provider, setProvider] = useState(null);
-    const [websocket, setWebsocket] = useState(null); // add websocket state to be access by other functions
     const [code, setCode] = useState('');
-    const [users, setUsers] = useState([]); // track users in the room 
-    const [userId, setUserId] = useState(""); // current user 
-    const [language, setLanguage] = useState("python") // set default language to python 
-    const [output, setOutput] = useState("")
-
+    const [users, setUsers] = useState([]); // Track users in the room 
+    const [userId, setUserId] = useState(""); // Current user 
+    const [language, setLanguage] = useState("python"); // Set default language to python 
+    const [output, setOutput] = useState("");
+    
     const LANGUAGEVERSIONS = {
         "python" : "3.10.0",
         "java" : "15.0.2",
         "c++": "10.2.0"
     };
 
-    const [showAccessDeniedToast, setShowAccessDeniedToast] = useState(
-        JSON.parse(sessionStorage.getItem('showAccessDeniedToast')) || false
-    );
+    const [showAccessDeniedToast, setShowAccessDeniedToast] = useState(false);
     const [toastMessage, setToastMessage] = useState('');
-    const [loading, setLoading] = useState(
-        JSON.parse(sessionStorage.getItem('loading')) !== false
-    );
+    const [loading, setLoading] = useState(true);
 
     const handleCloseToast = () => {
         setShowAccessDeniedToast(false);
-        sessionStorage.setItem('showAccessDeniedToast', false);
         navigate("/home");
     };
 
@@ -58,40 +53,40 @@ const CollaborationSpace = () => {
         };
 
         fetchUser();
-        // Sync states with sessionStorage
+
         return () => {
-            sessionStorage.setItem('loading', loading);
-            sessionStorage.setItem('showAccessDeniedToast', showAccessDeniedToast);
+            if (websocketRef.current) {
+                websocketRef.current.close();
+                websocketRef.current = null;
+            }
+            if (provider) provider.destroy();
+            if (yDoc) yDoc.destroy();
         };
-    }, [loading, showAccessDeniedToast]);
+    }, []);
 
     const initiateWebSocket = (userId) => {
+        if (websocketRef.current) return; // Prevent duplicate connections
         const websocket = new WebSocket("ws://localhost:3004");
-        setWebsocket(websocket);
+        websocketRef.current = websocket;
 
         websocket.onopen = () => {
-            websocket.send(JSON.stringify( {type: 'joinRoom', roomId, userId: userId}));
-            
-            // Request userIds when matched user rejoins
+            websocket.send(JSON.stringify({ type: 'joinRoom', roomId, userId }));
             websocket.send(JSON.stringify({ type: 'requestUserList', roomId }));
         };
 
         websocket.onmessage = (event) => {
             const data = JSON.parse(event.data);
-            const stringData = JSON.stringify(data);
-            console.log(`[FRONTEND] data message is ${stringData}`);
+            console.log(`[FRONTEND] data message is ${JSON.stringify(data)}`);
             switch (data.type) {
                 case 'usersListUpdate':
-                    setUsers(data.users);  // Update the user list
+                    setUsers(data.users); // Update the user list
                     setShowAccessDeniedToast(false);
-                    setLoading(false);      // Access allowed; stop loading
-                    sessionStorage.setItem('loading', false);
+                    setLoading(false); // Access allowed; stop loading
                     break;
                 case 'accessDenied':
                     setToastMessage(data.message);
                     setShowAccessDeniedToast(true);
                     setLoading(false);
-                    sessionStorage.setItem('showAccessDeniedToast', true);
                     break;
                 default:
                     console.log("No messages received from room management server");
@@ -99,33 +94,20 @@ const CollaborationSpace = () => {
             }
         };
 
-        // create a Yjs document for collaboration
         const doc = new Y.Doc();
         setYDoc(doc);
 
-        // create websocket provider to synchronize the document
         const wsProvider = new WebsocketProvider("ws://localhost:1234", roomId, doc);
         setProvider(wsProvider);
 
-        // Create a shared type in Yjs for collaborative code editing
         const yText = doc.getText('monacoEditor');
-
-        // Update monaco editor with Yjs changes 
         yText.observe(() => {
             setCode(yText.toString());
         });
-
-        return () => {
-            // clean up for room management
-            wsProvider.destroy();
-            doc.destroy();
-        };
     };
 
     const handleExit = () => {
-        websocket.send(JSON.stringify({ type: 'leaveRoom', roomId, userId}));
-        if (provider) provider.destroy();
-        if (yDoc) yDoc.destroy();
+        if (websocketRef.current) websocketRef.current.send(JSON.stringify({ type: 'leaveRoom', roomId, userId }));
         navigate("/home");
     };
 
@@ -137,8 +119,8 @@ const CollaborationSpace = () => {
         };
 
         collabService.getCodeOutput(code_message)
-        .then(result => setOutput(result.data.run.output))
-        .catch(err => console.log(err));
+            .then(result => setOutput(result.data.run.output))
+            .catch(err => console.log(err));
     };
 
     const handleEditorChange = (value) => {
@@ -149,7 +131,7 @@ const CollaborationSpace = () => {
 
     if (loading) {
         return (
-            <div style={{ textAlign: 'center', marginTop: '50px' }}>
+            <div style={{ textAlign: 'center' }}>
                 <Spinner animation="border" variant="primary" role="status">
                     <span className="visually-hidden">Loading...</span>
                 </Spinner>
@@ -161,26 +143,21 @@ const CollaborationSpace = () => {
     return (
         <div style={{ textAlign: 'center' }}>
             {showAccessDeniedToast ? (
-            <ToastContainer
-                className="p-3"
-                position="top-center"
-                style={{ zIndex: 1 }}
-            >
-                <Toast 
-                    onClose={handleCloseToast} 
-                    show={showAccessDeniedToast} 
-                    delay={3000} 
-                    autohide
-                    bg="danger"
-                >
-                    <Toast.Body className='text-white'>
-                        <strong>{toastMessage}</strong>
-                    </Toast.Body>
-                </Toast>
-            </ToastContainer>
-        ) : (
-            <>
-                <div>
+                <ToastContainer className="p-3" position="top-center" style={{ zIndex: 1 }}>
+                    <Toast 
+                        onClose={handleCloseToast} 
+                        show={showAccessDeniedToast} 
+                        delay={3000} 
+                        autohide
+                        bg="danger"
+                    >
+                        <Toast.Body className='text-white'>
+                            <strong>{toastMessage}</strong>
+                        </Toast.Body>
+                    </Toast>
+                </ToastContainer>
+            ) : (
+                <>
                     <CollabNavigationBar handleExit={handleExit} handleCodeRun={handleCodeRun} users={users} setLanguage={setLanguage} language={language}/>
                     <Container fluid style={{ marginTop: '20px' }}>
                         <Row>
@@ -193,9 +170,8 @@ const CollaborationSpace = () => {
                             </Col>
                         </Row>
                     </Container>
-                </div>
-            </>
-        )}
+                </>
+            )}
         </div>
     );
 };
