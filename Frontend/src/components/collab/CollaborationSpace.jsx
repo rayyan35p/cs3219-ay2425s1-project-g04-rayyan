@@ -24,7 +24,7 @@ const CollaborationSpace = () => {
     const [userId, setUserId] = useState(""); // Current user 
     const [language, setLanguage] = useState("python"); // Set default language to python 
     const [output, setOutput] = useState("");
-    
+
     const LANGUAGEVERSIONS = {
         "python" : "3.10.0",
         "java" : "15.0.2",
@@ -40,7 +40,8 @@ const CollaborationSpace = () => {
         navigate("/home");
     };
 
-    // Set up websockets for room management on client side, and collaboration for Yjs
+
+    {/* Set up websockets for room management on client side, and collaboration for Yjs */}
     useEffect(() => {
         const fetchUser = async () => {
             const user = await getUserFromToken();
@@ -66,14 +67,18 @@ const CollaborationSpace = () => {
 
     const initiateWebSocket = (userId) => {
         if (websocketRef.current) return; // Prevent duplicate connections
+
         const websocket = new WebSocket("ws://localhost:3004");
         websocketRef.current = websocket;
 
         websocket.onopen = () => {
+
             websocket.send(JSON.stringify({ type: 'joinRoom', roomId, userId }));
             websocket.send(JSON.stringify({ type: 'requestUserList', roomId }));
         };
 
+
+        // on getting a reply from server
         websocket.onmessage = (event) => {
             const data = JSON.parse(event.data);
             console.log(`[FRONTEND] data message is ${JSON.stringify(data)}`);
@@ -113,6 +118,7 @@ const CollaborationSpace = () => {
 
     const handleExit = () => {
         if (websocketRef.current) websocketRef.current.send(JSON.stringify({ type: 'leaveRoom', roomId, userId }));
+
         // Clean up Yjs document and provider before going back to home
         if (provider) {
             provider.destroy();
@@ -127,9 +133,13 @@ const CollaborationSpace = () => {
     const handleCodeRun = () => {
         const code_message = {
             "language": language,
-            "files": [{ "content": code }],
+            "files": [
+                {
+                    "content": code
+                }
+            ],
             "version": LANGUAGEVERSIONS[language]
-        };
+        }
 
         collabService.getCodeOutput(code_message)
             .then(result => {
