@@ -29,7 +29,7 @@ const CollabNavigationBar = ({ handleExit, users, handleCodeRun, setLanguage, la
           
           {/* Users at the right */}
           <Nav className='d-flex align-items-center'>
-            <p className='mb-0 me-2'>Users online:</p>
+            <p className='mb-0 me-2'>Online:</p>
             {users.map(user => {
                 return <div
                 className='border rounded p-2 bg-secondary text-center mx-2'
