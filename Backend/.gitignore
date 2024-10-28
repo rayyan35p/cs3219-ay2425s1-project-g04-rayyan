@@ -11,6 +11,7 @@ QuestionService/node_modules
 user-service/node_modules
 MatchingService/node_modules
 CollabService/node_modules
+HistoryService/node_modules
 /.pnp
 .pnp.js
 

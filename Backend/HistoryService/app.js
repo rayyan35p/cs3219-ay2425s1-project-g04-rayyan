@@ -15,7 +15,7 @@ mongoose.connect(mongoURI)
 .then(() => console.log('MongoDB connected'))
 .catch(err => console.error('MongoDB connection error:', err));
 
-app.use('/api/histories', questionRouter)
+app.use('/api/histories', historyRouter)
 
 app.get("/", (req, res, next) => {
     console.log("Sending Greetings!");
