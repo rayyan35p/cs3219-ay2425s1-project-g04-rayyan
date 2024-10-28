@@ -25,8 +25,8 @@ const HistorySchema = new mongoose.Schema({
         required: true
     },
     code: {
-        type: Buffer, // Store the code as binary file
-        required: true
+    type: Buffer, // Store the code as binary file
+    required: true
     }
 });
 
