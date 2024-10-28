@@ -59,7 +59,8 @@ function UserAvatarBox() {
             <Dropdown.Item eventKey="1" onClick={handleLogout}>
                 <span style={{color: 'red'}}>Logout</span>
             </Dropdown.Item>
-            <Dropdown.Item eventKey="2" onClick={() => navigate(`/profile/${user.id}`)}>Edit Profile</Dropdown.Item>
+            <Dropdown.Item eventKey="2" onClick={() => navigate(`/profile/${user.id}`)}>Edit Profile</Dropdown.Item>            
+            <Dropdown.Item eventKey="3" onClick={() => navigate(`/history/${user.id}`)}>View Attempt History</Dropdown.Item>            
         </Dropdown.Menu>
     </Dropdown>
     );
