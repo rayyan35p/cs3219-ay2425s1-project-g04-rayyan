@@ -5,11 +5,13 @@ const { setUpYjsSocket } = require('./websocket/collabSocket');
 const app = express();
  
 const server = http.createServer(app);
-const yjsPORT = 1234
+
+// Set up Yjs server 
+setUpYjsSocket();
 
 // Set up WebSocket server and attach to HTTP server
 setupWebSocket(server);
-setUpYjsSocket(yjsPORT);
+
 
 // Basic route to test the server
 app.get('/', (req, res) => {
