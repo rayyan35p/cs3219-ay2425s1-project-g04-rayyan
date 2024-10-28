@@ -4,7 +4,7 @@ import {useNavigate, useParams} from 'react-router-dom';
 import userService from "../../services/users"
 import InputField from "../auth/InputField";
 
-function EditProfile() {
+const EditProfile = () => {
     const navigate = useNavigate();
     const { id } = useParams(); // Access the id from the route
     const [userData, setUserData] = useState(null);
