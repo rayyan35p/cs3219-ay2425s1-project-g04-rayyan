@@ -9,19 +9,20 @@ import SuccessfulMatch from "./matching/SuccessfulMatch";
 import UnsuccessfulMatch from "./matching/UnsuccessfulMatch";
 import CriteriaDisplay from './matching/CriteriaDisplay';
 import { useNavigate } from 'react-router-dom';
+import {getAllCategories} from '../services/categories'
 const { getUserFromToken } = require('./user/userAvatarBox');
-
 
 function Sidebar() {
     const [ws, setWs] = useState(null);
     const [difficulty, setDifficulty] = useState('');
-    const [language, setLanguage] = useState('');
+    const [category, setCategory] = useState('');
     const [userId, setUserId] = useState(null); 
+    const [categories, setCategories] = useState([]);
 
     const [showMatching, setShowMatching] = useState(false);
     const [showSuccessfulMatch, setShowSuccessfulMatch] = useState(false);
     const [showUnsuccessfulMatch, setShowUnsuccessfulMatch] = useState(false);
-    
+
     const handleShowMatching = () => setShowMatching(true);
     const handleCloseMatching = () => setShowMatching(false);
     
@@ -31,6 +32,19 @@ function Sidebar() {
     const navigate = useNavigate();
 
     useEffect(() => {
+        // Fetch categories from backend
+        const fetchCategories = async () => {
+            try {
+                const response = await getAllCategories();
+                setCategories(response);
+            } catch (error) {
+                console.error("Failed to fetch categories:", error);
+            }
+        };
+
+        fetchCategories();
+
+        // Fetch user data
         const fetchUser = async () => {
             const user = await getUserFromToken();
             if (user !== "No User") {
@@ -41,6 +55,8 @@ function Sidebar() {
         };
 
         fetchUser();
+
+        console.log("categories: ", categories)
 
         const websocket = new WebSocket('ws://localhost:8080');
 
@@ -68,12 +84,12 @@ function Sidebar() {
     }, []);
 
     const handleMatch = () => {
-        if (ws && difficulty && language) {
+        if (ws && difficulty && category) {
             handleShowMatching();
             setShowUnsuccessfulMatch(false);
-            ws.send(JSON.stringify({ userId, difficulty, language , action: 'match'})); // Send to server
+            ws.send(JSON.stringify({ userId, difficulty, category, action: 'match' })); // Send category instead of language
         } else {
-            alert('Please select a difficulty and language.');
+            alert('Please select a difficulty and category.');
         }
     };
 
@@ -97,20 +113,19 @@ function Sidebar() {
                 <Button variant="warning" onClick={() => setDifficulty('medium')}>Medium</Button>{' '}
                 <Button variant="danger" onClick={() => setDifficulty('hard')}>Hard</Button>{' '}
             </div>
+
+            {/* Category Dropdown */}
             <Form.Select 
-                aria-label="Select your language" 
-                onChange={(e) => {
-                    const selectedLanguage = e.target.value === "C++" ? "cplusplus" : e.target.value.toLowerCase();
-                    setLanguage(selectedLanguage);
-                }}>
-                <option value="">Select your language</option>
-                <option value="Python">Python</option>
-                <option value="Java">Java</option>
-                <option value="C++">C++</option>
+                aria-label="Select a category" 
+                onChange={(e) => setCategory(e.target.value)}>
+                <option value="">Select a category</option>
+                {categories.map((category) => (
+                    <option key={category._id} value={category.name}>{category.name}</option>
+                ))}
             </Form.Select>
 
-            {/* Display Criteria Selected*/}
-            <CriteriaDisplay difficulty={difficulty} language={language}></CriteriaDisplay>
+            {/* Display Criteria Selected */}
+            <CriteriaDisplay difficulty={difficulty} category={category}></CriteriaDisplay>
 
             <Button variant="primary" onClick={handleMatch}>Match me!</Button>
 

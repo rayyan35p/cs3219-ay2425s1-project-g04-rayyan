@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const baseCategoryUrl = 'http://localhost:3001/api/categories';
 
-const getAllCategories = async () => {
+export const getAllCategories = async () => {
     console.log("getAllCategories func called")
     const response = await axios.get(baseCategoryUrl);
     console.log(`${JSON.stringify(response.data)}`)
