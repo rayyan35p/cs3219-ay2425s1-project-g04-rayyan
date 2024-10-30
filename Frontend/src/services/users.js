@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const baseUrl = 'http://localhost:3002';
+const baseUrl = 'http://35.247.178.111:3002';
 const auth = "auth"
 const user = "users"
 

@@ -38,7 +38,10 @@ function Sidebar() {
 
         fetchUser();
 
-        const websocket = new WebSocket('ws://localhost:8080');
+        // adding a comment so the thing updates
+        const websocket_url = 'ws://34.126.131.140:8080';
+        console.log(`Websocket url: ${websocket_url}`)
+        const websocket = new WebSocket(websocket_url);
 
         websocket.onmessage = (event) => {
             const { message, type } = JSON.parse(event.data);
