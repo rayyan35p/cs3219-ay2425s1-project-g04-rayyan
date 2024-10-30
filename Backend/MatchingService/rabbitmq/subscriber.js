@@ -2,6 +2,7 @@ const amqp = require('amqplib');
 const { queueNames } = require('./setup.js');
 // const { matchUsers } = require('../services/matchingService.js');
 const { notifyUsers } = require('../websocket/websocket');
+const { v4: uuidv4 } = require('uuid');
 
 // TODO: Subscribe and acknowledge messages with user info when timeout/user matched
 
@@ -31,9 +32,14 @@ function matchUsers(channel, msg, userId, language, difficulty) {
     if (waitingUsers[criteriaKey].length >= 2) {
         const matchedUsers = waitingUsers[criteriaKey].splice(0, 2); // Match the first two users
         console.log(`Matched users: ${matchedUsers.map(user => user.userId)}`);
+        
+        // Create a unique collaboration room ID
+        const roomId = uuidv4();
 
         // Notify users of the match
-        notifyUsers(matchedUsers.map(user => user.userId), 'Match found!', 'match');
+        notifyUsers(matchedUsers.map(user => user.userId), 'Match found!', 'match', {
+                collaborationUrl: `/collaboration/${roomId}`
+            });
 
         // Acknowledge the messages for both matched users
         matchedUsers.forEach(({ msg, channel }) => {

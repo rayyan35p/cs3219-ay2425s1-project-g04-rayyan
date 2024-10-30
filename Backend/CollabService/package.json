@@ -1,11 +1,10 @@
 {
   "dependencies": {
-    "amqplib": "^0.10.4",
-    "cors": "^2.8.5",
-    "dotenv": "^16.4.5",
     "express": "^4.21.1",
-    "uuid": "^10.0.0",
-    "ws": "^8.18.0"
+    "ws": "^8.18.0",
+    "y-websocket": "^2.0.4",
+    "y-websocket-server": "^1.0.2",
+    "y-websockets-server": "^9.2.1"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",

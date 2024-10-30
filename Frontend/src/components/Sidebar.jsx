@@ -8,7 +8,9 @@ import Matching from "./matching/Matching";
 import SuccessfulMatch from "./matching/SuccessfulMatch";
 import UnsuccessfulMatch from "./matching/UnsuccessfulMatch";
 import CriteriaDisplay from './matching/CriteriaDisplay';
+import { useNavigate } from 'react-router-dom';
 const { getUserFromToken } = require('./user/userAvatarBox');
+
 
 function Sidebar() {
     const [ws, setWs] = useState(null);
@@ -26,6 +28,8 @@ function Sidebar() {
     const handleCloseSuccessfulMatch = () => setShowSuccessfulMatch(false);
     const handleCloseUnsuccessfulMatch = () => setShowUnsuccessfulMatch(false);
 
+    const navigate = useNavigate();
+
     useEffect(() => {
         const fetchUser = async () => {
             const user = await getUserFromToken();
@@ -41,13 +45,16 @@ function Sidebar() {
         const websocket = new WebSocket('ws://localhost:8080');
 
         websocket.onmessage = (event) => {
-            const { message, type } = JSON.parse(event.data);
-            console.log(`Notification from server: ${message}`);
+            const data = JSON.parse(event.data);
+            console.log(`Notification from server: ${data.message}`);
             
-            if (type === 'match') {
+            if (data.type === 'match' && data.collaborationUrl) {
                 setShowMatching(false);
                 setShowSuccessfulMatch(true);
-            } else if (type === 'rejection') {
+                setTimeout(() => {
+                   navigate(data.collaborationUrl);  // Programmatically navigate to collaboration space
+                }, 3000); 
+            } else if (data.type === 'rejection') {
                 setShowMatching(false);
                 setShowUnsuccessfulMatch(true);
             }

@@ -20,6 +20,14 @@ services:
     ports:
       - "8080:8080"
 
+  collab-service:
+    build:
+      context: ./Backend/CollabService
+      dockerfile: Dockerfile
+    ports:
+      - "3004:3004" # change the first port number xxxx:3004 to suit your needs
+      - "1234:1234"
+  
   frontend:
     build:
       context: ./Frontend
