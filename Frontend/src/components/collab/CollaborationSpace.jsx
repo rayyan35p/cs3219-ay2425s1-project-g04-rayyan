@@ -116,6 +116,10 @@ const CollaborationSpace = () => {
                 case 'newMessage':
                     console.log("adding message", data.message)
                     break;
+                case 'languageChange':
+                    addNotif(`User ${data.user} has changed the language to ${data.language}`);
+                    setLanguage(data.language);
+                    break;
                 case 'userJoin':
                     addNotif(`User ${data.user} has joined.`)
                     break;
@@ -199,6 +203,11 @@ const CollaborationSpace = () => {
         websocketRef.current.send(JSON.stringify({ type: 'sendMessage', roomId: roomId, message: message}));
     }
 
+    const handleLanguageChange = (value) => {
+        websocketRef.current.send(JSON.stringify({ type: 'languageChange', roomId: roomId,
+            user: userId, language: value }));
+    }
+
     if (loading) {
         return (
             <div style={{ textAlign: 'center' }}>
@@ -240,7 +249,8 @@ const CollaborationSpace = () => {
                     </ToastContainer>
 
                     {/* Main component content */}
-                    <CollabNavigationBar handleExit={handleExit} handleCodeRun={handleCodeRun} users={users} setLanguage={setLanguage} language={language}/>
+                    <CollabNavigationBar handleExit={handleExit} handleCodeRun={handleCodeRun} users={users}
+                                         setLanguage={setLanguage} language={language} userLangChange={handleLanguageChange}/>
                     <Container fluid style={{ marginTop: '20px' }}>
                         <Row>
                             <Col md={8}>

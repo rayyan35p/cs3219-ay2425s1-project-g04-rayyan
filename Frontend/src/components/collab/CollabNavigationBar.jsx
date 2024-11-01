@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button, Container, Navbar, Nav, Dropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'react-bootstrap';
 
-const CollabNavigationBar = ({ handleExit, users, handleCodeRun, setLanguage, language }) => {
+const CollabNavigationBar = ({ handleExit, users, handleCodeRun, setLanguage, language, userLangChange }) => {
 
   return (
      <Navbar className='bg-light' sticky='top' style={{ zIndex: 1040 }}>
@@ -9,7 +9,10 @@ const CollabNavigationBar = ({ handleExit, users, handleCodeRun, setLanguage, la
           
           {/* Language Dropdown on left */}
           <Nav className='me-auto'>
-            <Dropdown onSelect={(eventKey) => setLanguage(eventKey)}>
+            <Dropdown onSelect={(eventKey) => {
+              setLanguage(eventKey);
+              userLangChange(eventKey);
+            }}>
               <DropdownToggle style={{ backgroundColor: 'transparent', border: '1px solid #ccc', borderRadius: '0', color: '#000', padding: '8px 16px'}}>
                 {language}
               </DropdownToggle>

@@ -31,6 +31,11 @@ function setupWebSocket(server) {
                     console.log('got message ', data.message);
                     broadcastMessage(data.roomId, data.message);
                     break;
+                case 'languageChange':
+                    // send message to all users in room
+                    console.log('got language change ', data.language);
+                    broadcastLanguageChange(data.roomId, data.language, data.user);
+                    break;
                 default:
                     console.error('Unknown message type');
             }
@@ -47,6 +52,17 @@ function setupWebSocket(server) {
             room.sockets.forEach((client) => {
                 if (client.readyState === WebSocket.OPEN) {
                     client.send(JSON.stringify({ type: 'newMessage', message: message }));
+                }
+            })
+        }
+    }
+
+    function broadcastLanguageChange(roomId, language, userId) {
+        const room = getRoom(roomId)
+        if (room) {
+            room.sockets.forEach((client) => {
+                if (client.readyState === WebSocket.OPEN) {
+                    client.send(JSON.stringify({ type: 'languageChange', language: language , user: userId}));
                 }
             })
         }
