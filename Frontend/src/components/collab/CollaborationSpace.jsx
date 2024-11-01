@@ -33,6 +33,7 @@ const CollaborationSpace = () => {
         "c++": "10.2.0"
     };
 
+    {/* State management for access denied toast */}
     const [showAccessDeniedToast, setShowAccessDeniedToast] = useState(false);
     const [toastMessage, setToastMessage] = useState('');
     const [loading, setLoading] = useState(true);
@@ -42,6 +43,18 @@ const CollaborationSpace = () => {
         navigate("/home");
     };
 
+    {/* State management for user join/leave toast */}
+    const [notifs, setNotifs] = useState([]); 
+
+    const addNotif = (message) => {
+        const id = Date.now(); // unique id based on timestamp
+        setNotifs((prevNotifs) => [...prevNotifs, {id, message}]);
+
+        // Remove notif after 2 seconds
+        setTimeout(() => {
+            setNotifs((prevNotifs) => prevNotifs.filter((notif) => notif.id !== id))
+        }, 1500);
+    };
 
     {/* Set up websockets for room management on client side, and collaboration for Yjs */}
     useEffect(() => {
@@ -87,7 +100,7 @@ const CollaborationSpace = () => {
         // on getting a reply from server
         websocket.onmessage = (event) => {
             const data = JSON.parse(event.data);
-            console.log(`[FRONTEND] data message is ${JSON.stringify(data)}`);
+            // console.log(`[FRONTEND] data message is ${JSON.stringify(data)}`);
             switch (data.type) {
                 case 'usersListUpdate':
                     setUsers(data.users); // Update the user list
@@ -101,7 +114,12 @@ const CollaborationSpace = () => {
                     break;
                 case 'newMessage':
                     console.log("adding message", data.message)
-                    setMessages((prevMessages) => [...prevMessages, data.message]);
+                    break;
+                case 'userJoin':
+                    addNotif(`User ${data.user} has joined.`)
+                    break;
+                case 'userLeft':
+                    addNotif(`User ${data.user} has left`)
                     break;
                 default:
                     console.log("No messages received from room management server");
@@ -205,6 +223,18 @@ const CollaborationSpace = () => {
                 </ToastContainer>
             ) : (
                 <>
+                    {/* Toast Container for Join/Leave notifications */}
+                    <ToastContainer className='p-3' position='top-center' style={{ zIndex: 1050 }}>
+                        {notifs.map((notif) => (
+                            <Toast key={notif.id} className='mb-2' style={{ backgroundColor: 'rgba(255, 255, 255, 0.8)' }}>
+                                <Toast.Body>
+                                    <strong className='text-black'>{notif.message}</strong>
+                                </Toast.Body>
+                            </Toast>
+                        ))}
+                    </ToastContainer>
+
+                    {/* Main component content */}
                     <CollabNavigationBar handleExit={handleExit} handleCodeRun={handleCodeRun} users={users} setLanguage={setLanguage} language={language}/>
                     <Container fluid style={{ marginTop: '20px' }}>
                         <Row>

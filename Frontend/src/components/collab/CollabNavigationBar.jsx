@@ -4,7 +4,7 @@ import { Button, Container, Navbar, Nav, Dropdown, DropdownToggle, DropdownMenu,
 const CollabNavigationBar = ({ handleExit, users, handleCodeRun, setLanguage, language }) => {
 
   return (
-     <Navbar className='bg-light' sticky='top'>
+     <Navbar className='bg-light' sticky='top' style={{ zIndex: 1040 }}>
         <Container className='d-flex justify-content-between'>
           
           {/* Language Dropdown on left */}
