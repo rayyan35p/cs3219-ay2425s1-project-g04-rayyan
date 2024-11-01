@@ -5,11 +5,11 @@ const matching_exchange_name = "matching_exchange";
 const dead_letter_exchange_name = "dead_letter_exchange";
 const dead_letter_queue_name = "dead_letter_queue";
 const cancel_queue_name = "cancel_queue";
-const difficulties = ["easy", "medium", "hard"];
-const languages = ["python", "java", "cplusplus"];
+const difficulties = ["easy", "medium", "hard", "any"]; // Add "any" for fallback
+const categories = ["data-structures", "strings", "arrays"]; // Adjust to include categories
 
 const queueNames = generator.generateQueueNames(
-    generator.generateCombinations(difficulties, languages)
+    generator.generateCombinations(difficulties, categories)
 );
 
 async function setupRabbitMQ() {

@@ -15,43 +15,82 @@ const timeoutMap = {};
 // Local dictionary to store waiting users
 const waitingUsers = {};
 
-// using promises to handle errors and ensure clearing of timer.
-function matchUsers(channel, msg, userId, language, difficulty) {
-    const criteriaKey = `${difficulty}.${language}`;
+// // using promises to handle errors and ensure clearing of timer.
+// function matchUsers(channel, msg, userId, language, difficulty) {
+//     const criteriaKey = `${difficulty}.${language}`;
 
-    // If the criteria key does not exist, create it
-    if (!waitingUsers[criteriaKey]) {
-        waitingUsers[criteriaKey] = [];
-    }
+//     // If the criteria key does not exist, create it
+//     if (!waitingUsers[criteriaKey]) {
+//         waitingUsers[criteriaKey] = [];
+//     }
 
-    // Store both the userId, message, and the channel in waitingUsers
+//     // Store both the userId, message, and the channel in waitingUsers
+//     waitingUsers[criteriaKey].push({ userId, msg, channel });
+//     console.log(`User ${userId} added to ${criteriaKey}. Waiting list: ${waitingUsers[criteriaKey].length}`);
+
+//     // Check if there are 2 or more users waiting for this criteria
+//     if (waitingUsers[criteriaKey].length >= 2) {
+//         const matchedUsers = waitingUsers[criteriaKey].splice(0, 2); // Match the first two users
+//         console.log(`Matched users: ${matchedUsers.map(user => user.userId)}`);
+        
+//         // Create a unique collaboration room ID
+//         const roomId = uuidv4();
+
+//         // Notify users of the match
+//         notifyUsers(matchedUsers.map(user => user.userId), 'Match found!', 'match', {
+//                 collaborationUrl: `/collaboration/${roomId}`
+//             });
+
+//         // Acknowledge the messages for both matched users
+//         matchedUsers.forEach(({ msg, channel }) => {
+//             acknowledgeMessage(channel, msg);
+//         });
+
+//         return true;
+//     }
+
+//     return false;
+// }
+
+function matchUsers(channel, msg, userId, difficulty, category) {
+    const criteriaKey = `${difficulty}.${category}`;
+    const categoryKey = `any.${category}`;
+
+    if (!waitingUsers[criteriaKey]) waitingUsers[criteriaKey] = [];
+    if (!waitingUsers[categoryKey]) waitingUsers[categoryKey] = [];
+
+    // Try matching with exact difficulty and category
     waitingUsers[criteriaKey].push({ userId, msg, channel });
     console.log(`User ${userId} added to ${criteriaKey}. Waiting list: ${waitingUsers[criteriaKey].length}`);
 
-    // Check if there are 2 or more users waiting for this criteria
     if (waitingUsers[criteriaKey].length >= 2) {
-        const matchedUsers = waitingUsers[criteriaKey].splice(0, 2); // Match the first two users
-        console.log(`Matched users: ${matchedUsers.map(user => user.userId)}`);
-        
-        // Create a unique collaboration room ID
-        const roomId = uuidv4();
-
-        // Notify users of the match
-        notifyUsers(matchedUsers.map(user => user.userId), 'Match found!', 'match', {
-                collaborationUrl: `/collaboration/${roomId}`
-            });
-
-        // Acknowledge the messages for both matched users
-        matchedUsers.forEach(({ msg, channel }) => {
-            acknowledgeMessage(channel, msg);
-        });
-
+        const matchedUsers = waitingUsers[criteriaKey].splice(0, 2);
+        notifyMatch(channel, matchedUsers, category);
         return true;
+    } 
+
+    // Try matching with category only if no difficulty match is found
+    if (waitingUsers[criteriaKey].length < 2) {
+        waitingUsers[categoryKey].push({ userId, msg, channel });
+        console.log(`Fallback: User ${userId} added to ${categoryKey}. Waiting list: ${waitingUsers[categoryKey].length}`);
+        if (waitingUsers[categoryKey].length >= 2) {
+            const matchedUsers = waitingUsers[categoryKey].splice(0, 2);
+            notifyMatch(channel, matchedUsers, category);
+            return true;
+        }
     }
 
     return false;
 }
 
+function notifyMatch(channel, matchedUsers, category) {
+    const roomId = uuidv4();
+    notifyUsers(matchedUsers.map(user => user.userId), 'Match found!', 'match', { collaborationUrl: `/collaboration/${roomId}`, category: category });
+
+    matchedUsers.forEach(({ msg, channel }) => {
+        acknowledgeMessage(channel, msg);
+    });
+}
 
 async function acknowledgeMessage(channel, msg) {
     return new Promise((resolve, reject) => {
@@ -68,46 +107,107 @@ async function acknowledgeMessage(channel, msg) {
     });
 }
 
+// async function rejectMessage(channel, msg, userId) {
+//     return new Promise((resolve, reject) => {
+//         try {
+//             // Get user data from the message to find the correct key in waitingUsers
+//             const userData = JSON.parse(msg.content.toString());
+//             const { language, difficulty } = userData;
+
+//             // Correctly creating the criteriaKey using template literals
+//             const criteriaKey = `${difficulty}.${language}`;
+
+            
+//             // Find the user in the waitingUsers list and remove them
+//             if (waitingUsers[criteriaKey]) {
+//                 // Find the index of the user in the waiting list
+//                 const userIndex = waitingUsers[criteriaKey].findIndex(user => user.userId === userId);
+
+//                 if (userIndex !== -1) {
+//                     // Remove the user from the waiting list
+//                     waitingUsers[criteriaKey].splice(userIndex, 1);
+//                     console.log(`Removed user ${userId} from waiting list for ${criteriaKey}`);
+//                 }
+//             }
+
+//             // Reject the message without requeuing
+//             channel.reject(msg, false); // Reject without requeuing
+//             console.log(`Rejected message for user: ${userId}`);
+
+//             // Clean up the timeoutMap
+//             if (timeoutMap[userId]) {
+//                 clearTimeout(timeoutMap[userId]);
+//                 delete timeoutMap[userId];
+//             }
+
+//             resolve();
+//         } catch (error) {
+//             console.error(`Failed to reject message for user ${userId}:, error`);
+//             reject(error);
+//         }
+//     });
+// }
+
 async function rejectMessage(channel, msg, userId) {
     return new Promise((resolve, reject) => {
         try {
-            // Get user data from the message to find the correct key in waitingUsers
             const userData = JSON.parse(msg.content.toString());
-            const { language, difficulty } = userData;
-
-            // Correctly creating the criteriaKey using template literals
-            const criteriaKey = `${difficulty}.${language}`;
-
-            
-            // Find the user in the waitingUsers list and remove them
-            if (waitingUsers[criteriaKey]) {
-                // Find the index of the user in the waiting list
-                const userIndex = waitingUsers[criteriaKey].findIndex(user => user.userId === userId);
-
-                if (userIndex !== -1) {
-                    // Remove the user from the waiting list
-                    waitingUsers[criteriaKey].splice(userIndex, 1);
-                    console.log(`Removed user ${userId} from waiting list for ${criteriaKey}`);
-                }
-            }
-
-            // Reject the message without requeuing
             channel.reject(msg, false); // Reject without requeuing
             console.log(`Rejected message for user: ${userId}`);
-
-            // Clean up the timeoutMap
             if (timeoutMap[userId]) {
                 clearTimeout(timeoutMap[userId]);
                 delete timeoutMap[userId];
             }
-
             resolve();
         } catch (error) {
-            console.error(`Failed to reject message for user ${userId}:, error`);
+            console.error(`Failed to reject message for user ${userId}:`, error);
             reject(error);
         }
     });
 }
+
+// async function consumeQueue() {
+//     try {
+//         const connection = await amqp.connect(process.env.RABBITMQ_URL);
+//         const channel = await connection.createChannel();
+
+//         console.log("Waiting for users...");
+
+//         // Process + subscribe to each matchmaking queue
+//         for (let queueName of queueNames) {
+//             await channel.consume(queueName, async (msg) => {
+//                 if (msg !== null) {
+//                     const userData = JSON.parse(msg.content.toString());
+//                     const { userId, category, difficulty } = userData;
+
+//                     // Perform the matching logic
+//                     console.log(`Received user ${userId} with ${category} and ${difficulty}`);
+                    
+//                     // Call matchUsers with channel, message, and user details
+//                     const matched = matchUsers(channel, msg, userId, category, difficulty);
+
+//                     if (!matched) {
+//                         console.log(`No match for ${userId}, waiting for rejection timeout.`);
+
+//                         const timeoutId = setTimeout(async () => {
+//                             await rejectMessage(channel, msg, userId);
+//                         }, 10000); // 10 seconds delay
+
+//                         timeoutMap[userId] = timeoutId;
+//                     }
+//                 }
+//             }, { noAck: false }); // Ensure manual acknowledgment
+//         }
+
+//         console.log("Listening to matchmaking queues");
+
+//         await consumeCancelQueue();
+//         console.log("Listening to Cancel Queue");
+//     } catch (error) {
+//         console.error('Error consuming RabbitMQ queue:', error);
+//     }
+// }
+
 
 async function consumeQueue() {
     try {
@@ -116,22 +216,20 @@ async function consumeQueue() {
 
         console.log("Waiting for users...");
 
-        // Process + subscribe to each matchmaking queue
+        // Consume from each queue based on difficulty and category criteria
         for (let queueName of queueNames) {
             await channel.consume(queueName, async (msg) => {
-                if (msg !== null) {
+                if (msg) {
                     const userData = JSON.parse(msg.content.toString());
-                    const { userId, language, difficulty } = userData;
+                    console.log("userData is: ", userData);
+                    const { userId, difficulty, category } = userData;
 
-                    // Perform the matching logic
-                    console.log(`Received user ${userId} with ${language} and ${difficulty}`);
+                    console.log(`Received user ${userId} with ${difficulty} and ${category}`);
                     
-                    // Call matchUsers with channel, message, and user details
-                    const matched = matchUsers(channel, msg, userId, language, difficulty);
+                    const matched = await matchUsers(channel, msg, userId, difficulty, category);
 
                     if (!matched) {
                         console.log(`No match for ${userId}, waiting for rejection timeout.`);
-
                         const timeoutId = setTimeout(async () => {
                             await rejectMessage(channel, msg, userId);
                         }, 10000); // 10 seconds delay
@@ -160,12 +258,12 @@ async function consumeDLQ() {
       await channel.consume(dead_letter_queue_name, (msg) => {
           if (msg !== null) {
               const messageContent = JSON.parse(msg.content.toString());
-              const { userId, difficulty, language } = messageContent;
+              const { userId, difficulty, category } = messageContent;
 
               console.log(`Received message from DLQ for user: ${userId}`);
 
               // Notify the user via WebSocket
-              notifyUsers(userId, `Match not found for ${difficulty} ${language}, please try again.`, 'rejection');
+              notifyUsers(userId, `Match not found for ${difficulty} ${category}, please try again.`, 'rejection');
 
               // Acknowledge the message (so it's removed from the DLQ)
               channel.ack(msg);
@@ -207,7 +305,7 @@ async function cancelMatching(cancelChannel, cancelMsg, userId) {
         // Loop through waitingUsers to find the original message for the user
         Object.keys(waitingUsers).forEach(criteriaKey => {
             const userIndex = waitingUsers[criteriaKey].findIndex(user => user.userId === userId);
-
+            const userIndexCat = waitingUsers[categoryKey].findIndex(user => user.userId === userId);
             if (userIndex !== -1) {
                 const { msg, channel } = waitingUsers[criteriaKey][userIndex]; // Get original msg and its channel
 
@@ -220,6 +318,7 @@ async function cancelMatching(cancelChannel, cancelMsg, userId) {
 
                 // Remove the user from the waiting list
                 waitingUsers[criteriaKey].splice(userIndex, 1);
+                waitingUsers[categoryKey].splice(userIndex, 1);
                 console.log(`User ${userId} removed from waiting list for ${criteriaKey}`);
             }
         });

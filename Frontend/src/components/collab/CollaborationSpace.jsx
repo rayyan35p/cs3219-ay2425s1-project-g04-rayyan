@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import * as Y from 'yjs';
 import { WebsocketProvider } from 'y-websocket';
 import { getUserFromToken } from '../user/userAvatarBox';
@@ -16,6 +16,9 @@ import Spinner from 'react-bootstrap/Spinner';
 const CollaborationSpace = () => {
     const navigate = useNavigate();
     const { roomId } = useParams(); // Get the roomId from the URL
+    const location = useLocation();
+    const { category } = location.state || {};
+    console.log(`category is :${category}`);
     const websocketRef = useRef(null); // Use ref to persist websocket across renders
     const [yDoc, setYDoc] = useState(null);
     const [provider, setProvider] = useState(null);
@@ -212,7 +215,7 @@ const CollaborationSpace = () => {
                                 <CodeSpace handleEditorChange={handleEditorChange} code={code} language={language} output={output}/>
                             </Col>
                             <Col md={4}>
-                                <QuestionDisplay/>
+                                <QuestionDisplay criteria={category}/>
                                 <Chat currentUser={userId} messages={messages} sendMessage={sendMessage}> </Chat>
                             </Col>
                         </Row>

@@ -1,7 +1,7 @@
 const amqp = require('amqplib');
 const { matching_exchange_name } = require('./setup.js');
 
-let channel = null;  // Store a persistent channel connection
+let channel = null;
 
 async function connectToRabbitMQ() {
     if (!channel) {
@@ -16,16 +16,15 @@ async function connectToRabbitMQ() {
     return channel;
 }
 
-async function publishToQueue({userId, difficulty, language}) {
+async function publishToQueue({ userId, difficulty, category }) {
     try {
-        const channel = await connectToRabbitMQ();  // Reuse persistent connection
-        const routingKey = `${difficulty}.${language}`;
+        const channel = await connectToRabbitMQ();
+        const routingKey = `${difficulty}.${category}`;
 
-        // Publish the message to the exchange
         const messageSent = channel.publish(
             matching_exchange_name,
             routingKey,
-            Buffer.from(JSON.stringify({ userId, difficulty, language }))
+            Buffer.from(JSON.stringify({ userId, difficulty, category }))
         );
 
         if (messageSent) {
@@ -40,10 +39,9 @@ async function publishToQueue({userId, difficulty, language}) {
 
 async function publishCancelRequest({ userId }) {
     try {
-        const channel = await connectToRabbitMQ(); // Reuse persistent connection
-        const routingKey = 'cancel'; // Define a routing key for cancellation
+        const channel = await connectToRabbitMQ();
+        const routingKey = 'cancel';
 
-        // Publish the cancel message to the exchange
         const messageSent = channel.publish(
             matching_exchange_name,
             routingKey,
@@ -60,4 +58,4 @@ async function publishCancelRequest({ userId }) {
     }
 }
 
-module.exports = { publishToQueue, publishCancelRequest }; 
+module.exports = { publishToQueue, publishCancelRequest };

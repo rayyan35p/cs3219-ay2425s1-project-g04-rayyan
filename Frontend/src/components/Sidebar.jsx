@@ -63,12 +63,13 @@ function Sidebar() {
         websocket.onmessage = (event) => {
             const data = JSON.parse(event.data);
             console.log(`Notification from server: ${data.message}`);
+            console.log(`Category from server: ${data.category}`);
             
             if (data.type === 'match' && data.collaborationUrl) {
                 setShowMatching(false);
                 setShowSuccessfulMatch(true);
                 setTimeout(() => {
-                   navigate(data.collaborationUrl);  // Programmatically navigate to collaboration space
+                    navigate(data.collaborationUrl, { state: { category: data.category } }); 
                 }, 3000); 
             } else if (data.type === 'rejection') {
                 setShowMatching(false);
@@ -83,8 +84,14 @@ function Sidebar() {
         };
     }, []);
 
+    function formatCategoryString(str) {
+        return str.toLowerCase().replace(/\s+/g, '-');
+    }
+
     const handleMatch = () => {
         if (ws && difficulty && category) {
+            const formattedCategory = formatCategoryString(category);
+            setCategory(formattedCategory);
             handleShowMatching();
             setShowUnsuccessfulMatch(false);
             ws.send(JSON.stringify({ userId, difficulty, category, action: 'match' })); // Send category instead of language
@@ -117,7 +124,7 @@ function Sidebar() {
             {/* Category Dropdown */}
             <Form.Select 
                 aria-label="Select a category" 
-                onChange={(e) => setCategory(e.target.value)}>
+                onChange={(e) => setCategory(e.target.value.toLowerCase().replace(/\s+/g, '-'))}>
                 <option value="">Select a category</option>
                 {categories.map((category) => (
                     <option key={category._id} value={category.name}>{category.name}</option>
