@@ -5,13 +5,15 @@ import { getQuestionsByCategory } from '../../services/questions';
 const QuestionDisplay = ({ criteria }) => {
     const [question, setQuestion] = useState(null);
     const [error, setError] = useState(null);
+    const [cats, setCats] = useState(null)
 
     useEffect(() => {
         const fetchQuestion = async () => {
             try {
                 const questions = await getQuestionsByCategory(criteria);
                 if (questions.length > 0) {
-                    setQuestion(questions[0]); // Display the first matching question
+                    setQuestion(questions[0]);
+                    setCats(questions[0].category.join(", "))
                 } else {
                     setError("No question found for the selected topic.");
                 }
@@ -33,7 +35,8 @@ const QuestionDisplay = ({ criteria }) => {
     return (
         <Card>
             <Card.Header>{question ? question.title : "Loading..."}</Card.Header>
-            <Card.Body>
+            <Card.Body style={{textAlign: 'left'}}>
+                <p>{cats ? cats : "Loading question description..."}</p>
                 <p>{question ? question.description : "Loading question description..."}</p>
             </Card.Body>
         </Card>

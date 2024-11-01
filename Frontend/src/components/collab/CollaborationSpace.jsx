@@ -191,38 +191,43 @@ const CollaborationSpace = () => {
     }
 
     return (
-        <div style={{ textAlign: 'center' }}>
-            {showAccessDeniedToast ? (
-                <ToastContainer className="p-3" position="top-center" style={{ zIndex: 1 }}>
-                    <Toast
-                        onClose={handleCloseToast}
-                        show={showAccessDeniedToast}
-                        delay={3000}
-                        autohide
-                        bg="danger"
-                    >
-                        <Toast.Body className='text-white'>
-                            <strong>{toastMessage}</strong>
-                        </Toast.Body>
-                    </Toast>
-                </ToastContainer>
-            ) : (
-                <>
-                    <CollabNavigationBar handleExit={handleExit} handleCodeRun={handleCodeRun} users={users} setLanguage={setLanguage} language={language}/>
-                    <Container fluid style={{ marginTop: '20px' }}>
-                        <Row>
-                            <Col md={8}>
-                                <CodeSpace handleEditorChange={handleEditorChange} code={code} language={language} output={output}/>
-                            </Col>
-                            <Col md={4}>
-                                <QuestionDisplay criteria={category}/>
-                                <Chat currentUser={userId} messages={messages} sendMessage={sendMessage}> </Chat>
-                            </Col>
-                        </Row>
-                    </Container>
-                </>
-            )}
-        </div>
+<div style={{ textAlign: 'center', height: '100vh', overflow: 'hidden' }}>
+    {showAccessDeniedToast ? (
+        <ToastContainer className="p-3" position="top-center" style={{ zIndex: 1 }}>
+            <Toast
+                onClose={handleCloseToast}
+                show={showAccessDeniedToast}
+                delay={3000}
+                autohide
+                bg="danger"
+            >
+                <Toast.Body className='text-white'>
+                    <strong>{toastMessage}</strong>
+                </Toast.Body>
+            </Toast>
+        </ToastContainer>
+    ) : (
+        <>
+            <CollabNavigationBar handleExit={handleExit} handleCodeRun={handleCodeRun} users={users} setLanguage={setLanguage} language={language}/>
+            <Container fluid style={{ marginTop: '20px', height: 'calc(100vh - 60px)', display: 'flex', overflow: 'hidden' }}>
+                <Row style={{ flexGrow: 1, width: '100%', height: '100%', overflow: 'hidden' }}>
+                    <Col md={6} style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
+                        <CodeSpace handleEditorChange={handleEditorChange} code={code} language={language} output={output}/>
+                    </Col>
+                    <Col md={6} style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
+                        <div style={{ flex: '60%', display: 'flex', overflow: 'hidden' }}>
+                            <QuestionDisplay criteria={category}/>
+                        </div>
+                        <div style={{ flex: '40%', overflow: 'hidden' }}> {/* Allow scroll only in chat section if needed */}
+                            <Chat currentUser={userId} messages={messages} sendMessage={sendMessage}/>
+                        </div>
+                    </Col>
+                </Row>
+            </Container>
+        </>
+    )}
+</div>
+          
     );
 };
 
