@@ -25,6 +25,7 @@ const CollaborationSpace = () => {
     const [language, setLanguage] = useState("python") // set default language to python 
     const [output, setOutput] = useState("")
     const [messages, setMessages] = useState([])
+    const [outputLoading, setOutputLoading] = useState(false)
 
     // use https://emkc.org/api/v2/piston/runtimes to GET other languages
     const LANGUAGEVERSIONS = {
@@ -165,6 +166,9 @@ const CollaborationSpace = () => {
     };
 
     const handleCodeRun = () => {
+
+        setOutputLoading(true);
+
         const code_message = {
             "language": language,
             "files": [
@@ -177,6 +181,7 @@ const CollaborationSpace = () => {
 
         collabService.getCodeOutput(code_message)
             .then(result => {
+                setOutputLoading(false);
                 console.log(result.data.run.output)
                 setOutput(result.data.run.output)
             })
@@ -239,7 +244,7 @@ const CollaborationSpace = () => {
                     <Container fluid style={{ marginTop: '20px' }}>
                         <Row>
                             <Col md={8}>
-                                <CodeSpace handleEditorChange={handleEditorChange} code={code} language={language} output={output}/>
+                                <CodeSpace handleEditorChange={handleEditorChange} loading={outputLoading} code={code} language={language} output={output}/>
                             </Col>
                             <Col md={4}>
                                 <QuestionDisplay/>
