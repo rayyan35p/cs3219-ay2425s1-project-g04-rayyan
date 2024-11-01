@@ -5,16 +5,16 @@ import { getQuestionsByCategory } from '../../services/questions';
 const QuestionDisplay = ({ criteria }) => {
     const [question, setQuestion] = useState(null);
     const [error, setError] = useState(null);
-    const [cats, setCats] = useState(null)
+    // const [cats, setCats] = useState(null)
 
     useEffect(() => {
         const fetchQuestion = async () => {
             try {
                 const questions = await getQuestionsByCategory(criteria);
-                const randomIndex = Math.floor(Math.random() * questions.length);
+                // const randomIndex = Math.floor(Math.random() * questions.length);
                 if (questions.length > 0) {
-                    setQuestion(questions[randomIndex]);
-                    setCats(questions[randomIndex].category.join(", "))
+                    setQuestion(questions[0]);
+                    // setCats(questions[randomIndex].category.join(", "))
                 } else {
                     setError("No question found for the selected topic.");
                 }
@@ -37,7 +37,7 @@ const QuestionDisplay = ({ criteria }) => {
         <Card>
             <Card.Header>{question ? question.title : "Loading..."}</Card.Header>
             <Card.Body style={{textAlign: 'left'}}>
-                <p>{cats ? cats : "Loading question description..."}</p>
+                <p>{question ? question.category.join(", ") : "Loading question description..."}</p>
                 <p>{question ? question.description : "Loading question description..."}</p>
             </Card.Body>
         </Card>
