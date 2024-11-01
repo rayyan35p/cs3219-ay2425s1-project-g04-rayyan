@@ -11,9 +11,10 @@ const QuestionDisplay = ({ criteria }) => {
         const fetchQuestion = async () => {
             try {
                 const questions = await getQuestionsByCategory(criteria);
+                const randomIndex = Math.floor(Math.random() * questions.length);
                 if (questions.length > 0) {
-                    setQuestion(questions[0]);
-                    setCats(questions[0].category.join(", "))
+                    setQuestion(questions[randomIndex]);
+                    setCats(questions[randomIndex].category.join(", "))
                 } else {
                     setError("No question found for the selected topic.");
                 }
