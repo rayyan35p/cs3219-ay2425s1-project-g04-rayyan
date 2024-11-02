@@ -4,6 +4,8 @@ const rooms = {};  // { roomId: [sockets] }
 function manageRoom(ws, roomId, userId, type) {
     console.log(`manageRoom function: ${type} ${userId}`)
 
+    ws.hasLeft = false;
+
     switch (type) {
         case "join":
 
@@ -47,22 +49,12 @@ function manageRoom(ws, roomId, userId, type) {
 
             // notify users of roomId of updated user list to display in frontend
             broadcastUserListUpdate(roomId);
+            // notify users of user joining the room 
+            broadcastUserJoin(roomId, userId);
             break;
 
         case "leave":
-            // remove from room 
-            rooms[roomId].sockets = rooms[roomId].sockets.filter(socket => socket !== ws);
-            rooms[roomId].userIds = rooms[roomId].userIds.filter(user => user !== userId);
-
-            console.log(`User ${userId} left the room ${roomId}`);
-
-            // if no one in room delete room 
-            if (rooms[roomId].sockets.length === 0) {
-                delete rooms[roomId];
-                console.log(`Room ${roomId} is empty and deleted`);
-            } else {
-                broadcastUserListUpdate(roomId);
-            }
+            handleUserLeave(ws, roomId, userId);
             break;
         default:
             console.error(`Unknown room management type: ${type}`);
@@ -71,10 +63,17 @@ function manageRoom(ws, roomId, userId, type) {
 
     // Remove user when they disconnect
     ws.on('close', () => {
+       handleUserLeave(ws, roomId, userId)
+        
+    });
+
+    function handleUserLeave(ws, roomId, userId, leaveType) {
+        if (ws.hasLeft) return;
+        ws.hasLeft = true;
 
         if (rooms[roomId]) {
             rooms[roomId].sockets = rooms[roomId].sockets.filter(client => client !== ws);
-            rooms[roomId].userIds = rooms[roomId].userIds.filter(user => user != userId);
+            rooms[roomId].userIds = rooms[roomId].userIds.filter(user => user !== userId);
 
             console.log(`User ${userId} left room ${roomId}`);
 
@@ -82,13 +81,11 @@ function manageRoom(ws, roomId, userId, type) {
                 delete rooms[roomId];
                 console.log(`Room ${roomId} is empty and deleted`);
             } else {
-                // notify the remaining party about leave 
                 broadcastUserListUpdate(roomId);
+                broadcastUserLeft(roomId, userId);
             }
-
         }
-        
-    });
+    }
 
     function broadcastUserListUpdate(roomId) {
         const userList = rooms[roomId].userIds;
@@ -96,6 +93,24 @@ function manageRoom(ws, roomId, userId, type) {
         rooms[roomId].sockets.forEach((client) => {
             if (client.readyState === WebSocket.OPEN) {
                 client.send(JSON.stringify({ type: 'usersListUpdate', users: userList}));
+            }
+        })
+    }
+
+    function broadcastUserLeft(roomId, userId) {
+
+        rooms[roomId].sockets.forEach((client) => {
+            if (client.readyState == WebSocket.OPEN) {
+                client.send(JSON.stringify({ type: 'userLeft', user: userId}));
+            }
+        })
+    }
+
+    function broadcastUserJoin(roomId, userId) {
+
+        rooms[roomId].sockets.forEach((client) => {
+            if (client.readyState == WebSocket.OPEN) {
+                client.send(JSON.stringify({ type: 'userJoin', user: userId}));
             }
         })
     }
