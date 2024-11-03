@@ -7,10 +7,12 @@ const getHistoryByUserId = (userId) => {
     return axios.get(`${baseUrl}/user/${userId}`);
 };
 
-// Sample function to add a new history attempt (optional)
-const createHistoryAttempt = async (newAttempt) => {
-    const response = await axios.post(baseUrl, newAttempt);
-    return response.data;
-};
+// Function to create a new history entry
+const createHistory = async (historyData) => {
+    const response = await axios.post(baseUrl, historyData, {
+      headers: { Authorization: `Bearer ${sessionStorage.getItem('jwt_token')}` },
+    });
+    return response;
+  };
 
-export default { getHistoryByUserId, createHistoryAttempt };
+export default { getHistoryByUserId, createHistory };

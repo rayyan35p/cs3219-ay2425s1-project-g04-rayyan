@@ -54,15 +54,16 @@ const HistoryTable = ({userID}) => {
             try {
                 if (userID) {
                     const result = await historyService.getHistoryByUserId(userID);
+                    console.log('Received history data:', result.data);
                     setHistory(result.data);
                     console.log(`I have gotten the user id in table: ${userID}`)
                 }
             } catch (error) {
-                console.error('Error fetching attempt history:', error);
+                console.error('Error fetching attempt history:', error.response?.data || error.message);
             }
         }
         fetchData();
-    }, []);
+    }, [userID]);
 
     return (
         <div className="history-table">
