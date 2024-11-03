@@ -14,8 +14,8 @@ export async function getUserFromToken() {
             });
             
             // Assuming the user data is nested as described
-            const user = userResponse.data.data.username
-            return { userId: userId, username: user };
+            const username = userResponse.data.data.username
+            return { userId: userId, username: username };
         } catch (error) {
             console.error("Error fetching user:", error);
             return null; // Return null to indicate no user data could be retrieved
