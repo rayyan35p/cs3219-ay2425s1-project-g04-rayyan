@@ -6,17 +6,15 @@ const HistorySchema = new mongoose.Schema({
         ref: 'User', 
         required: true // The user for whom this history entry is being created
     },
-    matchedUser: { 
-        type: mongoose.Schema.Types.ObjectId, 
-        ref: 'User', 
-        required: true // The other user they were matched with
-    },
-    question: {
-        type: mongoose.Schema.Types.ObjectId, // Reference to the Question model
-        ref: 'Question',
+    matchedUsername: { 
+        type: String,
         required: true
     },
-    datetime: {
+    questionTitle: {
+        type: String,
+        required: true
+    },
+    startTime: {
         type: Date, // Time when the session started
         default: Date.now
     },
@@ -25,7 +23,7 @@ const HistorySchema = new mongoose.Schema({
         required: true
     },
     code: {
-    type: Buffer, // Store the code as binary file
+    type: Number, // Store the code as binary file
     required: true
     }
 });
