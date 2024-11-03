@@ -12,7 +12,7 @@ function manageRoom(ws, roomId, userId, type) {
             // userIds -> track users in room
             // matchedUserIds -> check authorized users
             if (!rooms[roomId]) {
-                rooms[roomId] = { sockets: [], userIds: [], matchedUserIds: []};
+                rooms[roomId] = { sockets: [], userIds: [], matchedUserIds: [], startTime: new Date().toISOString()};
             }
 
             console.log(`BEFORE room Info: userIds[${rooms[roomId].userIds}] || matchedusers[${rooms[roomId].matchedUserIds}]`)
@@ -113,6 +113,16 @@ function manageRoom(ws, roomId, userId, type) {
                 client.send(JSON.stringify({ type: 'userJoin', user: userId}));
             }
         })
+    }
+
+
+    function broadcastRoomStartTime(ws, roomId) {
+        const startTime = rooms[roomId].startTime;
+
+        ws.send(JSON.stringify({
+            type: 'roomStartTime',
+            startTime: startTime
+        }));
     }
 }
 

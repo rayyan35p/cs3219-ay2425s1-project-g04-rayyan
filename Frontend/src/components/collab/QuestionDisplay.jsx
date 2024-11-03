@@ -1,13 +1,14 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Card } from 'react-bootstrap'
 
-const QuestionDisplay = () => {
+const QuestionDisplay = ({ title, description}) => {
+
   return (
     <Card>
-        <Card.Header>Question Title</Card.Header>
-        <Card.Body>
-            <p>Question Description Placeholder</p>
-        </Card.Body>
+      <Card.Header>{title || "Loading..."}</Card.Header>
+      <Card.Body>
+        <p>{description || "Loading question details..."}</p>
+      </Card.Body>
     </Card>
   )
 }

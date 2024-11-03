@@ -4,8 +4,13 @@ import HistoryTable from './HistoryTable';
 import ProfileSidebar from './ProfileSidebar';
 import { getUserFromToken } from "./utils/authUtils";
 
+// get question title and create current time
+// get request successful
+
+
 function HistoryPage() {
     const [userID, setUserID] = useState(null);
+    const [username, setUsername] = useState(null);
 
     useEffect(() => {
         async function fetchData() {
@@ -13,7 +18,8 @@ function HistoryPage() {
                 const user = await getUserFromToken();
                 if (user) {
                     setUserID(user.userId); // asynchronous
-                    console.log(`I have gotten the user id in history page: ${user.userId}`)
+                    setUsername(user.username); // asynchronous
+                    console.log(`I have gotten the user id in history page: ${user.userId} ${user.username}`)
                 }
             } catch (error) {
                 console.error('Error fetching user ID in history page component:', error);
@@ -29,7 +35,7 @@ function HistoryPage() {
             <NavigationBar/>
             <div className="row">
                 <div className="Navbar col-2">
-                    <ProfileSidebar userID={userID}/>
+                    <ProfileSidebar userID={userID} username={username} />
                 </div>
                 <div className="col-10">
                     <HistoryTable userID={userID}/>

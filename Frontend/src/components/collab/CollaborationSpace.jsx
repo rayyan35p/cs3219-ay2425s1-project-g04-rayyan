@@ -2,13 +2,14 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import * as Y from 'yjs';
 import { WebsocketProvider } from 'y-websocket';
-import { getUserFromToken } from '../user/userAvatarBox';
+import { getUserFromToken } from '../user/utils/authUtils';
 import QuestionDisplay from './QuestionDisplay';
 import Chat from './Chat';
 import CollabNavigationBar from './CollabNavigationBar';
 import CodeSpace from './CodeSpace';
 import { Container, Row, Col } from 'react-bootstrap';
 import collabService from '../../services/collab'; 
+import historyService from '../../services/history';
 import Toast from 'react-bootstrap/Toast';
 import ToastContainer from 'react-bootstrap/ToastContainer';
 import Spinner from 'react-bootstrap/Spinner';
@@ -21,7 +22,9 @@ const CollaborationSpace = () => {
     const [provider, setProvider] = useState(null);
     const [code, setCode] = useState('');
     const [users, setUsers] = useState([]); // track users in the room 
+    const [usersSave, setUsersSave] = useState([]); // for saving users in the room; getting matched user's username
     const [userId, setUserId] = useState(""); // current user 
+    const [username, setUsername] = useState(""); // current user 
     const [language, setLanguage] = useState("python") // set default language to python 
     const [output, setOutput] = useState("")
     const [messages, setMessages] = useState([])
@@ -62,7 +65,8 @@ const CollaborationSpace = () => {
         const fetchUser = async () => {
             const user = await getUserFromToken();
             if (user !== "No User") {
-                setUserId(user.username); // Set the username in state
+                setUserId(user.userId); // Set the username in state
+                setUsername(user.username); // Set the username in state
                 initiateWebSocket(user.username);
             } else {
                 setUserId("Guest"); // Fallback in case no user is found
@@ -84,6 +88,12 @@ const CollaborationSpace = () => {
     useEffect(() => {
         console.log("Messages state updated:", messages);
     }, [messages]);
+
+    useEffect(() => {
+        if (users.length == 2) {
+            setUsersSave(users)
+        }
+    }, [users])
 
     const initiateWebSocket = (userId) => {
         if (websocketRef.current) return; // Prevent duplicate connections
@@ -156,6 +166,31 @@ const CollaborationSpace = () => {
     };
 
     const handleExit = () => {
+        try {
+            // Filter out the current user from the usersSave array to find the matched user
+            const matchedUser = usersSave.filter(user => user !== username)[0]; // Assuming usersSave contains objects with userId property
+
+            if (!matchedUser) {
+                throw new Error("No matched user found");
+            }
+            const sessionData = {
+                user: userId,
+              matchedUsername: matchedUser, // Assuming user[1] is the matched user
+              questionTitle: 'BFS', // This ID should be available in context or passed down
+            //   questionTitle: questionTitle, // This ID should be available in context or passed down
+            //   startTime: roomCreationTime,
+              startTime: new Date(),
+            //   duration: new Date().getTime() - new Date(roomCreationTime).getTime(),
+              duration: 10,
+              code: '1'
+            }
+        
+            historyService.createHistoryAttempt(sessionData)
+            // Navigate away or perform any additional actions on success
+          } catch (error) {
+            console.error("Failed to save session history:", error)
+          }
+
         if (websocketRef.current) websocketRef.current.send(JSON.stringify({ type: 'leaveRoom', roomId, userId }));
 
         // Clean up Yjs document and provider before going back to home
