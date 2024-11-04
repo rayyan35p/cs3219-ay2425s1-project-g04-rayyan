@@ -1,11 +1,11 @@
 const amqp = require('amqplib');
-const { queueNames } = require('./setup.js');
+const { queueNamesPromise } = require('./setup.js');
 // const { matchUsers } = require('../services/matchingService.js');
 const { notifyUsers } = require('../websocket/websocket');
 const { v4: uuidv4 } = require('uuid');
 // matchingService/fetchQuestion.js
 const axios = require('axios');
-const questionServiceUrl = 'http://localhost:3001/api/questions';
+const questionAPIUrl = 'http://localhost:3001/api/questions';
 
 
 // TODO: Subscribe and acknowledge messages with user info when timeout/user matched
@@ -69,7 +69,8 @@ function matchUsers(channel, msg, userId, difficulty, category) {
 
     if (waitingUsers[criteriaKey].length >= 2) {
         const matchedUsers = waitingUsers[criteriaKey].splice(0, 2);
-        delete waitingUsers[categoryKey];
+        removeMatchedUsersFromOtherLists(matchedUsers, categoryKey);
+        console.log("waitingusers after strict matching: ", waitingUsers)
         notifyMatch(channel, matchedUsers, category);
         return true;
     } 
@@ -80,7 +81,8 @@ function matchUsers(channel, msg, userId, difficulty, category) {
         console.log(`Fallback: User ${userId} added to ${categoryKey}. Waiting list: ${waitingUsers[categoryKey].length}`);
         if (waitingUsers[categoryKey].length >= 2) {
             const matchedUsers = waitingUsers[categoryKey].splice(0, 2);
-            delete waitingUsers[criteriaKey];
+            removeMatchedUsersFromOtherLists(matchedUsers, criteriaKey);
+            console.log("waitingusers after lenient matching: ", waitingUsers)
             notifyMatch(channel, matchedUsers, category);
             return true;
         }
@@ -89,12 +91,22 @@ function matchUsers(channel, msg, userId, difficulty, category) {
     return false;
 }
 
+function removeMatchedUsersFromOtherLists(matchedUsers, keyToSkip) {
+    for (const key in waitingUsers) {
+        if (key !== keyToSkip) {
+            waitingUsers[key] = waitingUsers[key].filter(
+                user => !matchedUsers.some(matchedUser => matchedUser.userId === user.userId)
+            );
+        }
+    }
+}
+
 async function notifyMatch(channel, matchedUsers, category) {
     const roomId = uuidv4();
 
     try {
         // Fetch a question from QuestionService based on category
-        const response = await axios.get(`${questionServiceUrl}/by-category`, {
+        const response = await axios.get(`${questionAPIUrl}/by-category`, {
             params: { category: category }
         });
         
@@ -242,6 +254,7 @@ async function rejectMessage(channel, msg, userId) {
 
 async function consumeQueue() {
     try {
+        const queueNames = await queueNamesPromise;
         const connection = await amqp.connect(process.env.RABBITMQ_URL);
         const channel = await connection.createChannel();
 
