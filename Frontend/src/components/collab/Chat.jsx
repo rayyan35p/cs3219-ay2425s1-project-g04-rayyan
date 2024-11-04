@@ -18,7 +18,7 @@ const Chat = ({ currentUser, messages, sendMessage }) => {
                     <Accordion.Header>
                         Chat
                     </Accordion.Header>
-                    <Accordion.Body>
+                    <Accordion.Body className="scrollable-accordion-body">
                         <ListGroup>
                             {messages.map((msg, idx) => (
                                 <ListGroupItem
