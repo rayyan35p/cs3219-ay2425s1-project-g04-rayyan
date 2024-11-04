@@ -29,6 +29,7 @@ const CollaborationSpace = () => {
     const [output, setOutput] = useState("")
     const [messages, setMessages] = useState([])
     const [outputLoading, setOutputLoading] = useState(false)
+    const [roomStartTime, setRoomStartTime] = useState(null); // Initialize state for room start time
 
     // use https://emkc.org/api/v2/piston/runtimes to GET other languages
     const LANGUAGEVERSIONS = {
@@ -136,6 +137,10 @@ const CollaborationSpace = () => {
                 case 'userLeft':
                     addNotif(`User ${data.user} has left`)
                     break;
+                // Handle room start time message
+                case 'roomStartTime':
+                    setRoomStartTime(data.startTime);
+                    break;
                 default:
                     console.log("No messages received from room management server");
                     break;
@@ -169,6 +174,8 @@ const CollaborationSpace = () => {
         try {
             // Filter out the current user from the usersSave array to find the matched user
             const matchedUser = usersSave.filter(user => user !== username)[0]; // Assuming usersSave contains objects with userId property
+            const startTime = new Date(roomStartTime); // Convert start time from ISO to Date object
+            const duration = new Date().getTime() - startTime.getTime();
 
             if (!matchedUser) {
                 throw new Error("No matched user found");
@@ -179,9 +186,11 @@ const CollaborationSpace = () => {
               questionTitle: 'BFS', // This ID should be available in context or passed down
             //   questionTitle: questionTitle, // This ID should be available in context or passed down
             //   startTime: roomCreationTime,
-              startTime: new Date(),
+            //   startTime: new Date(),
             //   duration: new Date().getTime() - new Date(roomCreationTime).getTime(),
-              duration: 10,
+            //   duration: 10,
+            startTime: startTime.toISOString(),
+            duration: Math.floor(duration / 1000),
               code: '1'
             }
         

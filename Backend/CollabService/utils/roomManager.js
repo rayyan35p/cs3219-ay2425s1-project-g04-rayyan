@@ -15,6 +15,9 @@ function manageRoom(ws, roomId, userId, type) {
                 rooms[roomId] = { sockets: [], userIds: [], matchedUserIds: [], startTime: new Date().toISOString()};
             }
 
+            // Broadcast start time to the newly joined user
+            broadcastRoomStartTime(ws, roomId);
+
             console.log(`BEFORE room Info: userIds[${rooms[roomId].userIds}] || matchedusers[${rooms[roomId].matchedUserIds}]`)
 
             const numOfMatchedUsers = rooms[roomId].matchedUserIds.length
