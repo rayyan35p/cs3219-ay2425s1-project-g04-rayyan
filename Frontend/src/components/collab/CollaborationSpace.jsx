@@ -17,8 +17,9 @@ const CollaborationSpace = () => {
     const navigate = useNavigate();
     const { roomId } = useParams(); // Get the roomId from the URL
     const location = useLocation();
-    const { category } = location.state || {};
+    const { category, question } = location.state || {};
     console.log(`category is :${category}`);
+    console.log(`question is :${question}`);
     const websocketRef = useRef(null); // Use ref to persist websocket across renders
     const [yDoc, setYDoc] = useState(null);
     const [provider, setProvider] = useState(null);
@@ -216,7 +217,7 @@ const CollaborationSpace = () => {
                         </Col>
                         <Col md={6} style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
                             <div style={{ flex: '60%', display: 'flex', overflow: 'hidden' }}>
-                                <QuestionDisplay criteria={category}/>
+                                <QuestionDisplay question={question}/>
                             </div>
                             <div style={{ flex: '40%', overflow: 'hidden' }}>
                                 <Chat currentUser={userId} messages={messages} sendMessage={sendMessage}/>

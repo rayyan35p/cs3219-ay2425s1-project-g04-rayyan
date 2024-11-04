@@ -69,7 +69,12 @@ function Sidebar() {
                 setShowMatching(false);
                 setShowSuccessfulMatch(true);
                 setTimeout(() => {
-                    navigate(data.collaborationUrl, { state: { category: data.category } }); 
+                    navigate(data.collaborationUrl, { 
+                        state: { 
+                            category: data.category, 
+                            question: data.question 
+                        } 
+                    }); 
                 }, 3000); 
             } else if (data.type === 'rejection') {
                 setShowMatching(false);

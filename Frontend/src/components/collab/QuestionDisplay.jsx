@@ -2,32 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Card } from 'react-bootstrap';
 import { getQuestionsByCategory } from '../../services/questions';
 
-const QuestionDisplay = ({ criteria }) => {
-    const [question, setQuestion] = useState(null);
+const QuestionDisplay = ({ question }) => {
+    // const [question, setQuestion] = useState(null);
     const [error, setError] = useState(null);
     // const [cats, setCats] = useState(null)
-
-    useEffect(() => {
-        const fetchQuestion = async () => {
-            try {
-                const questions = await getQuestionsByCategory(criteria);
-                // const randomIndex = Math.floor(Math.random() * questions.length);
-                if (questions.length > 0) {
-                    setQuestion(questions[0]);
-                    // setCats(questions[randomIndex].category.join(", "))
-                } else {
-                    setError("No question found for the selected topic.");
-                }
-            } catch (err) {
-                setError("Failed to fetch question.");
-                console.error(err);
-            }
-        };
-
-        if (criteria) {
-            fetchQuestion();
-        }
-    }, [criteria]);
 
     if (error) {
         return <p>{error}</p>;
