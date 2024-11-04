@@ -6,12 +6,16 @@ const HistoryAttempt = ({ attempt }) => {
 
   // Function to format duration based on requirements
   const formatDuration = (seconds) => {
+    if (seconds < 0) {
+      throw new Error('Negative duration is not supported');
+    }
+  
     if (seconds >= 3600) {
-      // Format as H:MM:SS
+      // Format as HH:MM:SS
       const hours = Math.floor(seconds / 3600);
       const minutes = Math.floor((seconds % 3600) / 60);
       const remainingSeconds = seconds % 60;
-      return `${hours}:${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
+      return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
     } else if (seconds >= 60) {
       // Format as MM:SS
       const minutes = Math.floor(seconds / 60);
@@ -22,6 +26,7 @@ const HistoryAttempt = ({ attempt }) => {
       return `00:${String(seconds).padStart(2, '0')}`;
     }
   };
+  
 
   return (
     <tr>
