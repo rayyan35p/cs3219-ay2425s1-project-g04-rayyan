@@ -4,7 +4,7 @@ const generator = require("../utils/generateQueues");
 const matching_exchange_name = "matching_exchange";
 const dead_letter_exchange_name = "dead_letter_exchange";
 const dead_letter_queue_name = "dead_letter_queue";
-const cancel_queue_name = "cancel_queue";
+// const cancel_queue_name = "cancel_queue";
 const difficulties = ["easy", "medium", "hard", "any"];
 const axios = require('axios');
 const categoryAPIUrl = 'http://localhost:3001/api/categories';
@@ -57,10 +57,10 @@ async function setupRabbitMQ() {
         await channel.assertQueue(dead_letter_queue_name, { durable: true });
         await channel.bindQueue(dead_letter_queue_name, dead_letter_exchange_name, ''); // Bind with no routing key
 
-        // Delete and recreate the cancel queue
-        await channel.deleteQueue(cancel_queue_name);
-        await channel.assertQueue(cancel_queue_name, { durable: true });
-        await channel.bindQueue(cancel_queue_name, matching_exchange_name, 'cancel'); // Bind with the "cancel" routing key
+        // // Delete and recreate the cancel queue
+        // await channel.deleteQueue(cancel_queue_name);
+        // await channel.assertQueue(cancel_queue_name, { durable: true });
+        // await channel.bindQueue(cancel_queue_name, matching_exchange_name, 'cancel'); // Bind with the "cancel" routing key
 
         console.log("RabbitMQ setup complete with queues, DLQ, and bindings.");
 
@@ -71,4 +71,5 @@ async function setupRabbitMQ() {
     }
 }
 
-module.exports = { setupRabbitMQ, matching_exchange_name, queueNamesPromise, dead_letter_queue_name, cancel_queue_name };
+// module.exports = { setupRabbitMQ, matching_exchange_name, queueNamesPromise, dead_letter_queue_name, cancel_queue_name };
+module.exports = { setupRabbitMQ, matching_exchange_name, queueNamesPromise, dead_letter_queue_name };

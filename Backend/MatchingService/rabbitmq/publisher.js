@@ -37,25 +37,26 @@ async function publishToQueue({ userId, difficulty, category }) {
     }
 }
 
-async function publishCancelRequest({ userId }) {
-    try {
-        const channel = await connectToRabbitMQ();
-        const routingKey = 'cancel';
+// async function publishCancelRequest({ userId }) {
+//     try {
+//         const channel = await connectToRabbitMQ();
+//         const routingKey = 'cancel';
 
-        const messageSent = channel.publish(
-            matching_exchange_name,
-            routingKey,
-            Buffer.from(JSON.stringify({ userId }))
-        );
+//         const messageSent = channel.publish(
+//             matching_exchange_name,
+//             routingKey,
+//             Buffer.from(JSON.stringify({ userId }))
+//         );
 
-        if (messageSent) {
-            console.log(`Cancel request sent: ${userId}`);
-        } else {
-            console.error(`Cancel request NOT sent: ${userId}`);
-        }
-    } catch (error) {
-        console.error('Error publishing cancel request to RabbitMQ:', error);
-    }
-}
+//         if (messageSent) {
+//             console.log(`Cancel request sent: ${userId}`);
+//         } else {
+//             console.error(`Cancel request NOT sent: ${userId}`);
+//         }
+//     } catch (error) {
+//         console.error('Error publishing cancel request to RabbitMQ:', error);
+//     }
+// }
 
-module.exports = { publishToQueue, publishCancelRequest };
+// module.exports = { publishToQueue, publishCancelRequest };
+module.exports = { publishToQueue };
