@@ -3,6 +3,10 @@ const { queueNames } = require('./setup.js');
 // const { matchUsers } = require('../services/matchingService.js');
 const { notifyUsers } = require('../websocket/websocket');
 const { v4: uuidv4 } = require('uuid');
+// matchingService/fetchQuestion.js
+const axios = require('axios');
+const questionServiceUrl = 'http://localhost:3001/api/questions';
+
 
 // TODO: Subscribe and acknowledge messages with user info when timeout/user matched
 
@@ -65,6 +69,7 @@ function matchUsers(channel, msg, userId, difficulty, category) {
 
     if (waitingUsers[criteriaKey].length >= 2) {
         const matchedUsers = waitingUsers[criteriaKey].splice(0, 2);
+        delete waitingUsers[categoryKey];
         notifyMatch(channel, matchedUsers, category);
         return true;
     } 
@@ -75,6 +80,7 @@ function matchUsers(channel, msg, userId, difficulty, category) {
         console.log(`Fallback: User ${userId} added to ${categoryKey}. Waiting list: ${waitingUsers[categoryKey].length}`);
         if (waitingUsers[categoryKey].length >= 2) {
             const matchedUsers = waitingUsers[categoryKey].splice(0, 2);
+            delete waitingUsers[criteriaKey];
             notifyMatch(channel, matchedUsers, category);
             return true;
         }
@@ -83,10 +89,35 @@ function matchUsers(channel, msg, userId, difficulty, category) {
     return false;
 }
 
-function notifyMatch(channel, matchedUsers, category) {
+async function notifyMatch(channel, matchedUsers, category) {
     const roomId = uuidv4();
-    notifyUsers(matchedUsers.map(user => user.userId), 'Match found!', 'match', { collaborationUrl: `/collaboration/${roomId}`, category: category });
 
+    try {
+        // Fetch a question from QuestionService based on category
+        const response = await axios.get(`${questionServiceUrl}/by-category`, {
+            params: { category: category }
+        });
+        
+        const questions = response.data;
+        const randomIndex = Math.floor(Math.random() * questions.length);
+
+        // Notify matched users with the roomId, question, and other details
+        notifyUsers(
+            matchedUsers.map(user => user.userId),
+            'Match found!',
+            'match',
+            {
+                collaborationUrl: `/collaboration/${roomId}`,
+                category: category,
+                question: questions[randomIndex]
+            }
+        );
+        console.log("random qn selected", questions[randomIndex])
+    } catch (error) {
+        console.error(`Failed to fetch question for category ${category}:`, error.message);
+    }
+
+    // Acknowledge messages for each matched user
     matchedUsers.forEach(({ msg, channel }) => {
         acknowledgeMessage(channel, msg);
     });
@@ -305,7 +336,7 @@ async function cancelMatching(cancelChannel, cancelMsg, userId) {
         // Loop through waitingUsers to find the original message for the user
         Object.keys(waitingUsers).forEach(criteriaKey => {
             const userIndex = waitingUsers[criteriaKey].findIndex(user => user.userId === userId);
-            const userIndexCat = waitingUsers[categoryKey].findIndex(user => user.userId === userId);
+            // const userIndexCat = waitingUsers[categoryKey].findIndex(user => user.userId === userId);
             if (userIndex !== -1) {
                 const { msg, channel } = waitingUsers[criteriaKey][userIndex]; // Get original msg and its channel
 
@@ -318,7 +349,7 @@ async function cancelMatching(cancelChannel, cancelMsg, userId) {
 
                 // Remove the user from the waiting list
                 waitingUsers[criteriaKey].splice(userIndex, 1);
-                waitingUsers[categoryKey].splice(userIndex, 1);
+                // waitingUsers[categoryKey].splice(userIndex, 1);
                 console.log(`User ${userId} removed from waiting list for ${criteriaKey}`);
             }
         });
