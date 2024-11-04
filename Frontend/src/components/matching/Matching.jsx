@@ -26,7 +26,7 @@ function Matching({ handleCancel }) {
             <div className="matching-text">
                 <h2>Matching you....</h2>
                 <p>{`${minutes < 10 ? `0${minutes}` : minutes}:${seconds < 10 ? `0${seconds}` : seconds}`}</p>
-                <button className='btn btn-primary btn-sm' onClick={handleCancel} >Cancel</button>
+                <button className='btn btn-primary btn-sm' style={{display: 'none'}} onClick={handleCancel} >Cancel</button>
             </div>
         </div>
     );
