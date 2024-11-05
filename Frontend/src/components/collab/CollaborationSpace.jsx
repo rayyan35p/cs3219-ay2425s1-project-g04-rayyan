@@ -31,7 +31,7 @@ const CollaborationSpace = () => {
     const LANGUAGEVERSIONS = {
         "python" : "3.10.0",
         "java" : "15.0.2",
-        "c++": "10.2.0"
+        "javascript": "1.32.3"
     };
 
     {/* State management for access denied toast */}
