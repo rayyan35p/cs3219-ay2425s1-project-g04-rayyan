@@ -96,15 +96,17 @@ const CollaborationSpace = () => {
         }
     }, [users])
 
-    const initiateWebSocket = (userId) => {
+    const initiateWebSocket = (username) => {
         if (websocketRef.current) return; // Prevent duplicate connections
 
         const websocket = new WebSocket("ws://localhost:3004");
         websocketRef.current = websocket;
 
+        console.log("In initiate websocket, the username is", username);
+
         websocket.onopen = () => {
 
-            websocket.send(JSON.stringify({ type: 'joinRoom', roomId, userId }));
+            websocket.send(JSON.stringify({ type: 'joinRoom', roomId, username }));
             websocket.send(JSON.stringify({ type: 'requestUserList', roomId }));
         };
 
@@ -112,7 +114,7 @@ const CollaborationSpace = () => {
         // on getting a reply from server
         websocket.onmessage = (event) => {
             const data = JSON.parse(event.data);
-            // console.log(`[FRONTEND] data message is ${JSON.stringify(data)}`);
+            console.log(`[FRONTEND] data message is ${JSON.stringify(data)}`);
             switch (data.type) {
                 case 'usersListUpdate':
                     setUsers(data.users); // Update the user list
@@ -200,7 +202,7 @@ const CollaborationSpace = () => {
             console.error("Failed to save session history:", error)
           }
 
-        if (websocketRef.current) websocketRef.current.send(JSON.stringify({ type: 'leaveRoom', roomId, userId }));
+        if (websocketRef.current) websocketRef.current.send(JSON.stringify({ type: 'leaveRoom', roomId, username }));
 
         // Clean up Yjs document and provider before going back to home
         if (provider) {
@@ -249,7 +251,7 @@ const CollaborationSpace = () => {
 
     const handleLanguageChange = (value) => {
         websocketRef.current.send(JSON.stringify({ type: 'languageChange', roomId: roomId,
-            user: userId, language: value }));
+            user: username, language: value }));
     }
 
     if (loading) {
