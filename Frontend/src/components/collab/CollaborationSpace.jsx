@@ -220,9 +220,9 @@ const CollaborationSpace = () => {
     }
 
     return (
-        <div style={{ textAlign: 'center' }}>
+        <div>
             {showAccessDeniedToast ? (
-                <ToastContainer className="p-3" position="top-center" style={{ zIndex: 1 }}>
+                <ToastContainer className="p-3" position="top-center" style={{ zIndex: 1, textAlign: 'center' }}>
                     <Toast
                         onClose={handleCloseToast}
                         show={showAccessDeniedToast}
