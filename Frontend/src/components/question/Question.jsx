@@ -5,6 +5,9 @@ import ButtonGroup from "react-bootstrap/ButtonGroup";
 import CreateQn from "./CreateQn";
 import EditQn from "./EditQn";
 import questionService from "../../services/questions"
+import { AgGridReact } from 'ag-grid-react'; // React Data Grid Component
+import "ag-grid-community/styles/ag-grid.css"; // Mandatory CSS required by the Data Grid
+import "ag-grid-community/styles/ag-theme-quartz.css"; // Optional Theme applied to the Data Grid
 
 function Question() {
     const [questions, setQuestions] = useState([]);
@@ -24,10 +27,6 @@ function Question() {
         })
         .catch(err => console.log(err));
     }, []);
-
-    const easyQuestions = questions.filter(q => q.complexity === "Easy")
-    const mediumQuestions = questions.filter(q => q.complexity === "Medium")
-    const hardQuestions = questions.filter(q => q.complexity === "Hard")
     
     const addQuestion = (newQuestion) => {
         setQuestions((prevQuestions) => [...prevQuestions, newQuestion]);
@@ -74,50 +73,88 @@ function Question() {
         }
     };
 
-    const renderQuestionsTable = (questions) => {
-      const sortedQuestions = [...questions].sort((a, b) => a.id - b.id)
+    const renderQuestionsTable = () => {
+        const CustomButtonComponent = (props) => {
+            const question = props.data
+            return <ButtonGroup className="mb-2">
+                <button 
+                    className='btn btn-success' 
+                    onClick={() => handleShowEditModal(question)}
+                >
+                    Edit
+                </button>
+                <button className='btn btn-danger' size="sm"
+                    onClick={() => handleShowDelete(question._id)}>
+                    Delete
+                </button>
+            </ButtonGroup>
+        };
+
+        const colDefs = [
+            { field: "id", flex: 1, wrapText: true, sort: "asc" },
+            { field: "title", flex: 2 },
+            { field: "description", flex: 5, wrapText: true, autoHeight: true},
+            { field: "complexity", flex: 1.5,
+                comparator: (valueA, valueB, nodeA, nodeB, isDescending) => {
+                    if (valueA == valueB) return 0;
+                    if (valueA == "Easy" || valueB == "Hard") return -1;
+                    if (valueA == "Hard" || valueB == "Easy") return 1;
+                } 
+            },
+            { field: "action", width: 200, resizable: false,  sortable: false, cellRenderer: CustomButtonComponent }
+        ];
 
         return (
-            <Table>
-                <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Title</th>
-                  <th>Description</th>
-                  <th>Category</th>
-                  <th>Action</th>
-                </tr>
-                </thead>
-                <tbody>
-                {sortedQuestions.map((question) => (
-                    <tr key={question.id}>
-                        <td>{question.id}</td>
-                        <td>{question.title}</td>
-                        <td>{question.description}</td>
-                        <td>{question.category ? question.category.join(", ") : ''}</td>
-                        <td>
-                            <ButtonGroup className="mb-2">
-                                <button 
-                                    className='btn btn-success' 
-                                    onClick={() => handleShowEditModal(question)}
-                                >
-                                    Edit
-                                </button>
-                                <button className='btn btn-danger' size="sm"
-                                    onClick={() => handleShowDelete(question._id)}>
-                                    Delete
-                                </button>
-                            </ButtonGroup>
-                        </td>
-                    </tr>
-                ))}
-                </tbody>
-            </Table>
+            <div
+              className="container-fluid ag-theme-quartz" // applying the Data Grid theme
+              style={{ height: 500 }} // the Data Grid will fill the size of the parent container
+            >
+                <AgGridReact
+                    rowData={questions}
+                    columnDefs={colDefs}
+                />
+            </div>
+
+            // <Table>
+            //     <thead>
+            //     <tr>
+            //       <th>ID</th>
+            //       <th>Title</th>
+            //       <th>Description</th>
+            //       <th>Category</th>
+            //       <th>Action</th>
+            //     </tr>
+            //     </thead>
+            //     <tbody>
+            //     {sortedQuestions.map((question) => (
+            //         <tr key={question.id}>
+            //             <td>{question.id}</td>
+            //             <td>{question.title}</td>
+            //             <td>{question.description}</td>
+            //             <td>{question.category ? question.category.join(", ") : ''}</td>
+            //             <td>
+                            // <ButtonGroup className="mb-2">
+                            //     <button 
+                            //         className='btn btn-success' 
+                            //         onClick={() => handleShowEditModal(question)}
+                            //     >
+                            //         Edit
+                            //     </button>
+                            //     <button className='btn btn-danger' size="sm"
+                            //         onClick={() => handleShowDelete(question._id)}>
+                            //         Delete
+                            //     </button>
+                            // </ButtonGroup>
+            //             </td>
+            //         </tr>
+            //     ))}
+            //     </tbody>
+            // </Table>
         );
     };
 
     return (
-        <div className="d-flex">
+        <div className="container-fluid">
             <div className='bg-white rounded p-3 m-3'>
                 <div className="d-flex justify-content-between">
                     <h1>Questions</h1>
@@ -137,14 +174,8 @@ function Question() {
                 <hr/>
 
                 <div className="container">
-                    <h2 className="p-2">Easy Questions</h2>
-                    {renderQuestionsTable(easyQuestions)}
-
-                    <h2 className="p-2">Medium Questions</h2>
-                    {renderQuestionsTable(mediumQuestions)}
-
-                    <h2 className="p-2">Hard Questions</h2>
-                    {renderQuestionsTable(hardQuestions)}
+                    <h2 className="p-2">Questions</h2>
+                    {renderQuestionsTable()}
 
                         {/* Edit Modal */}
                         <Modal show={showEditModal} onHide={handleCloseEditModal} backdrop="static">
