@@ -114,7 +114,8 @@ const CollaborationSpace = () => {
                     setLoading(false);
                     break;
                 case 'newMessage':
-                    console.log("adding message", data.message)
+                    console.log("adding message", data.message);
+                    setMessages((prevMessages) => [...prevMessages, data.message]);
                     break;
                 case 'languageChange':
                     addNotif(`User ${data.user} has changed the language to ${data.language}`);
