@@ -26,6 +26,7 @@ const CollaborationSpace = () => {
     const [output, setOutput] = useState("")
     const [messages, setMessages] = useState([])
     const [outputLoading, setOutputLoading] = useState(false)
+    const [isError, setIsError] = useState(false);
 
     // use https://emkc.org/api/v2/piston/runtimes to GET other languages
     const LANGUAGEVERSIONS = {
@@ -186,7 +187,14 @@ const CollaborationSpace = () => {
         collabService.getCodeOutput(code_message)
             .then(result => {
                 setOutputLoading(false);
-                console.log(result.data.run.output)
+
+                if (result.data.run.stderr != "") {
+                    console.log("There is an error");
+                   setIsError(true); 
+                } else {
+                    setIsError(false);
+                }
+
                 setOutput(result.data.run.output)
             })
             .catch(err => console.log(err));
@@ -254,7 +262,7 @@ const CollaborationSpace = () => {
                     <Container fluid style={{ marginTop: '20px' }}>
                         <Row>
                             <Col md={8}>
-                                <CodeSpace handleEditorChange={handleEditorChange} loading={outputLoading} code={code} language={language} output={output}/>
+                                <CodeSpace handleEditorChange={handleEditorChange} loading={outputLoading} code={code} language={language} output={output} isError={isError}/>
                             </Col>
                             <Col md={4}>
                                 <QuestionDisplay/>

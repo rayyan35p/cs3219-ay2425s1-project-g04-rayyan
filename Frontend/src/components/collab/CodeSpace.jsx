@@ -2,7 +2,7 @@ import React from 'react'
 import { Editor } from '@monaco-editor/react'
 import { Container, Stack, Spinner } from 'react-bootstrap'
 
-const CodeSpace = ({ handleEditorChange, loading, code, language, output }) => {
+const CodeSpace = ({ handleEditorChange, loading, code, language, output, isError }) => {
   return (
 
     <Stack gap={3} className='h-100'>
@@ -22,8 +22,8 @@ const CodeSpace = ({ handleEditorChange, loading, code, language, output }) => {
                 <span className="ms-1">Running...</span>
               </div>
             ): (
-              <div style={{ maxHeight: '150px', overflowY: 'auto', fontFamily: 'monospace', whiteSpace: 'pre-wrap', border: '1px solid rgba(0, 0, 0, 0.2)', borderRadius: '0.5rem'}}>
-                <p>{output}</p>
+              <div style={{ height: '150px', maxHeight: '150px', overflowY: 'auto', fontFamily: 'monospace', whiteSpace: 'pre-wrap', border: '1px solid rgba(0, 0, 0, 0.2)', borderRadius: '0.5rem'}}>
+                <p style={{ color: isError ? 'red' : '#212529' }}>{output}</p>
               </div>
             )}
         </Container>
