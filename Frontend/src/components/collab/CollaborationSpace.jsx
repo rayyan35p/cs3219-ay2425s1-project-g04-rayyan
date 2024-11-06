@@ -26,12 +26,13 @@ const CollaborationSpace = () => {
     const [output, setOutput] = useState("")
     const [messages, setMessages] = useState([])
     const [outputLoading, setOutputLoading] = useState(false)
+    const [isError, setIsError] = useState(false);
 
     // use https://emkc.org/api/v2/piston/runtimes to GET other languages
     const LANGUAGEVERSIONS = {
         "python" : "3.10.0",
         "java" : "15.0.2",
-        "c++": "10.2.0"
+        "javascript": "1.32.3"
     };
 
     {/* State management for access denied toast */}
@@ -187,7 +188,14 @@ const CollaborationSpace = () => {
         collabService.getCodeOutput(code_message)
             .then(result => {
                 setOutputLoading(false);
-                console.log(result.data.run.output)
+
+                if (result.data.run.stderr != "") {
+                    console.log("There is an error");
+                   setIsError(true); 
+                } else {
+                    setIsError(false);
+                }
+
                 setOutput(result.data.run.output)
             })
             .catch(err => console.log(err));
@@ -221,9 +229,9 @@ const CollaborationSpace = () => {
     }
 
     return (
-        <div style={{ textAlign: 'center' }}>
+        <div>
             {showAccessDeniedToast ? (
-                <ToastContainer className="p-3" position="top-center" style={{ zIndex: 1 }}>
+                <ToastContainer className="p-3" position="top-center" style={{ zIndex: 1, textAlign: 'center' }}>
                     <Toast
                         onClose={handleCloseToast}
                         show={showAccessDeniedToast}
@@ -255,7 +263,7 @@ const CollaborationSpace = () => {
                     <Container fluid style={{ marginTop: '20px' }}>
                         <Row>
                             <Col md={8}>
-                                <CodeSpace handleEditorChange={handleEditorChange} loading={outputLoading} code={code} language={language} output={output}/>
+                                <CodeSpace handleEditorChange={handleEditorChange} loading={outputLoading} code={code} language={language} output={output} isError={isError}/>
                             </Col>
                             <Col md={4}>
                                 <QuestionDisplay/>
