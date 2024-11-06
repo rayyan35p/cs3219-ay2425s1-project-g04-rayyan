@@ -37,15 +37,33 @@ const Chat = ({ currentUser, messages, sendMessage }) => {
                     >
                         <ListGroup>
                             {messages.map((msg, idx) => (
-                                <ListGroupItem
-                                    key={idx}
-                                    style={{
-                                        backgroundColor: msg.sender === currentUser ? "#d1e7dd" : "#50d7da",
-                                        textAlign: msg.sender === currentUser ? "right" : "left"
-                                    }}
-                                >
-                                    <Badge bg="secondary">{msg.sender}</Badge>: {msg.text}
-                                </ListGroupItem>
+                                <>
+                                    <ListGroupItem
+                                        key={idx}
+                                        style={{
+                                            backgroundColor: msg.sender === currentUser ? "#d1e7dd" : "#50d7da",
+                                            textAlign: msg.sender === currentUser ? "right" : "left"
+                                        }}
+                                    >
+                                        {/* alternative: keep badge within same line*/}
+                                        {/*{msg.sender !== currentUser && <><Badge bg="secondary">{msg.sender}</Badge> {msg.text}</>}*/}
+                                        {/*{msg.sender === currentUser && <>{msg.text} <Badge bg="secondary">{msg.sender}</Badge></>}*/}
+
+                                        {msg.text}
+                                    </ListGroupItem>
+                                    <ListGroupItem
+                                        key={idx}
+                                        style={{
+                                            backgroundColor: "white",
+                                            textAlign: msg.sender === currentUser ? "right" : "left",
+                                            border: "none",
+                                            padding: "0",
+                                    }}>
+                                        <Badge bg="secondary">{msg.sender}</Badge>
+                                    </ListGroupItem>
+                                    {/* spacer */}
+                                    <div style={{ height: '10px' }}></div>
+                                </>
                             ))}
                         </ListGroup>
                     </div>
