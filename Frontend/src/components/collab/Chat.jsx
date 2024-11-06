@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
-import { Accordion, ListGroup, ListGroupItem, Form, Button } from 'react-bootstrap';
+import React, {useState, useRef, useEffect} from 'react';
+import {Accordion, ListGroup, ListGroupItem, Form, Button, Badge} from 'react-bootstrap';
 
 const Chat = ({ currentUser, messages, sendMessage }) => {
     const [text, setText] = useState('');
+    const chatContainerRef = useRef(null);
+    const [isAccordionOpen, setIsAccordionOpen] = useState(true);
 
     const handleSend = () => {
         console.log("I am sending")
@@ -12,13 +14,27 @@ const Chat = ({ currentUser, messages, sendMessage }) => {
         }
     };
 
+    useEffect(() => {
+        if (chatContainerRef.current) {
+            chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+        }
+    }, [messages]);
+
     return (
-        <Accordion defaultActiveKey="0" className='mt-3'>
-                <Accordion.Item eventKey="0">
-                    <Accordion.Header>
-                        Chat
-                    </Accordion.Header>
-                    <Accordion.Body className="scrollable-accordion-body">
+        <Accordion defaultActiveKey="0" className='mt-3' onSelect={(eventKey) => setIsAccordionOpen(eventKey === "0")}>
+            <Accordion.Item eventKey="0">
+                <Accordion.Header>
+                    Chat
+                </Accordion.Header>
+                <Accordion.Body>
+                    <div
+                        ref={chatContainerRef}
+                        style={{
+                            maxHeight: '300px',
+                            overflowY: 'auto',
+                            marginBottom: '1rem',
+                        }}
+                    >
                         <ListGroup>
                             {messages.map((msg, idx) => (
                                 <ListGroupItem
@@ -28,11 +44,13 @@ const Chat = ({ currentUser, messages, sendMessage }) => {
                                         textAlign: msg.sender === currentUser ? "right" : "left"
                                     }}
                                 >
-                                    {msg.text}
+                                    <Badge bg="secondary">{msg.sender}</Badge>: {msg.text}
                                 </ListGroupItem>
                             ))}
                         </ListGroup>
-                        <Form className="mt-3" onSubmit={(e) => { e.preventDefault(); handleSend(); }}>
+                    </div>
+                    {isAccordionOpen && ( // Only show message input when accordion is open
+                        <Form onSubmit={(e) => { e.preventDefault(); handleSend(); }}>
                             <Form.Group controlId="messageInput">
                                 <Form.Control
                                     type="text"
@@ -45,8 +63,9 @@ const Chat = ({ currentUser, messages, sendMessage }) => {
                                 Send
                             </Button>
                         </Form>
-                    </Accordion.Body>
-                </Accordion.Item>
+                    )}
+                </Accordion.Body>
+            </Accordion.Item>
         </Accordion>
     );
 };
