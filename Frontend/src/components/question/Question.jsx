@@ -6,6 +6,8 @@ import CreateQn from "./CreateQn";
 import EditQn from "./EditQn";
 import questionService from "../../services/questions"
 import userService from "../../services/users";
+import categoryService from "../../services/categories";
+
 
 function Question() {
     const [questions, setQuestions] = useState([]);
