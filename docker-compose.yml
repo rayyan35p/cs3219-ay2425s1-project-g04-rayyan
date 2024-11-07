@@ -6,7 +6,7 @@ services:
     ports:
       - "3001:3001"
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://question-service:3001/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:3001/health"]
       interval: 10s
       timeout: 5s
       retries: 5
