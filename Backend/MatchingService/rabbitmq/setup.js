@@ -7,7 +7,9 @@ const dead_letter_queue_name = "dead_letter_queue";
 // const cancel_queue_name = "cancel_queue";
 const difficulties = ["easy", "medium", "hard", "any"];
 const axios = require('axios');
-const categoryAPIUrl = 'http://question-service:3001/api/categories';
+// Matching Service code
+const questionServiceHost = process.env.QUESTION_SERVICE_HOST || 'localhost';
+const categoryAPIUrl = `http://${questionServiceHost}:3001/api/categories`;
 
 let queueNamesPromise = axios.get(categoryAPIUrl)
     .then(response => {

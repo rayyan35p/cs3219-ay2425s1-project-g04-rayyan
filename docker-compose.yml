@@ -24,6 +24,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8080:8080"
+    environment:
+      - QUESTION_SERVICE_HOST=question-service
     depends_on:
       question-service:
         condition: service_healthy

@@ -5,7 +5,9 @@ const { notifyUsers } = require('../websocket/websocket');
 const { v4: uuidv4 } = require('uuid');
 // matchingService/fetchQuestion.js
 const axios = require('axios');
-const questionAPIUrl = 'http://question-service:3001/api/questions';
+// Matching Service code
+const questionServiceHost = process.env.QUESTION_SERVICE_HOST || 'localhost';
+const questionAPIUrl = `http://${questionServiceHost}:3001/api/questions`;
 
 
 // TODO: Subscribe and acknowledge messages with user info when timeout/user matched
