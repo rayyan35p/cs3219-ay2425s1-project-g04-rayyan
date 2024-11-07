@@ -5,6 +5,11 @@ services:
       dockerfile: Dockerfile
     ports:
       - "3001:3001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   user-service:
     build:
@@ -19,6 +24,11 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8080:8080"
+    environment:
+      - QUESTION_SERVICE_HOST=question-service
+    depends_on:
+      question-service:
+        condition: service_healthy
 
   collab-service:
     build:

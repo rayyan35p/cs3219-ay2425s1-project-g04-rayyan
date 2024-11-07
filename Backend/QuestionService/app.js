@@ -3,6 +3,7 @@ const mongoose = require('mongoose')
 const cors = require('cors')
 const dotenv = require("dotenv")
 const questionRouter = require("./controllers/questions")
+const categoriesRouter = require("./controllers/categories");
 
 dotenv.config()
 
@@ -16,6 +17,7 @@ mongoose.connect(mongoURI)
 .catch(err => console.error('MongoDB connection error:', err));
 
 app.use('/api/questions', questionRouter)
+app.use('/api/categories', categoriesRouter);
 
 app.get("/", (req, res, next) => {
     console.log("Sending Greetings!");
@@ -24,6 +26,10 @@ app.get("/", (req, res, next) => {
     });
   });
   
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'healthy' });
+});
+
 // Handle When No Route Match Is Found
 app.use((req, res, next) => {
     const error = new Error("Route Not Found");
