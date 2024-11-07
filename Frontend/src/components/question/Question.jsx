@@ -5,6 +5,7 @@ import ButtonGroup from "react-bootstrap/ButtonGroup";
 import CreateQn from "./CreateQn";
 import EditQn from "./EditQn";
 import questionService from "../../services/questions"
+import categoryService from "../../services/categories"
 
 function Question() {
     const [questions, setQuestions] = useState([]);
@@ -63,16 +64,44 @@ function Question() {
     };
 
     const handleDeleteConfirm = () => {
-        if (questionToDelete) {
-            questionService.deleteQuestion(questionToDelete)
-            .then(res => {
-                console.log(res);
-                setQuestions(questions.filter(question => question._id !== questionToDelete));
-                handleCloseDelete();
+        if (!questionToDelete) return;
+    
+        // retrieve the question to get its categories before deleting
+        questionService.get(questionToDelete)
+            .then((question) => {
+                const categories = question.data.category;
+                console.log("question retrieved: ", question)
+                console.log(`catgories of qn: ${categories}`)
+    
+                // delete the question
+                questionService.deleteQuestion(questionToDelete)
+                    .then(res => {
+                        console.log(res);
+                        
+                       
+                        setQuestions(questions.filter(q => q._id !== questionToDelete));
+                        handleCloseDelete();
+    
+                        // check each category to see if it should be deleted
+                        categories.forEach(async (category) => {
+                            try {
+                                const remainingQuestions = await questionService.getQuestionsByCategory(category);
+                                
+                                // if no other questions have this category, delete the category
+                                if (remainingQuestions.length === 0) {
+                                    await categoryService.deleteCategory(category);
+                                    console.log(`Category ${category} deleted.`);
+                                }
+                            } catch (err) {
+                                console.error(`Error processing category ${category}:`, err);
+                            }
+                        });
+                    })
+                    .catch(err => console.error("Error deleting question:", err));
             })
-            .catch(err => console.log(err));
-        }
+            .catch(err => console.error(`Error fetching question data for ID ${questionToDelete}:`, err));
     };
+    
 
     const renderQuestionsTable = (questions) => {
       const sortedQuestions = [...questions].sort((a, b) => a.id - b.id)

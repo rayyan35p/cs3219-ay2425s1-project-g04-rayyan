@@ -16,9 +16,10 @@ const createCategories = async (newCategories) => {
 };
 
 
-const deleteCategory = async (CategoryId) => {
-    const response = await axios.delete(`${baseCategoryUrl}/${CategoryId}`);
+const deleteCategory = async (categoryName) => {
+    const response = await axios.delete(`${baseCategoryUrl}/${categoryName}`);
     return response.data;
 };
+
 
 export default { getAllCategories, createCategories, deleteCategory };

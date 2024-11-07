@@ -17,6 +17,18 @@ questionsRouter.get("/by-category-and-complexity", async (req, res) => {
     }
 });
 
+questionsRouter.get("/by-category", async (req, res) => {
+    const { category } = req.query;
+    try {
+        const query = category ? { category: { $in: [new RegExp(`^${category}$`, "i")] } } : {};
+        const questions = await QuestionModel.find(query);
+        res.status(200).json(questions);
+    } catch (error) {
+        console.error("Error fetching questions by category:", error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
 // Read all questions
 questionsRouter.get("/", async (req, res) => {
     try {

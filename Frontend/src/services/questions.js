@@ -33,4 +33,4 @@ const deleteQuestion = (id) => {
     return request.then(response => response.data);
 }
 
-export default { getAll, get, createQuestion, updateQuestion, deleteQuestion }
+export default { getAll, get, createQuestion, updateQuestion, deleteQuestion, getQuestionsByCategory }
