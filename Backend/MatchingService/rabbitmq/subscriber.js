@@ -5,7 +5,7 @@ const { notifyUsers } = require('../websocket/websocket');
 const { v4: uuidv4 } = require('uuid');
 // matchingService/fetchQuestion.js
 const axios = require('axios');
-const questionAPIUrl = 'http://localhost:3001/api/questions';
+const questionAPIUrl = 'http://question-service:3001/api/questions';
 
 
 // TODO: Subscribe and acknowledge messages with user info when timeout/user matched
@@ -77,15 +77,19 @@ function matchUsers(channel, msg, userId, difficulty, category) {
 
     // Try matching with category only if no difficulty match is found
     if (waitingUsers[criteriaKey].length < 2) {
-        waitingUsers[categoryKey].push({ userId, msg, channel });
-        console.log(`Fallback: User ${userId} added to ${categoryKey}. Waiting list: ${waitingUsers[categoryKey].length}`);
-        if (waitingUsers[categoryKey].length >= 2) {
-            const matchedUsers = waitingUsers[categoryKey].splice(0, 2);
-            removeMatchedUsersFromOtherLists(matchedUsers, categoryKey);
-            console.log("waitingusers after lenient matching: ", waitingUsers)
-            notifyMatch(channel, matchedUsers, category, difficulty);
-            return true;
-        }
+        // Add a 5-second delay before adding the user to waitingUsers[categoryKey]
+        setTimeout(() => {
+            waitingUsers[categoryKey].push({ userId, msg, channel });
+            console.log(`Fallback: User ${userId} added to ${categoryKey}. Waiting list: ${waitingUsers[categoryKey].length}`);
+    
+            if (waitingUsers[categoryKey].length >= 2) {
+                const matchedUsers = waitingUsers[categoryKey].splice(0, 2);
+                removeMatchedUsersFromOtherLists(matchedUsers, categoryKey);
+                console.log("waitingusers after lenient matching: ", waitingUsers)
+                notifyMatch(channel, matchedUsers, category, difficulty);
+                return true;
+            }
+        }, 5000); // 5-second delay
     }
 
     return false;

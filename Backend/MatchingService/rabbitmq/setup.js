@@ -7,7 +7,7 @@ const dead_letter_queue_name = "dead_letter_queue";
 // const cancel_queue_name = "cancel_queue";
 const difficulties = ["easy", "medium", "hard", "any"];
 const axios = require('axios');
-const categoryAPIUrl = 'http://localhost:3001/api/categories';
+const categoryAPIUrl = 'http://question-service:3001/api/categories';
 
 let queueNamesPromise = axios.get(categoryAPIUrl)
     .then(response => {
