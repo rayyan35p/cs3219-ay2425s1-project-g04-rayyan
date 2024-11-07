@@ -26,8 +26,13 @@ const ProtectedRoute = ({ children }) => {
         // verify token asynchronously, set auth status only after request completes
         userService.verifyToken(authHeader)
         .then(response => {
-            console.log(response);
-            setIsAuthenticated(true);
+            //console.log(response.status);
+            if (response.status == 200) {
+                setIsAuthenticated(true);
+            } else {
+                setIsAuthenticated(false);
+            }
+
         })
         .catch(e => {
             console.log('Error:', e);

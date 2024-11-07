@@ -1,8 +1,8 @@
 import React from 'react'
 import { Editor } from '@monaco-editor/react'
-import { Container, Stack } from 'react-bootstrap'
+import { Container, Stack, Spinner } from 'react-bootstrap'
 
-const CodeSpace = ({ handleEditorChange, code, language, output }) => {
+const CodeSpace = ({ handleEditorChange, loading, code, language, output, isError }) => {
   return (
 
     <Stack gap={3} className='h-100'>
@@ -14,9 +14,18 @@ const CodeSpace = ({ handleEditorChange, code, language, output }) => {
             onChange={handleEditorChange}
             theme='vs-dark'
         />
-        <Container style={{ height: '200px', border: '1px solid #ccc', borderRadius: '0.5rem', padding: '1rem', backgroundColor: '#f8f9fa'}}>
-            <h5>Output</h5>
-            <p style={{ fontFamily: 'monospace', whiteSpace: 'pre-wrap'}}>{output}</p>
+        <Container style={{ height: '225px', border: '1px solid #ccc', borderRadius: '0.5rem', padding: '1rem', backgroundColor: '#f8f9fa', padding: '20px'}}>
+            <h4>Output</h4>
+            {loading ? (
+              <div className="d-flex justify-content-center align-items-center" style={{ height: '100%' }}>
+                <Spinner animation="border" variant="primary" />
+                <span className="ms-1">Running...</span>
+              </div>
+            ): (
+              <div style={{ height: '150px', maxHeight: '150px', overflowY: 'auto', fontFamily: 'monospace', whiteSpace: 'pre-wrap', border: '1px solid rgba(0, 0, 0, 0.2)', borderRadius: '0.5rem'}}>
+                <p style={{ color: isError ? 'red' : '#212529' }}>{output}</p>
+              </div>
+            )}
         </Container>
     </Stack>
     

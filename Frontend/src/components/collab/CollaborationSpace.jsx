@@ -25,19 +25,21 @@ const CollaborationSpace = () => {
     const [provider, setProvider] = useState(null);
     const [code, setCode] = useState('');
     const [users, setUsers] = useState([]); // track users in the room 
-    const [outputLoading, setOutputLoading] = useState(false)
     const [userId, setUserId] = useState(""); // current user 
     const [language, setLanguage] = useState("python") // set default language to python 
     const [output, setOutput] = useState("")
     const [messages, setMessages] = useState([])
+    const [outputLoading, setOutputLoading] = useState(false)
+    const [isError, setIsError] = useState(false);
 
     // use https://emkc.org/api/v2/piston/runtimes to GET other languages
     const LANGUAGEVERSIONS = {
         "python" : "3.10.0",
         "java" : "15.0.2",
-        "c++": "10.2.0"
+        "javascript": "1.32.3"
     };
 
+    {/* State management for access denied toast */}
     const [showAccessDeniedToast, setShowAccessDeniedToast] = useState(false);
     const [toastMessage, setToastMessage] = useState('');
     const [loading, setLoading] = useState(true);
@@ -49,15 +51,16 @@ const CollaborationSpace = () => {
 
     {/* State management for user join/leave toast */}
     const [notifs, setNotifs] = useState([]); 
+
     const addNotif = (message) => {
         const id = Date.now(); // unique id based on timestamp
         setNotifs((prevNotifs) => [...prevNotifs, {id, message}]);
+
         // Remove notif after 2 seconds
         setTimeout(() => {
             setNotifs((prevNotifs) => prevNotifs.filter((notif) => notif.id !== id))
         }, 1500);
     };
-
 
     {/* Set up websockets for room management on client side, and collaboration for Yjs */}
     useEffect(() => {
@@ -103,6 +106,7 @@ const CollaborationSpace = () => {
         // on getting a reply from server
         websocket.onmessage = (event) => {
             const data = JSON.parse(event.data);
+
             switch (data.type) {
                 case 'usersListUpdate':
                     setUsers(data.users); // Update the user list
@@ -115,7 +119,7 @@ const CollaborationSpace = () => {
                     setLoading(false);
                     break;
                 case 'newMessage':
-                    console.log("adding message", data.message)
+                    console.log("adding message", data.message);
                     setMessages((prevMessages) => [...prevMessages, data.message]);
                     break;
                 case 'languageChange':
@@ -127,6 +131,7 @@ const CollaborationSpace = () => {
                     break;
                 case 'userLeft':
                     addNotif(`User ${data.user} has left`)
+                    break;
                 default:
                     console.log("No messages received from room management server");
                     break;
@@ -171,7 +176,9 @@ const CollaborationSpace = () => {
     };
 
     const handleCodeRun = () => {
+
         setOutputLoading(true);
+
         const code_message = {
             "language": language,
             "files": [
@@ -184,8 +191,17 @@ const CollaborationSpace = () => {
 
         collabService.getCodeOutput(code_message)
             .then(result => {
-                console.log(result.data.run.output)
+
                 setOutputLoading(false);
+
+                if (result.data.run.stderr != "") {
+                    console.log("There is an error");
+                   setIsError(true); 
+                } else {
+                    setIsError(false);
+                }
+
+
                 setOutput(result.data.run.output)
             })
             .catch(err => console.log(err));
@@ -219,6 +235,7 @@ const CollaborationSpace = () => {
     }
 
     return (
+
     <div style={{ textAlign: 'center', height: '100vh', overflow: 'hidden' }}>
         {showAccessDeniedToast ? (
             <ToastContainer className="p-3" position="top-center" style={{ zIndex: 1 }}>
@@ -265,6 +282,7 @@ const CollaborationSpace = () => {
             </>
         )}
     </div>
+
     );
 };
 
