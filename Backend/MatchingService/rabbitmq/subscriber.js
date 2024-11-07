@@ -71,7 +71,7 @@ function matchUsers(channel, msg, userId, difficulty, category) {
         const matchedUsers = waitingUsers[criteriaKey].splice(0, 2);
         removeMatchedUsersFromOtherLists(matchedUsers, criteriaKey);
         console.log("waitingusers after strict matching: ", waitingUsers)
-        notifyMatch(channel, matchedUsers, category);
+        notifyMatch(channel, matchedUsers, category, difficulty);
         return true;
     } 
 
@@ -83,7 +83,7 @@ function matchUsers(channel, msg, userId, difficulty, category) {
             const matchedUsers = waitingUsers[categoryKey].splice(0, 2);
             removeMatchedUsersFromOtherLists(matchedUsers, categoryKey);
             console.log("waitingusers after lenient matching: ", waitingUsers)
-            notifyMatch(channel, matchedUsers, category);
+            notifyMatch(channel, matchedUsers, category, difficulty);
             return true;
         }
     }
@@ -102,16 +102,18 @@ function removeMatchedUsersFromOtherLists(matchedUsers, keyToSkip) {
     console.log("waiting users after removing: ", waitingUsers);
 }
 
-async function notifyMatch(channel, matchedUsers, category) {
+async function notifyMatch(channel, matchedUsers, category, complexity) {
     const roomId = uuidv4();
 
     try {
         // Fetch a question from QuestionService based on category
-        const response = await axios.get(`${questionAPIUrl}/by-category`, {
-            params: { category: category }
+        console.log(`fetching question by ${category} ${complexity}`)
+        const response = await axios.get(`${questionAPIUrl}/by-category-and-complexity`, {
+            params: { category: category, complexity: complexity }
         });
         
         const questions = response.data;
+        console.log("questions fetch from db: ", questions)
         const randomIndex = Math.floor(Math.random() * questions.length);
 
         // Notify matched users with the roomId, question, and other details

@@ -1,14 +1,18 @@
 const questionsRouter = require('express').Router()
 const QuestionModel = require('../models/Questions')
 
-questionsRouter.get("/by-category", async (req, res) => {
-    const { category } = req.query;
+questionsRouter.get("/by-category-and-complexity", async (req, res) => {
+    let { category, complexity } = req.query;
     try {
-        const query = category ? { category: { $in: [new RegExp(`^${category}$`, "i")] } } : {};
+        const query = {}
+        category = category.replace(/-/g, " ");
+        query.category = { $in: [new RegExp(`^${category}$`, "i")] };
+        query.complexity = { $in: [new RegExp(`^${complexity}$`, "i")] };
+
         const questions = await QuestionModel.find(query);
         res.status(200).json(questions);
     } catch (error) {
-        console.error("Error fetching questions by category:", error);
+        console.error("Error fetching questions by category & complexity:", error);
         res.status(500).json({ error: error.message });
     }
 });
