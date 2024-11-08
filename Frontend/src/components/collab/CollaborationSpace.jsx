@@ -236,9 +236,9 @@ const CollaborationSpace = () => {
 
     return (
 
-    <div style={{ textAlign: 'center', height: '100vh', overflow: 'hidden' }}>
+    <div style={{ height: '100vh', overflow: 'hidden' }}>
         {showAccessDeniedToast ? (
-            <ToastContainer className="p-3" position="top-center" style={{ zIndex: 1 }}>
+            <ToastContainer className="p-3" position="top-center" style={{ zIndex: 1, textAlign: 'center' }}>
                 <Toast
                     onClose={handleCloseToast}
                     show={showAccessDeniedToast}
@@ -263,19 +263,21 @@ const CollaborationSpace = () => {
                         </Toast>
                     ))}
                 </ToastContainer>
-                <CollabNavigationBar handleExit={handleExit} handleCodeRun={handleCodeRun} users={users} setLanguage={setLanguage} language={language}/>
-                <Container fluid style={{ marginTop: '20px', height: 'calc(100vh - 60px)', display: 'flex', overflow: 'hidden' }}>
+                <CollabNavigationBar handleExit={handleExit} handleCodeRun={handleCodeRun} users={users} setLanguage={setLanguage} language={language} userLangChange={handleLanguageChange}/>
+                <Container fluid style={{ marginTop: '10px', height: 'calc(100vh - 60px)', display: 'flex', overflow: 'hidden' }}>
                     <Row style={{ flexGrow: 1, width: '100%', height: '100%', overflow: 'hidden' }}>
                         <Col md={6} style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
-                            <CodeSpace handleEditorChange={handleEditorChange} loading={outputLoading} code={code} language={language} output={output}/>
+                            <CodeSpace handleEditorChange={handleEditorChange} loading={outputLoading} code={code} language={language} output={output} isError={isError}/>
                         </Col>
                         <Col md={6} style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
-                            <div style={{ flex: '60%', display: 'flex', overflow: 'hidden' }}>
-                                <QuestionDisplay question={question}/>
+                            <div style={{ flex: '60%', display: 'flex', overflow: 'hidden', width:'100%' }}>
+                                <QuestionDisplay question={question} style={{width:'100%'}}/>
                             </div>
-                            <div style={{ flex: '40%', overflow: 'hidden' }}>
+
+                            <div style={{ flex: '40%', height:'100%', marginBottom: '20px' }}>
                                 <Chat currentUser={userId} messages={messages} sendMessage={sendMessage}/>
                             </div>
+      
                         </Col>
                     </Row>
                 </Container>
