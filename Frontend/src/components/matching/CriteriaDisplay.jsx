@@ -25,18 +25,20 @@ const capitalizeFirstLetter = (difficulty) => {
 
 const CriteriaDisplay = ({ difficulty, category }) => {
     return (
-            <Card className="mt-3" style={{ width: '20rem' }}>
-                <Card.Body>
-                    <Card.Title>Selected Criteria</Card.Title>
-                    <Card.Text>
-                        <span>
-                            Difficulty: <Badge bg={getBadgeVariant(difficulty ? difficulty : "Not Selected" )}>{capitalizeFirstLetter(difficulty ? difficulty : "Not Selected")}</Badge>
-                            <br></br>
-                            Category: <strong>{capitalizeFirstLetter(category ? category : "Not Selected")}</strong>
-                        </span>
-                    </Card.Text>
-                </Card.Body>
-            </Card>
+        <Card className="mt-3 mx-auto" style={{ maxWidth: '100%', width: '90%', minWidth: '200px' }}>
+        <Card.Body>
+            <Card.Title>Selected Criteria</Card.Title>
+            <Card.Text>
+                <span>
+                    Difficulty: <Badge bg={getBadgeVariant(difficulty ? difficulty : "Not Selected")}>
+                        {capitalizeFirstLetter(difficulty ? difficulty : "Not Selected")}
+                    </Badge>
+                    <br />
+                    Category: <strong>{capitalizeFirstLetter(category ? category : "Not Selected")}</strong>
+                </span>
+            </Card.Text>
+        </Card.Body>
+    </Card>
         )
 };
 
