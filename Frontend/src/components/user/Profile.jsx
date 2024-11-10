@@ -1,1 +1,0 @@
-// Profile Page that can list user accomplishments and other information

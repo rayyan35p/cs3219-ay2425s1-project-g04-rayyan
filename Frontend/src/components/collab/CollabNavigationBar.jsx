@@ -26,7 +26,12 @@ const CollabNavigationBar = ({ handleExit, users, handleCodeRun, setLanguage, la
           
           {/* Run Code and Exit Buttons in Center */}
           <Nav className='mx-auto'>
-            <Button onClick={handleCodeRun}>Run Code</Button>
+            <Button 
+                onClick={handleCodeRun} 
+                style={{ backgroundColor: '#28a745', color: '#fff', border: 'none' }}
+            >
+                Run Code
+            </Button>
             <Button variant="danger" className="ms-2" onClick={handleExit}>Exit</Button>
           </Nav>
           

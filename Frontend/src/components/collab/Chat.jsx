@@ -21,16 +21,18 @@ const Chat = ({ currentUser, messages, sendMessage }) => {
     }, [messages]);
 
     return (
-        <Accordion defaultActiveKey="0" className='mt-3' onSelect={(eventKey) => setIsAccordionOpen(eventKey === "0")}>
+        <Accordion defaultActiveKey="0" className='mt-3' onSelect={(eventKey) => setIsAccordionOpen(eventKey === "0")} style={{ height: '100%' }}>
             <Accordion.Item eventKey="0">
                 <Accordion.Header>
                     Chat
                 </Accordion.Header>
-                <Accordion.Body>
+                <Accordion.Body style={{ display: 'flex', flexDirection: 'column'}}>
                     <div
                         ref={chatContainerRef}
                         style={{
-                            maxHeight: '300px',
+                            minHeight: '33vh',
+                            maxHeight: '33vh',
+                            flex: 1,
                             overflowY: 'auto',
                             marginBottom: '1rem',
                         }}
@@ -68,8 +70,8 @@ const Chat = ({ currentUser, messages, sendMessage }) => {
                         </ListGroup>
                     </div>
                     {isAccordionOpen && ( // Only show message input when accordion is open
-                        <Form onSubmit={(e) => { e.preventDefault(); handleSend(); }}>
-                            <Form.Group controlId="messageInput">
+                        <Form onSubmit={(e) => { e.preventDefault(); handleSend(); }} style={{ display: 'flex', alignItems: 'center' }}>
+                            <Form.Group controlId="messageInput" style={{ flex: 1, marginRight: '10px' }}> {/* Makes input take available space */}
                                 <Form.Control
                                     type="text"
                                     placeholder="Type a message..."
@@ -77,10 +79,11 @@ const Chat = ({ currentUser, messages, sendMessage }) => {
                                     onChange={(e) => setText(e.target.value)}
                                 />
                             </Form.Group>
-                            <Button variant="primary" type="submit" className="mt-2">
+                            <Button variant="primary" type="submit">
                                 Send
                             </Button>
                         </Form>
+                    
                     )}
                 </Accordion.Body>
             </Accordion.Item>

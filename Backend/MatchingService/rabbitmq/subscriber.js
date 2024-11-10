@@ -91,7 +91,7 @@ function matchUsers(channel, msg, userId, difficulty, category) {
                 notifyMatch(channel, matchedUsers, category, difficulty);
                 return true;
             }
-        }, 5000); // 5-second delay
+        }, 15000); // 15-second delay
     }
 
     return false;
@@ -288,7 +288,7 @@ async function consumeQueue() {
                         const timeoutId = setTimeout(async () => {
                             const categorykey = "any." + category
                             await rejectMessage(channel, msg, userData);
-                        }, 10000); // 10 seconds delay
+                        }, 30000); // 30 seconds delay
 
                         timeoutMap[userId] = timeoutId;
                     }

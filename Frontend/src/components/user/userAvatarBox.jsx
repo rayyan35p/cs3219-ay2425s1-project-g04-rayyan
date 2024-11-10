@@ -55,7 +55,7 @@ function UserAvatarBox() {
         <Dropdown.Toggle id="dropdown-custom-1">
             {username}
         </Dropdown.Toggle>
-        <Dropdown.Menu className="super-colors">
+        <Dropdown.Menu className="super-colors dropdown-menu-end">
             <Dropdown.Item eventKey="1" onClick={handleLogout}>
                 <span style={{color: 'red'}}>Logout</span>
             </Dropdown.Item>
