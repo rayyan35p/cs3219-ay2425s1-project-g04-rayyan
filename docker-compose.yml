@@ -18,6 +18,21 @@ services:
     ports:
       - "3002:3002"
 
+  collab-service:
+    build:
+      context: ./Backend/CollabService
+      dockerfile: Dockerfile
+    ports:
+      - "3004:3004" # change the first port number xxxx:3004 to suit your needs
+      - "1234:1234"
+  
+  history-service:
+    build:
+      context: ./Backend/HistoryService
+      dockerfile: Dockerfile
+    ports:
+      - "3005:3005" # change the first port number xxxx:3004 to suit your needs
+
   matching-service:
     build:
       context: ./Backend/MatchingService
@@ -29,14 +44,6 @@ services:
     depends_on:
       question-service:
         condition: service_healthy
-
-  collab-service:
-    build:
-      context: ./Backend/CollabService
-      dockerfile: Dockerfile
-    ports:
-      - "3004:3004" # change the first port number xxxx:3004 to suit your needs
-      - "1234:1234"
   
   frontend:
     build:
