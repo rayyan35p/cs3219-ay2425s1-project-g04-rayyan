@@ -13,9 +13,10 @@ const QuestionDisplay = ({ question }) => {
 
     return (
             <Card style={{ width: '100%' }}>
-                <Card.Header>{question ? `${question.title} (${question.complexity})` : "Loading..."}</Card.Header>
+                <Card.Header>{question ? <strong>{question.title} ({question.complexity})</strong> : "Loading..."}</Card.Header>
                 <Card.Body style={{ textAlign: 'left' }}>
-                    <p>{question ? question.category.join(", ") : "Loading question description..."}</p>
+                    <p>{question ? "Category: " + question.category.join(", ") : "Loading question description..."}</p>
+                    <p> Description:</p>
                     <p>{question ? question.description : "Loading question description..."}</p>
                 </Card.Body>
             </Card>
