@@ -5,7 +5,8 @@ import Home from './components/Home';
 import Login from './components/auth/Login';
 import SignUp from './components/auth/SignUp';
 import CollaborationSpace from './components/collab/CollaborationSpace';
-import EditProfile from "./components/user/EditProfile";
+import EditProfilePage from "./components/user/EditProfilePage";
+import HistoryPage from "./components/user/HistoryPage"
 import ProtectedRoute from './components/routes/ProtectedRoute';
 
 function App() {
@@ -26,7 +27,10 @@ function App() {
           <Route path='/home' element={<ProtectedRoute><Home /></ProtectedRoute>} />
 
           {/* Edit Profile page route */}
-          <Route path='/profile/:id' element={<ProtectedRoute><EditProfile /></ProtectedRoute>} />
+          <Route path='/profile/:id' element={<ProtectedRoute><EditProfilePage /></ProtectedRoute>} />
+
+          {/* History page route */}
+          <Route path='/history/:id' element={<ProtectedRoute><HistoryPage /></ProtectedRoute>} />
 
           {/* Collaboration page route */}
           <Route path="/collaboration/:roomId" element={<ProtectedRoute><CollaborationSpace /></ProtectedRoute>} />

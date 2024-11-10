@@ -13,11 +13,11 @@ function setupWebSocket(server) {
             switch (data.type) {
                 case 'joinRoom':
                     // add user into room with roomId
-                    manageRoom(ws, data.roomId, data.userId, "join");
+                    manageRoom(ws, data.roomId, data.username, "join");
                     break;
                 case 'leaveRoom':
                     // remove user from room with roomId
-                    manageRoom(ws, data.roomId, data.userId, "leave");
+                    manageRoom(ws, data.roomId, data.username, "leave");
                     break;
                 case 'requestUserList':
                     const users = getUsersInRoom(data.roomId);

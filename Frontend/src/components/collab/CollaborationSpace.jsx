@@ -2,13 +2,14 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import * as Y from 'yjs';
 import { WebsocketProvider } from 'y-websocket';
-import { getUserFromToken } from '../user/userAvatarBox';
+import { getUserFromToken } from '../user/utils/authUtils';
 import QuestionDisplay from './QuestionDisplay';
 import Chat from './Chat';
 import CollabNavigationBar from './CollabNavigationBar';
 import CodeSpace from './CodeSpace';
 import { Container, Row, Col } from 'react-bootstrap';
 import collabService from '../../services/collab'; 
+import historyService from '../../services/history';
 import Toast from 'react-bootstrap/Toast';
 import ToastContainer from 'react-bootstrap/ToastContainer';
 import Spinner from 'react-bootstrap/Spinner';
@@ -25,12 +26,15 @@ const CollaborationSpace = () => {
     const [provider, setProvider] = useState(null);
     const [code, setCode] = useState('');
     const [users, setUsers] = useState([]); // track users in the room 
+    const [usersSave, setUsersSave] = useState([]); // for saving users in the room; getting matched user's username
     const [userId, setUserId] = useState(""); // current user 
+    const [username, setUsername] = useState(""); // current user 
     const [language, setLanguage] = useState("python") // set default language to python 
     const [output, setOutput] = useState("")
     const [messages, setMessages] = useState([])
     const [outputLoading, setOutputLoading] = useState(false)
     const [isError, setIsError] = useState(false);
+    const [roomStartTime, setRoomStartTime] = useState(null); // Initialize state for room start time
 
     // use https://emkc.org/api/v2/piston/runtimes to GET other languages
     const LANGUAGEVERSIONS = {
@@ -67,7 +71,8 @@ const CollaborationSpace = () => {
         const fetchUser = async () => {
             const user = await getUserFromToken();
             if (user !== "No User") {
-                setUserId(user.username); // Set the username in state
+                setUserId(user.userId); // Set the username in state
+                setUsername(user.username); // Set the username in state
                 initiateWebSocket(user.username);
             } else {
                 setUserId("Guest"); // Fallback in case no user is found
@@ -90,15 +95,23 @@ const CollaborationSpace = () => {
         console.log("Messages state updated:", messages);
     }, [messages]);
 
-    const initiateWebSocket = (userId) => {
+    useEffect(() => {
+        if (users.length == 2) {
+            setUsersSave(users)
+        }
+    }, [users])
+
+    const initiateWebSocket = (username) => {
         if (websocketRef.current) return; // Prevent duplicate connections
 
         const websocket = new WebSocket("ws://localhost:3004");
         websocketRef.current = websocket;
 
+        console.log("In initiate websocket, the username is", username);
+
         websocket.onopen = () => {
 
-            websocket.send(JSON.stringify({ type: 'joinRoom', roomId, userId }));
+            websocket.send(JSON.stringify({ type: 'joinRoom', roomId, username }));
             websocket.send(JSON.stringify({ type: 'requestUserList', roomId }));
         };
 
@@ -106,7 +119,7 @@ const CollaborationSpace = () => {
         // on getting a reply from server
         websocket.onmessage = (event) => {
             const data = JSON.parse(event.data);
-
+            console.log(`[FRONTEND] data message is ${JSON.stringify(data)}`);
             switch (data.type) {
                 case 'usersListUpdate':
                     setUsers(data.users); // Update the user list
@@ -131,6 +144,10 @@ const CollaborationSpace = () => {
                     break;
                 case 'userLeft':
                     addNotif(`User ${data.user} has left`)
+                    break;
+                // Handle room start time message
+                case 'roomStartTime':
+                    setRoomStartTime(data.startTime);
                     break;
                 default:
                     console.log("No messages received from room management server");
@@ -162,7 +179,38 @@ const CollaborationSpace = () => {
     };
 
     const handleExit = () => {
-        if (websocketRef.current) websocketRef.current.send(JSON.stringify({ type: 'leaveRoom', roomId, userId }));
+        try {
+            // Filter out the current user from the usersSave array to find the matched user
+            const matchedUser = usersSave.filter(user => user !== username)[0]; // Assuming usersSave contains objects with userId property
+            const startTime = new Date(roomStartTime); // Convert start time from ISO to Date object
+            const duration = new Date().getTime() - startTime.getTime();
+
+            if (!matchedUser) {
+                throw new Error("No matched user found");
+            }
+
+            console.log('users:', usersSave)
+            const sessionData = {
+                user: userId,
+              matchedUsername: matchedUser, // Assuming user[1] is the matched user
+              questionTitle: 'BFS', // This ID should be available in context or passed down
+            //   questionTitle: questionTitle, // This ID should be available in context or passed down
+            //   startTime: roomCreationTime,
+            //   startTime: new Date(),
+            //   duration: new Date().getTime() - new Date(roomCreationTime).getTime(),
+            //   duration: 10,
+            startTime: startTime.toISOString(),
+            duration: Math.floor(duration / 1000),
+              code: '1'
+            }
+        
+            historyService.createHistoryAttempt(sessionData)
+            // Navigate away or perform any additional actions on success
+          } catch (error) {
+            console.error("Failed to save session history:", error)
+          }
+
+        if (websocketRef.current) websocketRef.current.send(JSON.stringify({ type: 'leaveRoom', roomId, username }));
 
         // Clean up Yjs document and provider before going back to home
         if (provider) {
@@ -214,13 +262,13 @@ const CollaborationSpace = () => {
     };
 
     const sendMessage = (text) => {
-        const message = {text, sender: userId};
+        const message = {text, sender: username};
         websocketRef.current.send(JSON.stringify({ type: 'sendMessage', roomId: roomId, message: message}));
     }
 
     const handleLanguageChange = (value) => {
         websocketRef.current.send(JSON.stringify({ type: 'languageChange', roomId: roomId,
-            user: userId, language: value }));
+            user: username, language: value }));
     }
 
     if (loading) {
@@ -276,6 +324,7 @@ const CollaborationSpace = () => {
 
                             <div style={{ flex: 2, height:'100%', marginBottom: '38px', maxHeight:'50vh'}}>
                                 <Chat currentUser={userId} messages={messages} sendMessage={sendMessage}/>
+
                             </div>
       
                         </Col>
