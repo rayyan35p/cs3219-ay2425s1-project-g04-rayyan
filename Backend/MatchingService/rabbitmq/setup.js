@@ -46,7 +46,7 @@ async function setupRabbitMQ() {
             await channel.assertQueue(queueName, {
                 durable: true, 
                 arguments: {
-                    'x-message-ttl': 10000, // TTL for messages in the queue
+                    'x-message-ttl': 30000, // TTL for messages in the queue
                     'x-dead-letter-exchange': dead_letter_exchange_name // Bind to dead-letter exchange
                 }
             });
