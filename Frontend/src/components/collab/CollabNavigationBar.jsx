@@ -18,7 +18,7 @@ const CollabNavigationBar = ({ handleExit, users, handleCodeRun, setLanguage, la
               </DropdownToggle>
               <DropdownMenu>
                 <DropdownItem eventKey="python">Python</DropdownItem>
-                <DropdownItem eventKey="c++">C++</DropdownItem>
+                <DropdownItem eventKey="javascript">Javascript</DropdownItem>
                 <DropdownItem eventKey="java">Java</DropdownItem>
               </DropdownMenu>
             </Dropdown>

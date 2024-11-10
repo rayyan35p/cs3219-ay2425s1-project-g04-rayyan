@@ -12,6 +12,12 @@ const get = id => {
     return request//.then(response => response.data);
 }
 
+export const getQuestionsByCategory = async (category) => {
+    const response = await axios.get(`${baseUrl}/by-category?category=${category}`);
+    return response.data;
+};
+
+
 const createQuestion = async newQuestion => {
     const response = await axios.post(baseUrl, newQuestion);
     return response//.data;
@@ -27,4 +33,4 @@ const deleteQuestion = (id) => {
     return request.then(response => response.data);
 }
 
-export default { getAll, get, createQuestion, updateQuestion, deleteQuestion }
+export default { getAll, get, createQuestion, updateQuestion, deleteQuestion, getQuestionsByCategory }

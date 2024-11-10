@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import * as Y from 'yjs';
 import { WebsocketProvider } from 'y-websocket';
 import { getUserFromToken } from '../user/utils/authUtils';
@@ -17,6 +17,10 @@ import Spinner from 'react-bootstrap/Spinner';
 const CollaborationSpace = () => {
     const navigate = useNavigate();
     const { roomId } = useParams(); // Get the roomId from the URL
+    const location = useLocation();
+    const { category, question } = location.state || {};
+    console.log(`category is :${category}`);
+    console.log(`question is :${question}`);
     const websocketRef = useRef(null); // Use ref to persist websocket across renders
     const [yDoc, setYDoc] = useState(null);
     const [provider, setProvider] = useState(null);
@@ -29,13 +33,14 @@ const CollaborationSpace = () => {
     const [output, setOutput] = useState("")
     const [messages, setMessages] = useState([])
     const [outputLoading, setOutputLoading] = useState(false)
+    const [isError, setIsError] = useState(false);
     const [roomStartTime, setRoomStartTime] = useState(null); // Initialize state for room start time
 
     // use https://emkc.org/api/v2/piston/runtimes to GET other languages
     const LANGUAGEVERSIONS = {
         "python" : "3.10.0",
         "java" : "15.0.2",
-        "c++": "10.2.0"
+        "javascript": "1.32.3"
     };
 
     {/* State management for access denied toast */}
@@ -127,7 +132,8 @@ const CollaborationSpace = () => {
                     setLoading(false);
                     break;
                 case 'newMessage':
-                    console.log("adding message", data.message)
+                    console.log("adding message", data.message);
+                    setMessages((prevMessages) => [...prevMessages, data.message]);
                     break;
                 case 'languageChange':
                     addNotif(`User ${data.user} has changed the language to ${data.language}`);
@@ -182,6 +188,8 @@ const CollaborationSpace = () => {
             if (!matchedUser) {
                 throw new Error("No matched user found");
             }
+
+            console.log('users:', usersSave)
             const sessionData = {
                 user: userId,
               matchedUsername: matchedUser, // Assuming user[1] is the matched user
@@ -231,8 +239,17 @@ const CollaborationSpace = () => {
 
         collabService.getCodeOutput(code_message)
             .then(result => {
+
                 setOutputLoading(false);
-                console.log(result.data.run.output)
+
+                if (result.data.run.stderr != "") {
+                    console.log("There is an error");
+                   setIsError(true); 
+                } else {
+                    setIsError(false);
+                }
+
+
                 setOutput(result.data.run.output)
             })
             .catch(err => console.log(err));
@@ -245,7 +262,7 @@ const CollaborationSpace = () => {
     };
 
     const sendMessage = (text) => {
-        const message = {text, sender: userId};
+        const message = {text, sender: username};
         websocketRef.current.send(JSON.stringify({ type: 'sendMessage', roomId: roomId, message: message}));
     }
 
@@ -266,51 +283,54 @@ const CollaborationSpace = () => {
     }
 
     return (
-        <div style={{ textAlign: 'center' }}>
-            {showAccessDeniedToast ? (
-                <ToastContainer className="p-3" position="top-center" style={{ zIndex: 1 }}>
-                    <Toast
-                        onClose={handleCloseToast}
-                        show={showAccessDeniedToast}
-                        delay={3000}
-                        autohide
-                        bg="danger"
-                    >
-                        <Toast.Body className='text-white'>
-                            <strong>{toastMessage}</strong>
-                        </Toast.Body>
-                    </Toast>
-                </ToastContainer>
-            ) : (
-                <>
-                    {/* Toast Container for Join/Leave notifications */}
-                    <ToastContainer className='p-3' position='top-center' style={{ zIndex: 1050 }}>
-                        {notifs.map((notif) => (
-                            <Toast key={notif.id} className='mb-2' style={{ backgroundColor: 'rgba(255, 255, 255, 0.8)' }}>
-                                <Toast.Body>
-                                    <strong className='text-black'>{notif.message}</strong>
-                                </Toast.Body>
-                            </Toast>
-                        ))}
-                    </ToastContainer>
 
-                    {/* Main component content */}
-                    <CollabNavigationBar handleExit={handleExit} handleCodeRun={handleCodeRun} users={users}
-                                         setLanguage={setLanguage} language={language} userLangChange={handleLanguageChange}/>
-                    <Container fluid style={{ marginTop: '20px' }}>
-                        <Row>
-                            <Col md={8}>
-                                <CodeSpace handleEditorChange={handleEditorChange} loading={outputLoading} code={code} language={language} output={output}/>
-                            </Col>
-                            <Col md={4}>
-                                <QuestionDisplay/>
-                                <Chat currentUser={userId} messages={messages} sendMessage={sendMessage}> </Chat>
-                            </Col>
-                        </Row>
-                    </Container>
-                </>
-            )}
-        </div>
+    <div style={{ textAlign: 'center', height: '100vh', overflow: 'hidden' }}>
+        {showAccessDeniedToast ? (
+            <ToastContainer className="p-3" position="top-center" style={{ zIndex: 1 }}>
+                <Toast
+                    onClose={handleCloseToast}
+                    show={showAccessDeniedToast}
+                    delay={3000}
+                    autohide
+                    bg="danger"
+                >
+                    <Toast.Body className='text-white'>
+                        <strong>{toastMessage}</strong>
+                    </Toast.Body>
+                </Toast>
+            </ToastContainer>
+        ) : (
+            <>
+                {/* Toast Container for Join/Leave notifications */}
+                <ToastContainer className='p-3' position='top-center' style={{ zIndex: 1050 }}>
+                    {notifs.map((notif) => (
+                        <Toast key={notif.id} className='mb-2' style={{ backgroundColor: 'rgba(255, 255, 255, 0.8)' }}>
+                            <Toast.Body>
+                                <strong className='text-black'>{notif.message}</strong>
+                            </Toast.Body>
+                        </Toast>
+                    ))}
+                </ToastContainer>
+                <CollabNavigationBar handleExit={handleExit} handleCodeRun={handleCodeRun} users={users} setLanguage={setLanguage} language={language}/>
+                <Container fluid style={{ marginTop: '20px', height: 'calc(100vh - 60px)', display: 'flex', overflow: 'hidden' }}>
+                    <Row style={{ flexGrow: 1, width: '100%', height: '100%', overflow: 'hidden' }}>
+                        <Col md={6} style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
+                            <CodeSpace handleEditorChange={handleEditorChange} loading={outputLoading} code={code} language={language} output={output}/>
+                        </Col>
+                        <Col md={6} style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
+                            <div style={{ flex: '60%', display: 'flex', overflow: 'hidden' }}>
+                                <QuestionDisplay question={question}/>
+                            </div>
+                            <div style={{ flex: '40%', overflow: 'hidden' }}>
+                                <Chat currentUser={username} messages={messages} sendMessage={sendMessage}/>
+                            </div>
+                        </Col>
+                    </Row>
+                </Container>
+            </>
+        )}
+    </div>
+
     );
 };
 

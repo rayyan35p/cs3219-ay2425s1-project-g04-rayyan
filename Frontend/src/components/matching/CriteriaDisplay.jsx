@@ -23,7 +23,7 @@ const capitalizeFirstLetter = (difficulty) => {
     return difficulty.charAt(0).toUpperCase() + difficulty.slice(1);
 }
 
-const CriteriaDisplay = ({ difficulty, language }) => {
+const CriteriaDisplay = ({ difficulty, category }) => {
     return (
             <Card className="mt-3" style={{ width: '20rem' }}>
                 <Card.Body>
@@ -32,7 +32,7 @@ const CriteriaDisplay = ({ difficulty, language }) => {
                         <span>
                             Difficulty: <Badge bg={getBadgeVariant(difficulty ? difficulty : "Not Selected" )}>{capitalizeFirstLetter(difficulty ? difficulty : "Not Selected")}</Badge>
                             <br></br>
-                            Language: <strong>{capitalizeFirstLetter(language ? language : "Not Selected")}</strong>
+                            Category: <strong>{capitalizeFirstLetter(category ? category : "Not Selected")}</strong>
                         </span>
                     </Card.Text>
                 </Card.Body>

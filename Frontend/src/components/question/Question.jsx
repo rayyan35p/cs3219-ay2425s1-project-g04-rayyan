@@ -5,6 +5,9 @@ import ButtonGroup from "react-bootstrap/ButtonGroup";
 import CreateQn from "./CreateQn";
 import EditQn from "./EditQn";
 import questionService from "../../services/questions"
+import userService from "../../services/users";
+import categoryService from "../../services/categories";
+
 
 function Question() {
     const [questions, setQuestions] = useState([]);
@@ -13,6 +16,7 @@ function Question() {
     const [questionToDelete, setQuestionToDelete] = useState(null);
     const [showEditModal, setShowEditModal] = useState(false);
     const [currentQuestion, setCurrentQuestion] = useState(null);
+    const [isAdmin, setIsAdmin] = useState(false);
 
     const handleShow = () => setShowComponent(true);
     const handleClose = () => setShowComponent(false);
@@ -23,6 +27,28 @@ function Question() {
             setQuestions(result.data);
         })
         .catch(err => console.log(err));
+    }, []);
+
+    {/* Added to check the authorization status to determine whether to show edit, delete, add buttons */}
+
+    useEffect(() => {
+        const token = sessionStorage.getItem('jwt_token');
+        const authHeader = {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            },
+        };
+
+        // verify token asynchronously, set auth status only after request completes
+        userService.verifyAdmin(authHeader)
+        .then(response => {
+            if (response.status == 200) {
+                setIsAdmin(true);
+            }
+        })
+        .catch(e => {
+            console.log('Error:', e);
+        });
     }, []);
 
     const easyQuestions = questions.filter(q => q.complexity === "Easy")
@@ -63,16 +89,44 @@ function Question() {
     };
 
     const handleDeleteConfirm = () => {
-        if (questionToDelete) {
-            questionService.deleteQuestion(questionToDelete)
-            .then(res => {
-                console.log(res);
-                setQuestions(questions.filter(question => question._id !== questionToDelete));
-                handleCloseDelete();
+        if (!questionToDelete) return;
+    
+        // retrieve the question to get its categories before deleting
+        questionService.get(questionToDelete)
+            .then((question) => {
+                const categories = question.data.category;
+                console.log("question retrieved: ", question)
+                console.log(`catgories of qn: ${categories}`)
+    
+                // delete the question
+                questionService.deleteQuestion(questionToDelete)
+                    .then(res => {
+                        console.log(res);
+                        
+                       
+                        setQuestions(questions.filter(q => q._id !== questionToDelete));
+                        handleCloseDelete();
+    
+                        // check each category to see if it should be deleted
+                        categories.forEach(async (category) => {
+                            try {
+                                const remainingQuestions = await questionService.getQuestionsByCategory(category);
+                                
+                                // if no other questions have this category, delete the category
+                                if (remainingQuestions.length === 0) {
+                                    await categoryService.deleteCategory(category);
+                                    console.log(`Category ${category} deleted.`);
+                                }
+                            } catch (err) {
+                                console.error(`Error processing category ${category}:`, err);
+                            }
+                        });
+                    })
+                    .catch(err => console.error("Error deleting question:", err));
             })
-            .catch(err => console.log(err));
-        }
+            .catch(err => console.error(`Error fetching question data for ID ${questionToDelete}:`, err));
     };
+    
 
     const renderQuestionsTable = (questions) => {
       const sortedQuestions = [...questions].sort((a, b) => a.id - b.id)
@@ -85,7 +139,7 @@ function Question() {
                   <th>Title</th>
                   <th>Description</th>
                   <th>Category</th>
-                  <th>Action</th>
+                  {isAdmin && (<th>Action</th>)}
                 </tr>
                 </thead>
                 <tbody>
@@ -95,20 +149,22 @@ function Question() {
                         <td>{question.title}</td>
                         <td>{question.description}</td>
                         <td>{question.category ? question.category.join(", ") : ''}</td>
-                        <td>
-                            <ButtonGroup className="mb-2">
-                                <button 
-                                    className='btn btn-success' 
-                                    onClick={() => handleShowEditModal(question)}
-                                >
-                                    Edit
-                                </button>
-                                <button className='btn btn-danger' size="sm"
-                                    onClick={() => handleShowDelete(question._id)}>
-                                    Delete
-                                </button>
-                            </ButtonGroup>
-                        </td>
+                        {isAdmin && (
+                            <td>
+                                <ButtonGroup className="mb-2">
+                                    <button 
+                                        className='btn btn-success' 
+                                        onClick={() => handleShowEditModal(question)}
+                                    >
+                                        Edit
+                                    </button>
+                                    <button className='btn btn-danger' size="sm"
+                                        onClick={() => handleShowDelete(question._id)}>
+                                        Delete
+                                    </button>
+                                </ButtonGroup>
+                            </td>
+                        )}
                     </tr>
                 ))}
                 </tbody>
@@ -121,10 +177,11 @@ function Question() {
             <div className='bg-white rounded p-3 m-3'>
                 <div className="d-flex justify-content-between">
                     <h1>Questions</h1>
-                    <button className="btn btn-primary mt-3" onClick={() => handleShow()}>
-                        {showComponent ? 'Hide' : 'Add question'}
-                    </button>
-
+                    {isAdmin && (
+                        <button className="btn btn-primary mt-3" onClick={() => handleShow()}>
+                            {showComponent ? 'Hide' : 'Add question'}
+                        </button>
+                    )}
                     <Modal show={showComponent} onHide={handleClose}>
                         <Modal.Header closeButton>
                             <Modal.Title>Add New Question</Modal.Title>

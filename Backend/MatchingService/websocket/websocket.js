@@ -11,14 +11,14 @@ wss.on('connection', (ws) => {
             console.log(`Received message: ${message}`);
 
             // Parse the message to extract userId, difficulty, and language
-            const { userId, difficulty, language , action} = JSON.parse(message);
+            const { userId, difficulty, category , action} = JSON.parse(message);
 
             // Store userId in WebSocket connection
             ws.userId = userId;
 
             if (action === 'match') {
                 // Call the RabbitMQ publisher to publish this message to the queue
-                await publishToQueue({ userId, difficulty, language });
+                await publishToQueue({ userId, difficulty, category });
                 console.log('Message published to RabbitMQ');
                 
                 // Notify the user that their message has been processed successfully
