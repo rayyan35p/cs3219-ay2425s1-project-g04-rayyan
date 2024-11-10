@@ -21,10 +21,6 @@ const HistorySchema = new mongoose.Schema({
     duration: {
         type: Number, // Duration in minutes for the individual user
         required: true
-    },
-    code: {
-    type: Number, // Store the code as binary file
-    required: true
     }
 });
 
