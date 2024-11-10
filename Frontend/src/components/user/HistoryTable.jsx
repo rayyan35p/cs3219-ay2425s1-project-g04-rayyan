@@ -32,7 +32,6 @@ const HistoryTable = ({userID}) => {
                         <th>Question</th>
                         <th>Start Time</th>
                         <th>Duration</th>
-                        <th>Code</th>
                     </tr>
                 </thead>
                 <tbody>

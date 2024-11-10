@@ -34,24 +34,9 @@ const HistoryAttempt = ({ attempt }) => {
       <td>{questionTitle}</td>
       <td>{new Date(startTime).toLocaleString()}</td>
       <td>{formatDuration(duration)}</td>
-      {/* Uncomment the below section if you want to enable code download */}
-      {/* <td>
-        <button onClick={() => downloadCode(code)} className="btn btn-sm btn-primary">
-          Download Code
-        </button>
-      </td> */}
-      <td>{code} dummy file content</td>
     </tr>
   );
 };
 
-// Function to download the binary code file
-const downloadCode = (file) => {
-  const blob = new Blob([file], { type: 'application/octet-stream' });
-  const link = document.createElement('a');
-  link.href = URL.createObjectURL(blob);
-  link.download = 'code_attempt.bin';
-  link.click();
-};
 
 export default HistoryAttempt;
