@@ -162,7 +162,7 @@ function Question() {
                         className='btn btn-info btn-sm' 
                         onClick={() => handleShowDetailModal(question)}
                     >
-                        Show Detail
+                        Show Details
                     </button>
                 </ButtonGroup>
             );
