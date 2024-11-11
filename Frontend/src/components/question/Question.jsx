@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import Modal from "react-bootstrap/Modal";
-import Table from "react-bootstrap/Table";
 import ButtonGroup from "react-bootstrap/ButtonGroup";
 import CreateQn from "./CreateQn";
 import EditQn from "./EditQn";
+import DetailQn from "./DetailQn";
 import questionService from "../../services/questions"
 import userService from "../../services/users";
 import categoryService from "../../services/categories";
@@ -17,6 +17,7 @@ function Question() {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [questionToDelete, setQuestionToDelete] = useState(null);
     const [showEditModal, setShowEditModal] = useState(false);
+    const [showDetailModal, setShowDetailModal] = useState(false);
     const [currentQuestion, setCurrentQuestion] = useState(null);
     const [isAdmin, setIsAdmin] = useState(false);
 
@@ -57,7 +58,15 @@ function Question() {
         setQuestions((prevQuestions) => [...prevQuestions, newQuestion]);
     };
 
-    
+    const handleShowDetailModal = (question) => {
+        setCurrentQuestion(question);
+        setShowDetailModal(true);
+    }
+
+    const handleCloseDetailModal = () => {
+        setShowDetailModal(false);
+    }
+
     const editQuestion = (id, updatedQuestion) => {
         const updatedQuestions = questions.map((q) =>
             q._id === id ? { ...q, ...updatedQuestion } : q
@@ -127,55 +136,69 @@ function Question() {
     
 
     const renderQuestionsTable = () => {
-        const CustomButtonComponent = (props) => {
-            const question = props.data
-            return <ButtonGroup className="mb-2">
-                <button 
-                    className='btn btn-success' 
-                    onClick={() => handleShowEditModal(question)}
-                >
-                    Edit
-                </button>
-                <button className='btn btn-danger' size="sm"
-                    onClick={() => handleShowDelete(question._id)}>
-                    Delete
-                </button>
-            </ButtonGroup>
+        const editDeleteButtonComponent = (props) => {
+            const question = props.data;
+            return (
+                <ButtonGroup className="container-fluid mt-1 mb-1">
+                    <button 
+                        className='btn btn-success btn-sm' 
+                        onClick={() => handleShowEditModal(question)}
+                    >
+                        Edit
+                    </button>
+                    <button className='btn btn-danger btn-sm' size="sm"
+                        onClick={() => handleShowDelete(question._id)}>
+                        Delete
+                    </button>
+                </ButtonGroup>
+            );
         };
 
+        const showDetailButtonComponent = (props) => {
+            const question = props.data;
+            return (
+                <ButtonGroup className="container-fluid mt-1 mb-1">
+                    <button 
+                        className='btn btn-info btn-sm' 
+                        onClick={() => handleShowDetailModal(question)}
+                    >
+                        Show Detail
+                    </button>
+                </ButtonGroup>
+            );
+        };
+    
         const colDefs = [
             { field: "id", flex: 1, wrapText: true, sort: "asc" },
-            { field: "title", flex: 2 },
-            { field: "description", flex: 5, wrapText: true, autoHeight: true},
-            { field: "complexity", flex: 1.5,
-                comparator: (valueA, valueB, nodeA, nodeB, isDescending) => {
-                    if (valueA == valueB) return 0;
-                    if (valueA == "Easy" || valueB == "Hard") return -1;
-                    if (valueA == "Hard" || valueB == "Easy") return 1;
-                } 
-            }
+            { field: "title", flex: 4, wrapText: true},
+            { field: "category", flex: 3, autoHeight: true, cellDataType: 'text' },
+            { 
+                field: "complexity", 
+                flex: 1.5,
+                comparator: (valueA, valueB) => {
+                    if (valueA === valueB) return 0;
+                    if (valueA === "Easy" || valueB === "Hard") return -1;
+                    if (valueA === "Hard" || valueB === "Easy") return 1;
+                }
+            },
+            ...(isAdmin ? [{
+                field: "action", 
+                width: 200, 
+                resizable: false,  
+                sortable: false, 
+                cellRenderer: editDeleteButtonComponent 
+            }] : [{
+                field: "details", 
+                width: 200, 
+                resizable: false,  
+                sortable: false, 
+                cellRenderer: showDetailButtonComponent }])
         ];
-
-        if (isAdmin) {
-            colDefs = [
-                { field: "id", flex: 1, wrapText: true, sort: "asc" },
-                { field: "title", flex: 2 },
-                { field: "description", flex: 5, wrapText: true, autoHeight: true},
-                { field: "complexity", flex: 1.5,
-                    comparator: (valueA, valueB, nodeA, nodeB, isDescending) => {
-                        if (valueA == valueB) return 0;
-                        if (valueA == "Easy" || valueB == "Hard") return -1;
-                        if (valueA == "Hard" || valueB == "Easy") return 1;
-                    } 
-                },
-                { field: "action", width: 200, resizable: false,  sortable: false, cellRenderer: CustomButtonComponent }
-            ];
-        }
-
+    
         return (
             <div
-              className="container-fluid ag-theme-quartz" // applying the Data Grid theme
-              style={{ height: 500 }} // the Data Grid will fill the size of the parent container
+                className="container-fluid ag-theme-quartz"
+                style={{ height: 500 }}
             >
                 <AgGridReact
                     rowData={questions}
@@ -219,6 +242,19 @@ function Question() {
                                     question={currentQuestion} 
                                     handleClose={handleCloseEditModal} 
                                     editQuestion={editQuestion}
+                                />
+                            </Modal.Body>
+                        </Modal>
+
+                        {/* Detail Modal */}
+                        <Modal show={showDetailModal} onHide={handleCloseDetailModal} backdrop="static">
+                            <Modal.Header closeButton>
+                                <Modal.Title>Question Details</Modal.Title>
+                            </Modal.Header>
+                            <Modal.Body>
+                                <DetailQn 
+                                    question={currentQuestion} 
+                                    handleClose={handleCloseDetailModal}
                                 />
                             </Modal.Body>
                         </Modal>
