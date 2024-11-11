@@ -30,7 +30,7 @@ const CriteriaDisplay = ({ difficulty, category }) => {
             <Card.Title>Selected Criteria</Card.Title>
             <Card.Text>
                 <span>
-                    Difficulty: <Badge bg={getBadgeVariant(difficulty ? difficulty : "Not Selected")}>
+                    Complexity: <Badge bg={getBadgeVariant(difficulty ? difficulty : "Not Selected")}>
                         {capitalizeFirstLetter(difficulty ? difficulty : "Not Selected")}
                     </Badge>
                     <br />
