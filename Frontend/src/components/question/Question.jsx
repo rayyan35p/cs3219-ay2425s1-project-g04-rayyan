@@ -181,18 +181,19 @@ function Question() {
                     if (valueA === "Hard" || valueB === "Easy") return 1;
                 }
             },
-            ...(isAdmin ? [{
+            {
+                field: "details", 
+                width: 200, 
+                resizable: false,  
+                sortable: false, 
+                cellRenderer: showDetailButtonComponent },
+                ...(isAdmin ? [{
                 field: "action", 
                 width: 200, 
                 resizable: false,  
                 sortable: false, 
                 cellRenderer: editDeleteButtonComponent 
-            }] : [{
-                field: "details", 
-                width: 200, 
-                resizable: false,  
-                sortable: false, 
-                cellRenderer: showDetailButtonComponent }])
+            }] : [])
         ];
     
         return (
