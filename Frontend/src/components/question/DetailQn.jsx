@@ -46,7 +46,14 @@ function DetailQn({ question, handleClose }) {
             <div className="mb-3">
                 <b>Description</b>
                 <div className="mt-1">
-                    <p>{description}</p>
+                    <p>
+                        {description.split('\n').map((line, index) => (
+                            <React.Fragment key={index}>
+                            {line}
+                            <br />
+                            </React.Fragment>
+                        ))}
+                    </p>
                 </div>
             </div>
         </div>

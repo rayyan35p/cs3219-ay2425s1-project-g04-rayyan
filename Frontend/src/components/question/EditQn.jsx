@@ -213,8 +213,13 @@ function EditQn({ question, handleClose, editQuestion }) {
                 </div>
                 <div className="mb-3">
                     <label htmlFor="">Description</label>
-                    <input type="text" placeholder='Return the largest....' className='form-control' 
-                    value={description} onChange={(e) => setDescription(e.target.value)}/>
+                    <textarea
+                        placeholder="Return the largest...."
+                        className="form-control"
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                        style={{ height: '100px', resize: 'none' }} // Set a fixed height; adjust as needed
+                    />
                 </div>
 
                 <button className="btn btn-success">Update</button>

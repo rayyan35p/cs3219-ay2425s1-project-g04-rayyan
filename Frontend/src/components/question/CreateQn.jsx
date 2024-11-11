@@ -221,8 +221,13 @@ function CreateQn({ handleClose, addQuestion }) {
           
           <div className="mb-3">
             <label htmlFor="">Description</label>
-            <input type="text" placeholder='Return the largest....' className='form-control'
-              onChange={(e) => setDescription(e.target.value)} />
+            <textarea
+                placeholder="Return the largest..."
+                className="form-control"
+                style={{ height: '100px', resize: 'none' }} // Fixed height of 100px, remove "resize: none" if you want to allow resizing
+                onChange={(e) => setDescription(e.target.value)}
+                value={description} // Assuming `description` is the state variable holding the value
+            />
           </div>
 
           <button className="btn btn-success">Submit</button>
