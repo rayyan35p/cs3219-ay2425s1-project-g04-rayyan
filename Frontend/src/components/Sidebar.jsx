@@ -31,6 +31,13 @@ function Sidebar() {
 
     const navigate = useNavigate();
 
+// Static array for difficulty options
+const difficultyLevels = [
+    { label: 'Easy', value: 'easy' },
+    { label: 'Medium', value: 'medium' },
+    { label: 'Hard', value: 'hard' },
+  ];
+
     useEffect(() => {
         // Fetch categories from backend
         const fetchCategories = async () => {
@@ -120,11 +127,22 @@ function Sidebar() {
                     </Card.Text>
                 </Card.Body>
             </Card>
-            <div>
+            {/* <div>
                 <Button variant="success" onClick={() => setDifficulty('easy')}>Easy</Button>{' '}
                 <Button variant="warning" onClick={() => setDifficulty('medium')}>Medium</Button>{' '}
                 <Button variant="danger" onClick={() => setDifficulty('hard')}>Hard</Button>{' '}
-            </div>
+            </div> */}
+            <Form.Select
+      aria-label="Select difficulty"
+      onChange={(e) => setDifficulty(e.target.value)}
+    >
+      <option value="">Select difficulty</option>
+      {difficultyLevels.map((level) => (
+        <option key={level.value} value={level.value}>
+          {level.label}
+        </option>
+      ))}
+    </Form.Select>
 
             {/* Category Dropdown */}
             <Form.Select 
