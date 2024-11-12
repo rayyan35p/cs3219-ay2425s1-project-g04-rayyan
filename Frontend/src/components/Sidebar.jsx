@@ -56,6 +56,13 @@ function Sidebar() {
 
         fetchUser();
 
+        // Custom event listener for category updates
+        const handleCategoryChange = () => {
+            fetchCategories();
+        };
+        window.addEventListener("categoryChange", handleCategoryChange);
+
+
         console.log("categories: ", categories)
 
         const websocket = new WebSocket('ws://localhost:8080');
@@ -86,6 +93,7 @@ function Sidebar() {
         
         return () => {
             websocket.close();
+            window.removeEventListener("categoryChange", handleCategoryChange);
         };
     }, []);
 

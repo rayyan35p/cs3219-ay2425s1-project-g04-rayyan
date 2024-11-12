@@ -29,6 +29,7 @@ function Question() {
         .then(result => {
             setQuestions(result.data);
         })
+        
         .catch(err => console.log(err));
     }, []);
 
