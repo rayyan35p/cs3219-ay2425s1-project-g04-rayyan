@@ -200,7 +200,7 @@ function Question() {
         return (
             <div
                 className="container-fluid ag-theme-quartz"
-                style={{ height: 500 }}
+                style={{ height: '80vh' }}
             >
                 <AgGridReact
                     rowData={questions}
