@@ -61,7 +61,10 @@ function EditQn({ question, handleClose, editQuestion }) {
         console.log(`newCategories are ${newCategories}`);
 
         categoryService.createCategories(newCategories)
-            .then(result => console.log(result.data))
+            .then(result => {
+                console.log(result.data)
+                window.dispatchEvent(new Event("categoryChange"));
+            })
             .catch(e => {
                 if (e.response && e.response.status === 400) {
                 setError(e.response.data.error);
@@ -71,7 +74,26 @@ function EditQn({ question, handleClose, editQuestion }) {
 
         questionService.updateQuestion(question._id, updatedQuestion)
             .then(result => {
-                
+                const initialCategories = question.category;
+                const categoriesRemoved = initialCategories.filter(item => !categories.includes(item));
+
+                // check each category to see if it should be deleted
+                categoriesRemoved.forEach(async (category) => {
+                    try {
+                        const remainingQuestions = await questionService.getQuestionsByCategory(category);
+                        
+                        // if no other questions have this category, delete the category
+                        if (remainingQuestions.length === 0) {
+                            await categoryService.deleteCategory(category);
+                            console.log(`Category ${category} deleted.`);
+                            // dispatch the event here
+                            window.dispatchEvent(new Event("categoryChange"));
+                        }
+                    } catch (err) {
+                        console.error(`Error processing category ${category}:`, err);
+                    }
+                });
+
                 editQuestion(question._id, updatedQuestion);
                 console.log('Question edited successfully:', result)
                 handleClose(); 

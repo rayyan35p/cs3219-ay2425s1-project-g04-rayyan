@@ -29,6 +29,7 @@ function Question() {
         .then(result => {
             setQuestions(result.data);
         })
+        
         .catch(err => console.log(err));
     }, []);
 
@@ -199,7 +200,7 @@ function Question() {
         return (
             <div
                 className="container-fluid ag-theme-quartz"
-                style={{ height: 500 }}
+                style={{ height: '80vh' }}
             >
                 <AgGridReact
                     rowData={questions}

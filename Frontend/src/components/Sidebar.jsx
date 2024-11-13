@@ -56,6 +56,13 @@ function Sidebar() {
 
         fetchUser();
 
+        // Custom event listener for category updates
+        const handleCategoryChange = () => {
+            fetchCategories();
+        };
+        window.addEventListener("categoryChange", handleCategoryChange);
+
+
         console.log("categories: ", categories)
 
         const matchingServiceHost = '34.126.114.137' || 'localhost';
@@ -87,6 +94,7 @@ function Sidebar() {
         
         return () => {
             websocket.close();
+            window.removeEventListener("categoryChange", handleCategoryChange);
         };
     }, []);
 
