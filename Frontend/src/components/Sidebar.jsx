@@ -58,7 +58,8 @@ function Sidebar() {
 
         console.log("categories: ", categories)
 
-        const websocket = new WebSocket('ws://localhost:8080');
+        const matchingServiceHost = '34.126.114.137' || 'localhost';
+        const websocket = new WebSocket(`ws://${matchingServiceHost}:8080`);
 
         websocket.onmessage = (event) => {
             const data = JSON.parse(event.data);

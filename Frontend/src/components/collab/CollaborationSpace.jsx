@@ -104,7 +104,8 @@ const CollaborationSpace = () => {
     const initiateWebSocket = (username) => {
         if (websocketRef.current) return; // Prevent duplicate connections
 
-        const websocket = new WebSocket("ws://localhost:3004");
+        const collabServiceHost = '35.186.151.220' || 'localhost';
+        const websocket = new WebSocket(`ws://${collabServiceHost}:3004`);
         websocketRef.current = websocket;
 
         console.log("In initiate websocket, the username is", username);
@@ -160,7 +161,7 @@ const CollaborationSpace = () => {
         setYDoc(doc);
 
         // create websocket provider to synchronize the document
-        const wsProvider = new WebsocketProvider("ws://localhost:1234", roomId, doc);
+        const wsProvider = new WebsocketProvider(`ws://${collabServiceHost}:1234`, roomId, doc);
         setProvider(wsProvider);
 
         // Create a shared type in Yjs for collaborative code editing

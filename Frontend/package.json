@@ -21,8 +21,9 @@
     "yjs": "^13.6.20"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
+    "start": "react-scripts start", 
+    "build": "react-scripts build", 
+    "serve": "serve build", 
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },

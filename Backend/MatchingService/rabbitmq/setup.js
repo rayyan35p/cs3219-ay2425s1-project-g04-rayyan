@@ -8,8 +8,8 @@ const dead_letter_queue_name = "dead_letter_queue";
 const difficulties = ["easy", "medium", "hard", "any"];
 const axios = require('axios');
 // Matching Service code
-const questionServiceHost = process.env.QUESTION_SERVICE_HOST || 'localhost';
-const categoryAPIUrl = `http://${questionServiceHost}:3001/api/categories`;
+// const questionServiceHost = process.env.QUESTION_SERVICE_HOST || 'localhost';
+const categoryAPIUrl = `http://34.120.84.41/api/categories`;
 
 let queueNamesPromise = axios.get(categoryAPIUrl)
     .then(response => {

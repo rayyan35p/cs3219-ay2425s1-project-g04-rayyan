@@ -19,7 +19,7 @@ function setUpYjsSocket() {
     });
 
     server.listen(1234, () => {
-        console.log('Websocket server is listening on ws://localhost:1234')
+        console.log('Websocket server is listening on ws://external-ip:1234')
     })
 }
 

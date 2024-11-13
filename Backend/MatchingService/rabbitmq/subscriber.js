@@ -6,8 +6,8 @@ const { v4: uuidv4 } = require('uuid');
 // matchingService/fetchQuestion.js
 const axios = require('axios');
 // Matching Service code
-const questionServiceHost = process.env.QUESTION_SERVICE_HOST || 'localhost';
-const questionAPIUrl = `http://${questionServiceHost}:3001/api/questions`;
+// const questionServiceHost = process.env.QUESTION_SERVICE_HOST || 'localhost';
+const questionAPIUrl = `http://34.120.84.41/api/questions`;
 
 
 // TODO: Subscribe and acknowledge messages with user info when timeout/user matched

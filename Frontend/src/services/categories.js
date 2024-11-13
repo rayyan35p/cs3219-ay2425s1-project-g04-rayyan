@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const baseCategoryUrl = 'http://localhost:3001/api/categories';
+const baseCategoryUrl = 'http://34.120.84.41/api/categories';
 
 export const getAllCategories = async () => {
     console.log("getAllCategories func called")
