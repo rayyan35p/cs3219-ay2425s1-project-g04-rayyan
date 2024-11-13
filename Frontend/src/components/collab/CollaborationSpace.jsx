@@ -194,7 +194,7 @@ const CollaborationSpace = () => {
             const sessionData = {
                 user: userId,
               matchedUsername: matchedUser, // Assuming user[1] is the matched user
-              questionTitle: 'BFS', // This ID should be available in context or passed down
+              questionTitle: question.title, // This ID should be available in context or passed down
             //   questionTitle: questionTitle, // This ID should be available in context or passed down
             //   startTime: roomCreationTime,
             //   startTime: new Date(),
